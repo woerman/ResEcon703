@@ -1,0 +1,177 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage[backend=biber, 
+authordate, 
+maxcitenames=2, 
+uniquename=false, 
+uniquelist=false, 
+url=false, 
+doi=false, 
+isbn=false]{biblatex-chicago}
+\addbibresource{refs.bib}
+\usepackage{bibentry}
+\setlength{\bibhang}{0pt}
+
+\begin{document}
+
+\title{Topics in Advanced Econometrics (ResEcon 703)}
+\subtitle{Fall 2019 Syllabus\vspace{-2ex}}
+\author{Matt Woerman\\Resource Economics, UMass Amherst}
+%\date{}  % Toggle commenting to test
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Course Info}
+
+\begin{tabular}{ll} 
+	\textbf{When:} & Tuesday \& Thursday, 10:00--11:15 am \\
+	\textbf{Where:} & 105 Flint Laboratory \\
+	\textbf{Website:} & \href{https://github.com/woerman/ResEcon703}{\texttt{github.com/woerman/ResEcon703}} \\
+	\\
+	\textbf{Instructor:} & Matt Woerman \\
+	\textbf{Email:} & \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} \\
+	\textbf{Office:} & 218 Stockbridge Hall \\
+	\textbf{Hours:} & Tuesday, 2:00--3:00 pm
+\end{tabular} 
+
+\section*{Course Description}
+
+This is the final course in the graduate econometrics sequence in the Department of Resource Economics. Following previous courses on probability and statistics and on linear regression, this course will cover the more advanced topics of nonlinear regression and structural estimation. The goal of this course is to provide students with an in-depth understanding of the most common structural estimation methods in modern empirical economics and with the technical ability to apply these methods to their own research. The course will focus on the application of these methods to discrete choice models, which underly many economic decisions studied in applied microeconomics and related fields.
+
+\section*{Prerequisites}
+
+Students should have a strong familiarity with statistics, linear algebra, and the classical linear regression model at the level of ResEcon 702 (the prior course in the econometrics sequence). If you have not taken that course but think your background in these topics is sufficient, please see me and we can discuss whether this course is appropriate for you.
+
+\section*{Readings}
+
+We will use two textbooks for this course:
+\begin{itemize}
+	\item[] \begin{refsection} \nocite{train_discrete_2009} \printbibliography[heading=none] \end{refsection}
+	\item[] \begin{refsection} \nocite{greene_econometric_2018} \printbibliography[heading=none] \end{refsection}
+\end{itemize}
+The \citeauthor{train_discrete_2009} textbook is available online for free at: \href{https://eml.berkeley.edu/books/choice2.html}{\texttt{eml.berkeley.edu/books/choice2.html}}; a paperback version is also available at a reasonable (relative to other textbooks) price. The \citeauthor{greene_econometric_2018} textbook is what you used in ResEcon 702; the Seventh Edition is also acceptable, and I will indicate when readings differ for the two editions. \\
+
+\noindent Additional econometric textbooks can serve as useful references if you want to see alternate presentations of the material covered in this course. Two such textbooks that I recommend are:
+\begin{itemize}
+	\item[] \begin{refsection} \nocite{cameron_microeconometrics:_2005} \printbibliography[heading=none] \end{refsection}
+	\item[] \begin{refsection} \nocite{wooldridge_economteric_2010} \printbibliography[heading=none] \end{refsection}
+\end{itemize}
+The \citeauthor{cameron_microeconometrics:_2005} textbook is more focused on application than many other econometric texts. The \citeauthor{wooldridge_economteric_2010} textbook presents more advanced material, which can be particularly helpful as you apply these econometric methods to your own research. \\
+
+\noindent We will also read papers from the economics literature that show practical applications of the structural estimation methods you will learn in class. A tentative list of these papers is:
+\begin{itemize}
+	\item[] \begin{refsection} \nocite{adamowicz_combining_1994,bayer_migration_2009,berry_automobile_1995,crawford_welfare_2012,fowlie_emissions_2010,gruber_tax_1994,handel_adverse_2013,nevo_practitioners_2000,nevo_taking_2010,reiss_structural_2007,revelt_mixed_1998,rust_optimal_1987,schaefer_dependence_1998,train_demand_1987} \printbibliography[heading=none] \end{refsection}
+\end{itemize}
+
+\section*{Software}
+
+We will use the R statistical programming language in this course. R is a free and powerful software environment for statistical analysis. It can be used for almost all analysis in applied economics and related fields: basic statistics, data cleaning, linear regression, structural estimation, data visualization, etc. I will work through examples in class using R, and I will provide example R code for your own use. You may use another programming language in this course if you would like, but I strongly recommend that you learn and use R. I will provide no support for this course in other programming languages, and I will not provide partial credit on problem sets or exams written in a programming language other than R. \\
+
+\noindent I will give an introduction to R early in this course to ensure all students have a basic understanding of key features of the R language. If you have never used R, this introduction may not be sufficient to implement the methods we will cover in this course. Several free online R resources that you may find useful are:
+\begin{itemize}
+	\item[] \href{https://www.datacamp.com/courses/free-introduction-to-r}{Introduction to R (\texttt{www.datacamp.com/courses/free-introduction-to-r})}
+	\item[] \href{https://r4ds.had.co.nz/}{R for Data Science (\texttt{r4ds.had.co.nz})}
+	\item[] \href{https://adv-r.hadley.nz/}{Advanced R (\texttt{adv-r.hadley.nz})}
+\end{itemize}
+
+\section*{Grades}
+
+I will assign four problem sets during the semester; each problem set is worth 15\% of your final grade. You may work on these problem sets in groups of up to three (and I recommend you do), but each person must submit a unique set of problem set answers. These problems will ask you to apply the estimation methods we learn in class, interpret their results, and draw policy-relevant conclusions, just as you will do in your own research. Some problems will allow you to use ``canned'' estimation routines, but many will require you to write your own estimation code. A tentative schedule of problem sets, including due dates, is shown below. \\
+
+\begin{table}[!ht]
+	\centering
+	\begin{threeparttable}
+		\caption*{\textbf{Tentative problem set schedule}}
+   		\begin{tabular}{@{\extracolsep{0.25cm}} c l l l @{}}
+    		\toprule
+		    \textbf{Problem Set} & \textbf{Date Assigned} & \textbf{Date Due} & \textbf{Material Covered} \\ \toprule
+    		1 & Sept. 10 & Sept. 24 & Random Utility and Logit Models \\
+    		2 & Sept. 24 & Oct. 17 & Logit Estimation \\
+    		3 & Oct. 17 & Oct. 31 & Generalized Extreme Value Model and Estimation \\
+    		4 & Oct. 31 & Nov. 21 & Mixed Logit Model and Estimation \\
+    		\bottomrule
+  		\end{tabular}
+  	\end{threeparttable}
+\end{table}
+
+\noindent I will assign a take-home final exam that is worth 30\%  of your final grade. The final exam is ``single-authored.'' You are not allowed to collaborate with or consult anyone else while completing this exam. I will give more details about the exam as we get closer to the end of the semester. \\
+
+\noindent The remaining 10\% of your final grade is for attendance and participation. Attendance is required for this course; you can miss at most two lectures and still receive full points. You are also required to come to lecture prepared and having completed the required reading before class. I will announce required reading during the preceding class and it will appear on slides that I post. A tentative schedule of leacture topics and assigned reading is shown below. You should also bring your laptop to class, so we can all work through examples together.
+
+\begin{NoHyper}
+\begin{table}[!ht]
+	\centering
+	\begin{threeparttable}
+		\caption*{\textbf{Tentative lecture and reading schedule}}
+   		\begin{tabular}{@{\extracolsep{0.35cm}} c l l l @{}}
+    		\toprule
+		    \textbf{Class} & \textbf{Date} & \textbf{Topics} & \textbf{Readings}\tnote{1} \\ \toprule
+    		1 & Sept. 3 & Introduction & \\
+    		2 & Sept. 5 & R Tutorial & \textcite{reiss_structural_2007}\\
+    		3 & Sept. 10 & Random Utility Model & KT 1-2\\
+    		4 & Sept. 12 & Logit Model & KT 3.1, \textcite{gruber_tax_1994} \\
+    		5 & Sept. 17 & Logit Model & KT 3.2-3.6, \textcite{adamowicz_combining_1994} \\
+    		6 & Sept. 19 & Maximum Likelihood Estimation & WG 7.1-7.2.1, 14.1-14.6 \\
+    		7 & Sept. 24 & Numerical Optimization & KT 8 \\
+    		8 & Sept. 26 & Logit Estimation & KT 3.7-3.8, \textcite{bayer_migration_2009} \\
+    		9 & Oct. 1 & Nonlinear Least Squares & WG 7.2.2-7.2.8 (7.2.2-7.2.6 in 7th Ed.) \\
+    		10 & Oct. 3 & Nonlinear Least Squares & \textcite{schaefer_dependence_1998} \\
+    		11 & Oct. 8 & Generalized Method of Moments & WG 13.1-13.5 \\
+    		12 & Oct. 10 & Generalized Method of Moments & \textcite{crawford_welfare_2012} \\
+    		& Oct. 15 & \emph{No class. Monday schedule.} & \\
+    		13 & Oct. 17 & Generalized Extreme Value Models & KT 4 \\
+    		14 & Oct. 22 & Generalized Extreme Value Models & \textcite{train_demand_1987} \\
+    		15 & Oct. 24 & Mixed Logit Model & KT 6.1-6.5 \\
+    		16 & Oct. 29 & Mixed Logit Model & \textcite{revelt_mixed_1998} \\
+    		17 & Oct. 31 & Mixed Logit Estimation & KT 9.1-9.2, 6.6-6.8 \\
+    		18 & Nov. 5 & Mixed Logit Estimation & \textcite{handel_adverse_2013} \\
+    		19 & Nov. 7 & Individual-Specific Parameters & KT 11 \\
+    		20 & Nov. 12 & Individual-Specific Parameters & \textcite{fowlie_emissions_2010} \\
+    		21 & Nov. 14 & Dynamic Discrete Choice & KT 7.7 \\
+    		22 & Nov. 19 & Dynamic Discrete Choice & \textcite{rust_optimal_1987} \\
+    		23 & Nov. 21 & Endogeneity & KT 13, \textcite{nevo_taking_2010} \\
+    		24 & Dec. 3 & Endogeneity & \textcite{nevo_practitioners_2000,berry_automobile_1995} \\
+    		25 & Dec. 5 & Endogeneity & \textcite{nevo_practitioners_2000,berry_automobile_1995} \\
+		    26 & Dec. 10 & Endogeneity & \textcite{nevo_practitioners_2000,berry_automobile_1995} \\
+    		\bottomrule
+  		\end{tabular}
+  		\begin{tablenotes}
+  			\item[1] KT refers to chapters in the \textcite{train_discrete_2009} textbook; WG refers to chapters in the \textcite{greene_econometric_2018} textbook. Full citations to textbooks and papers are given above.
+  		\end{tablenotes}
+  	\end{threeparttable}
+\end{table}
+\end{NoHyper}
+
+\section*{Academic Honesty Policy Statement}
+
+Since the integrity of the academic enterprise of any institution of higher education requires honesty in scholarship and research, academic honesty is required of all students at the University of Massachusetts Amherst. Academic dishonesty is prohibited in all programs of the University. Academic dishonesty includes but is not limited to: cheating, fabrication, plagiarism, and facilitating dishonesty. Appropriate sanctions may be imposed on any student who has committed an act of academic dishonesty. Instructors should take reasonable steps to address academic misconduct. Any person who has reason to believe that a student has committed academic dishonesty should bring such information to the attention of the appropriate course instructor as soon as possible. Instances of academic dishonesty not related to a specific course should be brought to the attention of the appropriate department Head or Chair. The procedures outlined below are intended to provide an efficient and orderly process by which action may be taken if it appears that academic dishonesty has occurred and by which students may appeal such actions. Since students are expected to be familiar with this policy and the commonly accepted standards of academic integrity, ignorance of such standards is not normally sufficient evidence of lack of intent. For more information about what constitutes academic dishonesty, please see the Dean of Students website: \href{http://www.umass.edu/dean_students/campus-policies}{\texttt{www.umass.edu/dean\_students/campus-policies}}.
+
+\section*{Disability Statement}
+
+The University of Massachusetts Amherst is committed to making reasonable, effective and appropriate accommodations to meet the needs of students with disabilities and help create a barrier-free campus. If you are in need of accommodation for a documented disability, register with Disability Services to have an accommodation letter sent to your faculty. It is your responsibility to initiate these services and to communicate with faculty ahead of time to manage accommodations in a timely manner. For more information, consult the Disability Services website: \href{http://www.umass.edu/disability/}{\texttt{www.umass.edu/disability}}.
+
+\end{document}
