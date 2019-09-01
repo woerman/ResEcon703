@@ -1,4 +1,4 @@
-# ResEcon703: Topics in Advanced Econometrics
+# Topics in Advanced Econometrics (ResEcon 703)
 
 Welcome to **Topics in Advanced Econometrics** (ResEcon 703) at the University of Massachusetts Amherst, taught by [Matt Woerman](https://sites.google.com/site/mattwoerman/).
 
