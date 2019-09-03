@@ -64,7 +64,7 @@ opts_chunk$set(size = 'footnotesize')
     \begin{itemize}
         \item For next time
         \begin{itemize}
-            \item Reiss and Wolack (2007), Sections 1--4
+            \item Reiss and Wolak (2007), Sections 1--4
             \item Install R software
         \end{itemize}
     \end{itemize}
@@ -344,7 +344,7 @@ opts_chunk$set(size = 'footnotesize')
 \end{frame}
 
 \begin{frame}\frametitle{Structural Econometric Model}
-    Definition according to Reiss and Wolack (2007)
+    Definition according to Reiss and Wolak (2007)
     \begin{itemize}
         \item Framework that ``combines explicit economic theories with statistical models''
     \end{itemize}
@@ -661,7 +661,7 @@ opts_chunk$set(size = 'footnotesize')
 \begin{frame}\frametitle{Announcements}
     For next time
     \begin{itemize}
-        \item Reiss and Wolack (2007), Sections 1--4
+        \item Reiss and Wolak (2007), Sections 1--4
         \item Install R software
     \end{itemize}
 \end{frame}
