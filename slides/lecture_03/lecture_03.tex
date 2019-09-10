@@ -373,7 +373,7 @@
 \begin{frame}\frametitle{Pros and Cons of the Linear Probability Model}
     Pros
     \begin{itemize}
-    	\item You can estimate the LMP using OLS
+    	\item You can estimate the LPM using OLS
     	\begin{itemize}
     		\item Regression is fast and easy to run
     		\item Assumptions are transparent and well-known
@@ -467,7 +467,7 @@
 \begin{alltt}
 \hlcom{### Model air conditioning as a linear probability model}
 \hlcom{## Regress air conditioning on cost variables}
-\hlstd{reg_lmp} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+\hlstd{reg_lpm} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
   \hlkwd{lm}\hlstd{(}\hlkwc{formula} \hlstd{= air_conditioning} \hlopt{~} \hlstd{cost_system} \hlopt{+} \hlstd{cost_operating)}
 \end{alltt}
 \end{kframe}
@@ -479,7 +479,7 @@
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{## Summarize regression results}
-\hlstd{reg_lmp} \hlopt{%>%}
+\hlstd{reg_lpm} \hlopt{%>%}
   \hlkwd{summary}\hlstd{()}
 \end{alltt}
 \begin{verbatim}
@@ -515,10 +515,10 @@
 \hlcom{### Visualize probability of air conditioning adoption}
 \hlcom{## Calculate probability of air conditioining}
 \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
-  \hlkwd{mutate}\hlstd{(}\hlkwc{probability_ac_lmp} \hlstd{=} \hlkwd{predict}\hlstd{(reg_lmp))}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{probability_ac_lpm} \hlstd{=} \hlkwd{predict}\hlstd{(reg_lpm))}
 \hlcom{## Plot air conditioning vs. probability of air conditioning}
 \hlstd{data} \hlopt{%>%}
-  \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= probability_ac_lmp,} \hlkwc{y} \hlstd{= air_conditioning))} \hlopt{+}
+  \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= probability_ac_lpm,} \hlkwc{y} \hlstd{= air_conditioning))} \hlopt{+}
   \hlkwd{geom_point}\hlstd{()} \hlopt{+}
   \hlkwd{xlab}\hlstd{(}\hlstr{'Probability of air conditioning'}\hlstd{)} \hlopt{+}
   \hlkwd{ylab}\hlstd{(}\hlstr{'Air conditioining'}\hlstd{)}
@@ -542,7 +542,7 @@
 \hlcom{### Visualize probability of air conditioning using bins}
 \hlcom{## Plot fraction vs. probability of air conditioning using bins}
 \hlstd{data} \hlopt{%>%}
-  \hlkwd{mutate}\hlstd{(}\hlkwc{bin} \hlstd{=} \hlkwd{cut}\hlstd{(probability_ac_lmp,}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{bin} \hlstd{=} \hlkwd{cut}\hlstd{(probability_ac_lpm,}
                    \hlkwc{breaks} \hlstd{=} \hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0.05}\hlstd{),}
                    \hlkwc{labels} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{20}\hlstd{))} \hlopt{%>%}
   \hlkwd{group_by}\hlstd{(bin)} \hlopt{%>%}
@@ -573,10 +573,10 @@
 \hlcom{### Visualize heteroskedastic residuals}
 \hlcom{## Calculate squared residuals}
 \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
-  \hlkwd{mutate}\hlstd{(}\hlkwc{sq_residual_lmp} \hlstd{= (air_conditioning} \hlopt{-} \hlstd{probability_ac_lmp)}\hlopt{^}\hlnum{2}\hlstd{)}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{sq_residual_lpm} \hlstd{= (air_conditioning} \hlopt{-} \hlstd{probability_ac_lpm)}\hlopt{^}\hlnum{2}\hlstd{)}
 \hlcom{## Plot squared residual vs. probability of air conditioning}
 \hlstd{data} \hlopt{%>%}
-  \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= probability_ac_lmp,} \hlkwc{y} \hlstd{= sq_residual_lmp))} \hlopt{+}
+  \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= probability_ac_lpm,} \hlkwc{y} \hlstd{= sq_residual_lpm))} \hlopt{+}
   \hlkwd{geom_point}\hlstd{()} \hlopt{+}
   \hlkwd{xlab}\hlstd{(}\hlstr{'Probability of air conditioning'}\hlstd{)} \hlopt{+}
   \hlkwd{ylab}\hlstd{(}\hlstr{'Squared residual'}\hlstd{)}
@@ -602,8 +602,8 @@
 \hlkwd{library}\hlstd{(lmtest)}
 \hlkwd{library}\hlstd{(sandwich)}
 \hlcom{## Summarize regression results with robust standard errors}
-\hlstd{reg_lmp} \hlopt{%>%}
-  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lmp))}
+\hlstd{reg_lpm} \hlopt{%>%}
+  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lpm))}
 \end{alltt}
 \begin{verbatim}
 ## 
@@ -620,18 +620,18 @@
 \end{knitrout}
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{LMP with Heterogeneous Coefficients}
+\begin{frame}[fragile]\frametitle{LPM with Heterogeneous Coefficients}
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{### Model air conditioning with heterogeneous cost coefficients}
 \hlcom{## Regress air conditioning on costs divided by income}
-\hlstd{reg_lmp_income} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+\hlstd{reg_lpm_income} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
   \hlkwd{lm}\hlstd{(}\hlkwc{formula} \hlstd{= air_conditioning} \hlopt{~} \hlkwd{I}\hlstd{(cost_system} \hlopt{/} \hlstd{income)} \hlopt{+}
        \hlkwd{I}\hlstd{(cost_operating} \hlopt{/} \hlstd{income))}
 \hlcom{## Summarize regression results with robust standard errors}
-\hlstd{reg_lmp_income} \hlopt{%>%}
-  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lmp_income))}
+\hlstd{reg_lpm_income} \hlopt{%>%}
+  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lpm_income))}
 \end{alltt}
 \begin{verbatim}
 ## 
@@ -672,7 +672,7 @@
 \begin{alltt}
 \hlcom{### Calculate marginal effects of cost variables}
 \hlcom{## Calculate marginal effects of costs when income == 60}
-\hlkwd{coef}\hlstd{(reg_lmp_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{60}
+\hlkwd{coef}\hlstd{(reg_lpm_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{60}
 \end{alltt}
 \begin{verbatim}
 ##    I(cost_system/income) I(cost_operating/income) 
@@ -680,7 +680,7 @@
 \end{verbatim}
 \begin{alltt}
 \hlcom{## Calculate marginal effects of costs when income == 30}
-\hlkwd{coef}\hlstd{(reg_lmp_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{30}
+\hlkwd{coef}\hlstd{(reg_lpm_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{30}
 \end{alltt}
 \begin{verbatim}
 ##    I(cost_system/income) I(cost_operating/income) 
@@ -688,7 +688,7 @@
 \end{verbatim}
 \begin{alltt}
 \hlcom{## Calculate marginal effects of costs when income == 90}
-\hlkwd{coef}\hlstd{(reg_lmp_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{90}
+\hlkwd{coef}\hlstd{(reg_lpm_income)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlnum{90}
 \end{alltt}
 \begin{verbatim}
 ##    I(cost_system/income) I(cost_operating/income) 
@@ -698,18 +698,18 @@
 \end{knitrout}
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{LMP with Age as an Explanatory Variable}
+\begin{frame}[fragile]\frametitle{LPM with Age as an Explanatory Variable}
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{### Model air conditioning with residents as an explanatory variable}
 \hlcom{## Regress air conditoning on scaled costs and number of residents}
-\hlstd{reg_lmp_residents} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+\hlstd{reg_lpm_residents} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
   \hlkwd{lm}\hlstd{(}\hlkwc{formula} \hlstd{= air_conditioning} \hlopt{~} \hlkwd{I}\hlstd{(cost_system} \hlopt{/} \hlstd{income)} \hlopt{+}
        \hlkwd{I}\hlstd{(cost_operating} \hlopt{/} \hlstd{income)} \hlopt{+} \hlstd{residents)}
 \hlcom{## Summarize regression results with robust standard errors}
-\hlstd{reg_lmp_residents} \hlopt{%>%}
-  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lmp_residents))}
+\hlstd{reg_lpm_residents} \hlopt{%>%}
+  \hlkwd{coeftest}\hlstd{(}\hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_lpm_residents))}
 \end{alltt}
 \begin{verbatim}
 ## 
@@ -725,6 +725,24 @@
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapters 3.1--3.6
+        \item Gruber and Proterba (1994)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+        \item Reminder: Tuesdays at 2:00--3:00 in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 1 is posted, due September 24
+    \end{itemize}
 \end{frame}
 
 \end{document}
