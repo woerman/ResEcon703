@@ -639,6 +639,68 @@
 \end{knitrout}
 \end{frame}
 
+\begin{frame}[fragile]\frametitle{Cost Tradeoffs}
+    How do consumers trade off the purchase price and the annual operating cost?
+    \begin{itemize}
+        \item What reduction in purchase price offsets a \$1 increase in the annual operating cost?
+    \end{itemize}
+    \begin{align*}
+        U &= \beta_0 + \beta_1 P + \beta_2 C + \varepsilon \\
+        dU &= \beta_1 dP + \beta_2 dC \\
+        dU = 0 \Rightarrow \frac{dP}{dC} &= -\frac{\beta_2}{\beta_1}
+    \end{align*}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate the tradeoff between system cost and operating cost}
+\hlcom{## Calculate system cost equivalence of an increse in operating cost}
+\hlopt{-}\hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{3}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{2}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## cost_operating 
+##      -1.831429
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Implied Discount Factor}
+    What is the implied discount factor of consumers for a two-year time horizon? A three-year time horizon?
+    \begin{align*}
+        U &= \beta_0 + \beta_1 P + \beta_2 C + \varepsilon \\
+        \intertext{Divide by $\beta_1$ to express in terms of present day dollars}
+        \frac{U}{\beta_1} &= \frac{\beta_0}{\beta_1} + P + \frac{\beta_2}{\beta_1} C + \frac{\varepsilon}{\beta_1} \\
+        \intertext{Re-express using a sum of discounted operating costs}
+        \frac{U}{\beta_1} &= \frac{\beta_0}{\beta_1} + P + \sum_{t = 1}^T \gamma^{t - 1} C + \frac{\varepsilon}{\beta_1} \\
+        \intertext{The last two equations give that}
+        \frac{\beta_2}{\beta_1} &= \sum_{t = 1}^T \gamma^{t - 1}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Implied Discount Factor Calculation}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculte the implied discount factor of consumers}
+\hlcom{## Calculate the implied discount factor for two-year horizon}
+\hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{3}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{2}\hlstd{]} \hlopt{-} \hlnum{1}
+\end{alltt}
+\begin{verbatim}
+## cost_operating 
+##      0.8314289
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate the implied discount factor for three-year horizon}
+\hlstd{(}\hlopt{-}\hlnum{1} \hlopt{+} \hlkwd{sqrt}\hlstd{(}\hlnum{1} \hlopt{-} \hlnum{4} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{3}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(reg_logit)[}\hlnum{2}\hlstd{])))} \hlopt{/} \hlnum{2}
+\end{alltt}
+\begin{verbatim}
+## cost_operating 
+##      0.5399177
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
 \begin{frame}[fragile]\frametitle{Visualize Income Data}
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -652,7 +714,7 @@
   \hlkwd{ylab}\hlstd{(}\hlstr{'Kernel density'}\hlstd{)}
 \end{alltt}
 \end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-14-1} 
 
 \end{knitrout}
 \end{frame}

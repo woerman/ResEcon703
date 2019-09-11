@@ -109,6 +109,16 @@ coef(reg_logit)[2:3] *
   c(mean(data$cost_system * (1 - data$prob_ac_logit)),
     mean(data$cost_operating * (1 - data$prob_ac_logit)))
 
+### Calculate the tradeoff between system cost and operating cost
+## Calculate system cost equivalence of an increse in operating cost
+-coef(reg_logit)[3] / coef(reg_logit)[2]
+
+### Calculte the implied discount factor of consumers
+## Calculate the implied discount factor for two-year horizon
+coef(reg_logit)[3] / coef(reg_logit)[2] - 1
+## Calculate the implied discount factor for three-year horizon
+(-1 + sqrt(1 - 4 * (1 - coef(reg_logit)[3] / coef(reg_logit)[2]))) / 2
+
 ### Visualize income variable
 ## Plot kernel density of income
 data %>% 

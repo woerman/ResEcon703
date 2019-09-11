@@ -427,6 +427,36 @@
     <<R CODE HERE>>
 \end{frame}
 
+\begin{frame}[fragile]\frametitle{Cost Tradeoffs}
+    How do consumers trade off the purchase price and the annual operating cost?
+    \begin{itemize}
+        \item What reduction in purchase price offsets a \$1 increase in the annual operating cost?
+    \end{itemize}
+    \begin{align*}
+        U &= \beta_0 + \beta_1 P + \beta_2 C + \varepsilon \\
+        dU &= \beta_1 dP + \beta_2 dC \\
+        dU = 0 \Rightarrow \frac{dP}{dC} &= -\frac{\beta_2}{\beta_1}
+    \end{align*}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Implied Discount Factor}
+    What is the implied discount factor of consumers for a two-year time horizon? A three-year time horizon?
+    \begin{align*}
+        U &= \beta_0 + \beta_1 P + \beta_2 C + \varepsilon \\
+        \intertext{Divide by $\beta_1$ to express in terms of present day dollars}
+        \frac{U}{\beta_1} &= \frac{\beta_0}{\beta_1} + P + \frac{\beta_2}{\beta_1} C + \frac{\varepsilon}{\beta_1} \\
+        \intertext{Re-express using a sum of discounted operating costs}
+        \frac{U}{\beta_1} &= \frac{\beta_0}{\beta_1} + P + \sum_{t = 1}^T \gamma^{t - 1} C + \frac{\varepsilon}{\beta_1} \\
+        \intertext{The last two equations give that}
+        \frac{\beta_2}{\beta_1} &= \sum_{t = 1}^T \gamma^{t - 1}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Implied Discount Factor Calculation}
+    <<R CODE HERE>>
+\end{frame}
+
 \begin{frame}[fragile]\frametitle{Visualize Income Data}
     <<R CODE HERE>>
 \end{frame}
