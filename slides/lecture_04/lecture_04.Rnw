@@ -394,14 +394,6 @@ options(width = 70)
     			0 & \text{ otherwise}
     		\end{cases}
     \end{align*}
-    \begin{align*}
-    	U_n &= \beta_0 + \beta_1 P_n + \beta_2 C_n + \varepsilon_n \\
-    	Y_n &= 
-    		\begin{cases}
-    			1 & \text{ if } U_n > 0 \\
-    			0 & \text{ otherwise}
-    		\end{cases}
-    \end{align*}
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Load Dataset}
