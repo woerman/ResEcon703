@@ -251,7 +251,7 @@ options(width = 70)
     Using the logit model, the probability of driving is
     $$P_c = \frac{e^{\alpha T_c + \beta M_c}}{e^{\alpha T_c + \beta M_c} + e^{\alpha T_b + \beta M_b}}$$
     and the log odds ratio of driving is
-    $$\ln \left( \frac{P_c}{1 - P_c} \right) = (\alpha T_b + \beta M_b) - (\alpha T_c + \beta M_c)$$
+    $$\ln \left( \frac{P_c}{1 - P_c} \right) = (\alpha T_c + \beta M_c) - (\alpha T_b + \beta M_b)$$
 \end{frame}
 
 \begin{frame}\frametitle{}
