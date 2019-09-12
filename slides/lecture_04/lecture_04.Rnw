@@ -385,7 +385,7 @@ options(width = 70)
 \end{frame}
 
 \begin{frame}\frametitle{Binary Logit Model Example}
-    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes. We have data on  or not they choose to purchase a window air conditioning unit. For each household, we observe the purchase price of the air conditioner and its annual operating cost. (To simplify things, we assume there is only one ``representative'' air conditioner for each household and how much the household operates the air conditioner is fixed.) We can use a binary logit model to see how the purchase price and the operating cost affect the decision to purchase.
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes. We have data on whether they choose to purchase a window air conditioning unit. For each household, we observe the purchase price of the air conditioner and its annual operating cost. (To simplify things, we assume there is only one ``representative'' air conditioner for each household and how much the household operates the air conditioner is fixed.) We can use a binary logit model to see how the purchase price and the operating cost affect the decision to purchase.
     \begin{align*}
     	U_n &= \beta_0 + \beta_1 P_n + \beta_2 C_n + \varepsilon_n \\
     	Y_n &= 
