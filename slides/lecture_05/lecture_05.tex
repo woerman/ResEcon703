@@ -1,0 +1,906 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 5:\ Logit Model II]{Lecture 5:\ Logit Model II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Logit Model
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item More Logit Properties
+    	\item Multinomial Logit Model Example in R
+    	\item Adamowicz et al. (1994)
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Greene textbook, Chapters 7.1-7.2.1 and 14.1-14.6
+        \end{itemize}
+        \item Problem set
+        \begin{itemize}
+            \item Problem Set 1 is posted, due September 24
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model Recap}
+	Simple assumption about the joint distribution of unobserved utility
+	$$\varepsilon_{nj} \sim \text{i.i.d.\ type I extreme value (Gumbel) with } Var(\varepsilon_{nj}) = \frac{\pi^2}{6}$$ \\
+	\vspace{2ex}
+	Choice probabilities have a closed-form expression
+	$$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$ \\
+	\vspace{2ex}
+	Some properties
+	\begin{itemize}
+		\item Coefficients are marginal utilities, not marginal effects
+		\item Taste variation is limited to observed characteristics
+		\item Coefficients are estimated relative to the scale parameter
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large More Logit Properties
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Independence of Irrelevant Alternatives}
+    The ratio of any two choice probabilities is
+    $$\frac{P_{ni}}{P_{nk}} = \frac{e^{V_{ni}}}{e^{V_{nk}}}$$
+    This ratio only depends on characteristics of alternatives $i$ and $k$, so it is considered to be independent of irrelevant alternatives (IIA) \\
+    \vspace{3ex}
+    When IIA holds, you can estimate consistent parameters using only a subset of alternatives for each decision maker
+    \begin{itemize}
+    	\item When the choice set is too large to be computationally feasible, you only have to consider a subset of alternatives
+    	\item When you only care about a subset of the choice set, you can ignore decision makers who choose the other alternatives
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Red-Bus/Blue-Bus Problem}
+    Two travel modes to commute to work: car and blue bus
+    \begin{itemize}
+    	\item For simplicity, assume choice probabilities are equal
+    \end{itemize}
+    $$P_c = P_{bb} = \frac{1}{2} \quad \Rightarrow \quad \frac{P_c}{P_{bb}} = 1$$ \\
+    Now suppose a red bus is introduced with all characteristics identical to the blue bus except the color
+    \begin{itemize}
+    	\item Assuming the commuter does not care about the color of the bus
+    \end{itemize}
+    $$P_{rb} = P_{bb} \quad \Rightarrow \quad \frac{P_{rb}}{P_{bb}} = 1$$ \\
+    But from IIA, the ratio of car and blue bus is not changed by the introduction of the red bus
+    \begin{itemize}
+    	\item The choice probability for all three modes must be equal
+    \end{itemize}
+    $$P_c = P_{bb} = P_{rb} = \frac{1}{3}$$
+    Should the introduction of a red bus change the probability of driving?
+\end{frame}
+
+\begin{frame}\frametitle{Proportional Substitution}
+    From last time: The cross-elasticity of $P_{ni}$, the choice probability of alternative $i$, with respect to $z_{nj}$, an observed factor of alternative $j$, is given by (assuming linearity of representative utility)
+    $$E_{iz_{nj}} = -\beta_z z_{nj} P_{nj}$$
+    This cross-elasticity depends only on features of alternative $j$ and not on features of alternative $i$
+    \begin{itemize}
+    	\item This cross-elasticity is the same for every alternative other than $j$!
+    \end{itemize}
+    \vspace{2ex}
+    When an attribute of one alternative changes, all other choice probabilities are changed by the same percentage (not percentage points)
+    \begin{itemize}
+    	\item That is, substitution to other alternatives is proportional to their original choice probabilities
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Proportional Substitution Example}
+    \begin{columns}
+    	\begin{column}{0.333\textwidth}
+    		\includegraphics[width=\textwidth]{hummer.jpg}
+    	\end{column}
+    	\begin{column}{0.333\textwidth}
+    		\includegraphics[width=\textwidth]{escalade.jpg}
+    	\end{column}
+    	\begin{column}{0.333\textwidth}
+    		\includegraphics[width=\textwidth]{smart.png}
+    	\end{column}
+    \end{columns}
+    \begin{columns}
+    	\begin{column}{0.333\textwidth}
+    		\centering Hummer H2
+    	\end{column}
+    	\begin{column}{0.333\textwidth}
+    		\centering Cadillac Escalade
+    	\end{column}
+    	\begin{column}{0.333\textwidth}
+    		\centering Smart Pure EV
+    	\end{column}
+    \end{columns}
+    \vspace{3ex}
+    Suppose Hummer lowers the price of the H2 to gain more market share
+    \begin{itemize}
+    	\item Will that attract a greater proportion of Excalade drivers of Pure EV drivers?
+    	\item The logit model says that substitution to the H2 will be proportionally equal for these very different vehicles!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Panel Data}
+    If we observe panel data for a discrete choice problem, we can add a time index to our random utility model and logit choice probabilities
+    $$U_{njt} = V_{njt} + \varepsilon_{njt} \quad \Rightarrow \quad P_{nit} = \frac{e^{V_{nit}}}{\sum_j e^{V_{njt}}}$$ \\
+    \vspace{2ex}
+    We can estimate this model just as in the cross-section
+    \begin{itemize}
+    	\item We can also include lagged or future variables to capture ``dynamics''
+    	\item We can even include previous choices as explanatory variables to represent behavioral factors like habit formation
+    \end{itemize}
+    \vspace{2ex}
+    The logit assumption still has to hold
+    $$\varepsilon_{njt} \sim \text{i.i.d.\ type I extreme value (Gumbel) with } Var(\varepsilon_{njt}) = \frac{\pi^2}{6}$$ \\
+    \begin{itemize}
+    	\item But the unobserved characteristics of a decision maker that affect choice are unlikely to be independent over time
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Consumer Surplus}
+    The logit model gives a closed-form expression for consumer surplus that depends on $\alpha_n$, the marginal utility of income for individual $n$
+    \begin{align*}
+    	CS_n &= \frac{1}{\alpha_n} \max_j (U_{nj}) \\
+    	\intertext{We do not observe $U_{nj}$, but we know it in expectation}
+    	E(CS_n) &= \frac{1}{\alpha_n} E\left[ \max_j (V_{nj} + \varepsilon_{nj}) \right] \\
+    	\intertext{If we further assume utility is linear in income, we get}
+    	E(CS_n) &= \frac{1}{\alpha_n} \ln \left( \sum_{j = 1}^J e^{V_{nj}} \right) + C
+    	\intertext{So the change in consumer surplus due to changes in alternatives is}
+    	\Delta E(CS_n) &= \frac{1}{\alpha_n} \left[ \ln \left( \sum_{j = 1}^{J^1} e^{V_{nj}^1} \right) - \ln \left( \sum_{j = 1}^{J^0} e^{V_{nj}^0} \right) \right]
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Market-Level Data}
+    The logit model can also be estimated from market-level data
+    \begin{itemize}
+    	\item You observe the price, market share, and characteristics of every cereal brand at the grocery store, and you want to estimate the structural parameters of consumer decision making that explain those purchases
+    \end{itemize}
+    \vspace{1ex}
+    When aggregated over many consumers, choice probabilities become market shares
+    $$S_i = \frac{e^{V_{i}}}{\sum_j e^{V_j}}$$
+    If we assume representative utility is liner, $V_j = \beta' x_j$
+    $$\ln(S_i) - \ln(S_j) = \beta' (x_i - x_j)$$
+    Set one alternative to be your reference (usually the outside option) and estimate the linear regression for the other $J - 1$ alternatives
+    $$\ln(S_i) - \ln(S_0) = \beta' (x_i - x_0) + \omega_i$$
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Multinomial Logit Model Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Logit Model Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 900 households in California and the type of heating system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GC: gas central
+		    	\item GR: gas room
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    	\item HP: heat pump
+		    \end{itemize}
+		    \vspace{8ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item IC: installation cost
+		    	\item OC: annual operating cost
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    	\item agehed: age of household head
+		    	\item rooms: number of rooms
+		    	\item region: home location
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load tidyverse and mlogit}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\hlcom{## Load dataset from mlogit package}
+\hlkwd{data}\hlstd{(}\hlstr{'Heating'}\hlstd{,} \hlkwc{package} \hlstd{=} \hlstr{'mlogit'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlkwd{as_tibble}\hlstd{(Heating)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 900 x 16
+##    idcase depvar ic.gc ic.gr ic.ec ic.er ic.hp oc.gc oc.gr oc.ec oc.er
+##     <dbl> <fct>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+##  1      1 gc      866   963.  860.  996. 1136.  200.  152.  553.  506.
+##  2      2 gc      728.  759.  797.  895.  969.  169.  169.  520.  486.
+##  3      3 gc      599.  783.  720.  900. 1048.  166.  138.  439.  405.
+##  4      4 er      835.  793.  761.  831. 1049.  181.  147.  483   425.
+##  5      5 er      756.  846.  859.  986.  883.  175.  139.  404.  390.
+##  6      6 gc      666.  842.  694.  863.  859.  136.  141.  398.  371.
+##  7      7 gc      670.  941.  634.  952. 1087.  192.  148.  478.  446.
+##  8      8 gc      778. 1022.  813. 1012.  990.  188.  159.  502.  465.
+##  9      9 gc      928. 1212.  876. 1025. 1232.  169.  190.  553.  452.
+## 10     10 gc      683. 1045.  776.  874.  878.  176.  136.  532.  472.
+## # ... with 890 more rows, and 5 more variables: oc.hp <dbl>,
+## #   income <dbl>, agehed <dbl>, rooms <dbl>, region <fct>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert to a Long Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Gather into a long dataset}
+\hlstd{heating_long} \hlkwb{<-} \hlstd{Heating} \hlopt{%>%}
+  \hlkwd{gather}\hlstd{(key, value,} \hlkwd{starts_with}\hlstd{(}\hlstr{'ic.'}\hlstd{),} \hlkwd{starts_with}\hlstd{(}\hlstr{'oc.'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(key,} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(cost, value)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{= (depvar} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{depvar)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Long Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at long dataset}
+\hlkwd{as_tibble}\hlstd{(heating_long)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 4,500 x 9
+##    idcase income agehed rooms region alt      ic    oc choice
+##     <dbl>  <dbl>  <dbl> <dbl> <fct>  <chr> <dbl> <dbl> <lgl> 
+##  1      1      7     25     6 ncostl ec     860.  553. FALSE 
+##  2      1      7     25     6 ncostl er     996.  506. FALSE 
+##  3      1      7     25     6 ncostl gc     866   200. TRUE  
+##  4      1      7     25     6 ncostl gr     963.  152. FALSE 
+##  5      1      7     25     6 ncostl hp    1136.  238. FALSE 
+##  6      2      5     60     5 scostl ec     797.  520. FALSE 
+##  7      2      5     60     5 scostl er     895.  486. FALSE 
+##  8      2      5     60     5 scostl gc     728.  169. TRUE  
+##  9      2      5     60     5 scostl gr     759.  169. FALSE 
+## 10      2      5     60     5 scostl hp     969.  199. FALSE 
+## # ... with 4,490 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Datasets to \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Convert data to mlogit format}
+\hlcom{## Convert wide data to mlogit format}
+\hlstd{heating_mlogit} \hlkwb{<-} \hlkwd{mlogit.data}\hlstd{(Heating,} \hlkwc{shape} \hlstd{=} \hlstr{'wide'}\hlstd{,}
+                              \hlkwc{choice} \hlstd{=} \hlstr{'depvar'}\hlstd{,} \hlkwc{varying} \hlstd{=} \hlnum{3}\hlopt{:}\hlnum{12}\hlstd{)}
+\hlcom{## Convert long data to mlogit format}
+\hlstd{heating_long_mlogit} \hlkwb{<-} \hlkwd{mlogit.data}\hlstd{(heating_long,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                                   \hlkwc{choice} \hlstd{=} \hlstr{'choice'}\hlstd{,} \hlkwc{alt.var} \hlstd{=} \hlstr{'alt'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Wide Dataset in \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at wide data in mlogit format}
+\hlkwd{as_tibble}\hlstd{(heating_mlogit)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 4,500 x 10
+##    idcase depvar income agehed rooms region alt      ic    oc  chid
+##     <dbl> <lgl>   <dbl>  <dbl> <dbl> <fct>  <chr> <dbl> <dbl> <int>
+##  1      1 FALSE       7     25     6 ncostl ec     860.  553.     1
+##  2      1 FALSE       7     25     6 ncostl er     996.  506.     1
+##  3      1 TRUE        7     25     6 ncostl gc     866   200.     1
+##  4      1 FALSE       7     25     6 ncostl gr     963.  152.     1
+##  5      1 FALSE       7     25     6 ncostl hp    1136.  238.     1
+##  6      2 FALSE       5     60     5 scostl ec     797.  520.     2
+##  7      2 FALSE       5     60     5 scostl er     895.  486.     2
+##  8      2 TRUE        5     60     5 scostl gc     728.  169.     2
+##  9      2 FALSE       5     60     5 scostl gr     759.  169.     2
+## 10      2 FALSE       5     60     5 scostl hp     969.  199.     2
+## # ... with 4,490 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Long Dataset in \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at long data in mlogit format}
+\hlkwd{as_tibble}\hlstd{(heating_long_mlogit)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 4,500 x 9
+##    idcase income agehed rooms region alt      ic    oc choice
+##     <dbl>  <dbl>  <dbl> <dbl> <fct>  <fct> <dbl> <dbl> <lgl> 
+##  1      1      7     25     6 ncostl ec     860.  553. FALSE 
+##  2      1      7     25     6 ncostl er     996.  506. FALSE 
+##  3      1      7     25     6 ncostl gc     866   200. TRUE  
+##  4      1      7     25     6 ncostl gr     963.  152. FALSE 
+##  5      1      7     25     6 ncostl hp    1136.  238. FALSE 
+##  6      2      5     60     5 scostl ec     797.  520. FALSE 
+##  7      2      5     60     5 scostl er     895.  486. FALSE 
+##  8      2      5     60     5 scostl gc     728.  169. TRUE  
+##  9      2      5     60     5 scostl gr     759.  169. FALSE 
+## 10      2      5     60     5 scostl hp     969.  199. FALSE 
+## # ... with 4,490 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multinomial Logit Model Estimation}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model heating choice as a multinomial logit}
+\hlcom{## Model choice using cost data and alternative effects}
+\hlstd{model_mlogit} \hlkwb{<-} \hlstd{heating_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= depvar} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hp'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Summary}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_mlogit} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = depvar ~ ic + oc | 1 | 0, data = ., reflevel = "hp", 
+##     method = "nr")
+## 
+## Frequencies of alternatives:
+##       hp       ec       er       gc       gr 
+## 0.055556 0.071111 0.093333 0.636667 0.143333 
+## 
+## nr method
+## 6 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 9.58E-06 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                   Estimate  Std. Error z-value  Pr(>|z|)    
+## ec:(intercept)  1.65884594  0.44841936  3.6993 0.0002162 ***
+## er:(intercept)  1.85343697  0.36195509  5.1206 3.045e-07 ***
+## gc:(intercept)  1.71097930  0.22674214  7.5459 4.485e-14 ***
+## gr:(intercept)  0.30826328  0.20659222  1.4921 0.1356640    
+## ic             -0.00153315  0.00062086 -2.4694 0.0135333 *  
+## oc             -0.00699637  0.00155408 -4.5019 6.734e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1008.2
+## McFadden R^2:  0.013691 
+## Likelihood ratio test : chisq = 27.99 (p.value = 8.3572e-07)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Elasticities}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate mean own-price elasticities for central gas}
+\hlcom{## Calculate probability of central gas}
+\hlstd{Heating} \hlkwb{<-} \hlstd{Heating} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob_gc_mlogit} \hlstd{=} \hlkwd{fitted}\hlstd{(model_mlogit,}
+                                 \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[,} \hlnum{4}\hlstd{])}
+\hlcom{## Calculate mean own-price elasticities}
+\hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{5}\hlopt{:}\hlnum{6}\hlstd{]} \hlopt{*}
+  \hlkwd{c}\hlstd{(}\hlkwd{mean}\hlstd{(Heating}\hlopt{$}\hlstd{ic.gc} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{Heating}\hlopt{$}\hlstd{prob_gc_mlogit)),}
+    \hlkwd{mean}\hlstd{(Heating}\hlopt{$}\hlstd{oc.gc} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{Heating}\hlopt{$}\hlstd{prob_gc_mlogit)))}
+\end{alltt}
+\begin{verbatim}
+##         ic         oc 
+## -0.4297750 -0.4347879
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Distribution of Elasticities}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Visualize distibution of own-price elasticity of ic for gc}
+\hlcom{## Calculate and plot density of own-price elasticity of ic for gc}
+\hlstd{Heating} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{elasticity} \hlstd{=} \hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{5}\hlstd{]} \hlopt{*} \hlstd{ic.gc} \hlopt{*}
+           \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{prob_gc_mlogit))} \hlopt{%>%}
+  \hlkwd{ggplot}\hlstd{(}\hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= elasticity))} \hlopt{+}
+  \hlkwd{geom_density}\hlstd{()} \hlopt{+}
+  \hlkwd{xlab}\hlstd{(}\hlstr{'Own-price elasticity of central gas installation cost'}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlstr{'Kernel density'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Elasticity Distribution Plot}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-13-1} 
+
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cross Elasticities}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate mean cross-price elasticities of ec with respect to gc}
+\hlcom{## Calculate mean cross-price elasticity}
+\hlopt{-}\hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{5}\hlopt{:}\hlnum{6}\hlstd{]} \hlopt{*}
+  \hlkwd{c}\hlstd{(}\hlkwd{mean}\hlstd{(Heating}\hlopt{$}\hlstd{ic.gc} \hlopt{*} \hlstd{Heating}\hlopt{$}\hlstd{prob_gc_mlogit),}
+    \hlkwd{mean}\hlstd{(Heating}\hlopt{$}\hlstd{oc.gc} \hlopt{*} \hlstd{Heating}\hlopt{$}\hlstd{prob_gc_mlogit))}
+\end{alltt}
+\begin{verbatim}
+##        ic        oc 
+## 0.7612192 0.7693978
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cost Tradeoffs}
+    How do consumers trade off the installation cost and the annual operating cost?
+    \begin{itemize}
+        \item What reduction in installation cost offsets a \$1 increase in the annual operating cost?
+    \end{itemize}
+    \begin{align*}
+        U_{ni} &= \alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni} + \varepsilon_{ni} \\
+        dU &= \beta_1 dIC_{ni} + \beta_2 dOC_{ni} \\
+        dU = 0 \Rightarrow \frac{dIC}{dOC} &= -\frac{\beta_2}{\beta_1}
+    \end{align*}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate the tradeoff between installation cost and operating cost}
+\hlcom{## Calculate install cost equivalence of an increse in operating cost}
+\hlopt{-}\hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{6}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{5}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+##        oc 
+## -4.563385
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Implied Discount Rate}
+    What is the implied discount rate of consumers? Assume (for simplicity) that the operating cost accrues in perpetuity.
+    \begin{align*}
+        U_{ni} &= \alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni} + \varepsilon_{ni} \\
+        \intertext{Divide by $\beta_1$ to express in terms of present day dollars}
+        \frac{U_{ni}}{\beta_1} &= \frac{\alpha_i}{\beta_1} + IC_{ni} + \frac{\beta_2}{\beta_1} OC_{ni} + \frac{\varepsilon_{ni}}{\beta_1} \\
+        \intertext{Re-express using an infinite sum of discounted operating costs}
+        \frac{U_{ni}}{\beta_1} &= \frac{\alpha_i}{\beta_1} + IC_{ni} + \frac{1}{r} OC_{ni} + \frac{\varepsilon_{ni}}{\beta_1} \\
+        \intertext{The last two equations give that}
+        r &= \frac{\beta_1}{\beta_2}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Implied Discount Rate Calculation}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculte the implied discount rate of consumers}
+\hlcom{## Calculate the implied discount in perpetuity}
+\hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{5}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_mlogit)[}\hlnum{6}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+##        ic 
+## 0.2191356
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Heterogeneous Coefficients}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model heating choice with heterogeneous cost coefficients}
+\hlcom{## Model heating choice with costs divided by income}
+\hlstd{model_mlogit_income} \hlkwb{<-} \hlstd{heating_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= depvar} \hlopt{~} \hlkwd{I}\hlstd{(ic} \hlopt{/} \hlstd{income)} \hlopt{+} \hlkwd{I}\hlstd{(oc} \hlopt{/} \hlstd{income)} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,}
+         \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hp'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Heterogeneous Coefficients Model Summary}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_mlogit_income} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = depvar ~ I(ic/income) + I(oc/income) | 1 | 0, 
+##     data = ., reflevel = "hp", method = "nr")
+## 
+## Frequencies of alternatives:
+##       hp       ec       er       gc       gr 
+## 0.055556 0.071111 0.093333 0.636667 0.143333 
+## 
+## nr method
+## 6 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 1.23E-05 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                  Estimate Std. Error z-value  Pr(>|z|)    
+## ec:(intercept)  0.4570416  0.2867524  1.5939  0.110969    
+## er:(intercept)  0.7557773  0.2304446  3.2796  0.001039 ** 
+## gc:(intercept)  2.2223040  0.1941569 11.4459 < 2.2e-16 ***
+## gr:(intercept)  0.7894157  0.1792350  4.4044 1.061e-05 ***
+## I(ic/income)   -0.0022639  0.0019592 -1.1555  0.247874    
+## I(oc/income)   -0.0053289  0.0027577 -1.9324  0.053315 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1018.9
+## McFadden R^2:  0.0032964 
+## Likelihood ratio test : chisq = 6.7393 (p.value = 0.034402)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients on Demographics}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model heating choice with alternative-specific demographics}
+\hlcom{## Model heating choice with alternative-specific rooms coefficient}
+\hlstd{model_mlogit_rooms} \hlkwb{<-} \hlstd{heating_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= depvar} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlstd{rooms} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,}
+         \hlkwc{reflevel} \hlstd{=} \hlstr{'hp'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Demographics Model Summary}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_mlogit_rooms} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = depvar ~ ic + oc | rooms | 0, data = ., reflevel = "hp", 
+##     method = "nr")
+## 
+## Frequencies of alternatives:
+##       hp       ec       er       gc       gr 
+## 0.055556 0.071111 0.093333 0.636667 0.143333 
+## 
+## nr method
+## 6 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 1.58E-05 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                   Estimate  Std. Error z-value  Pr(>|z|)    
+## ec:(intercept)  1.47832643  0.67123250  2.2024   0.02764 *  
+## er:(intercept)  1.75977504  0.58813686  2.9921   0.00277 ** 
+## gc:(intercept)  1.77021331  0.44444627  3.9830 6.806e-05 ***
+## gr:(intercept)  0.44338366  0.47207112  0.9392   0.34761    
+## ic             -0.00153161  0.00062169 -2.4636   0.01375 *  
+## oc             -0.00696375  0.00155563 -4.4765 7.589e-06 ***
+## ec:rooms        0.03811449  0.10825890  0.3521   0.72479    
+## er:rooms        0.01939934  0.10278196  0.1887   0.85029    
+## gc:rooms       -0.01294329  0.08476424 -0.1527   0.87864    
+## gr:rooms       -0.03008528  0.09570570 -0.3144   0.75325    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1007.8
+## McFadden R^2:  0.014102 
+## Likelihood ratio test : chisq = 28.831 (p.value = 6.5482e-05)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients on Costs}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model heating choice with alternative-specific costs}
+\hlcom{## Model heating choice with alternative-specific cost coefficient}
+\hlstd{model_mlogit_costs} \hlkwb{<-} \hlstd{heating_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= depvar} \hlopt{~} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlstd{ic,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hp'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Cost Coefficients Model Summary}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_mlogit_costs} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = depvar ~ oc | 1 | ic, data = ., reflevel = "hp", 
+##     method = "nr")
+## 
+## Frequencies of alternatives:
+##       hp       ec       er       gc       gr 
+## 0.055556 0.071111 0.093333 0.636667 0.143333 
+## 
+## nr method
+## 6 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 8.85E-05 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                   Estimate  Std. Error z-value Pr(>|z|)   
+## ec:(intercept)  1.70480715  1.27495400  1.3372 0.181173   
+## er:(intercept)  2.52929123  1.20296858  2.1025 0.035506 * 
+## gc:(intercept)  1.46257610  1.01069767  1.4471 0.147870   
+## gr:(intercept) -0.56099198  1.13846726 -0.4928 0.622182   
+## oc             -0.00545750  0.00182214 -2.9951 0.002743 **
+## hp:ic          -0.00159724  0.00101723 -1.5702 0.116373   
+## ec:ic          -0.00214993  0.00122995 -1.7480 0.080468 . 
+## er:ic          -0.00265151  0.00093039 -2.8499 0.004374 **
+## gc:ic          -0.00120808  0.00082802 -1.4590 0.144567   
+## gr:ic          -0.00055589  0.00083672 -0.6644 0.506453   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1006.2
+## McFadden R^2:  0.015635 
+## Likelihood ratio test : chisq = 31.965 (p.value = 1.6569e-05)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Adamowicz et al. (1994)
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Adamowicz et al. (1994)}
+    Research question
+    \begin{itemize}
+    	\item Do stated preference methods and revealed preference methods yield similar results on recreational site choice?
+    \end{itemize}
+    \vspace{2ex}
+    Empirical methods
+    \begin{itemize}
+    	\item Conduct both a stated preference survey and a revealed preference survey on site choice for fishing and other water-based recreation
+    	\item Estimate a multinomial logit model for each model separately and a joint model including both surveys
+    \end{itemize}
+    \vspace{2ex}
+    Results
+    \begin{itemize}
+    	\item Independent models appear to be different, but estimating a joint model that includes a scale parameter yields similar underlying preferences
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Stated Preference Survey}
+    Method used to value non-market goods
+    \begin{itemize}
+    	\item Traditional application is valuing environmental amenities
+    	\item Popular research method in the 1980s--2000s but less popular now
+    	\item Any other areas where this could be used to elicit valuation?
+    \end{itemize}
+    \vspace{2ex}
+    Respondents state their choice over a hypothetical set of alternatives
+    \begin{itemize}
+    	\item Survey methods have been refined over the years to remove bias that was present in early surveys
+    	\item Do we believe hypothetical decision making reveals true preferences?
+    \end{itemize}
+    \vspace{2ex}
+    Contrast with revealed preference methods
+    \begin{itemize}
+    	\item Researchers document actual choices over a set of real alternatives
+    	\item May limit what parameters can be estimated
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{General Comments and Questions}
+    Both stated choice and revealed choice methods yield data that seem perfect for a multinomial logit model
+    \begin{itemize}
+    	\item But do we believe the assumptions of the logit model in this case?
+    \end{itemize}
+    \vspace{2ex}
+    Estimation of the joint model depends importantly on the scale parameter
+    \begin{itemize}
+    	\item But they never say what scale parameter best fits the joint dataset
+    \end{itemize}
+    \vspace{2ex}
+    Authors apply their results to estimate the change in consumer surplus associated with a change in river flows
+    \begin{itemize}
+    	\item Consumer surplus calculations require a marginal utility of income, which they do not directly estimate
+    	\item Welfare effects from the joint model are much closer to the revealed preference model than to the stated preference model
+    	\item What other counterfactuals or policy scenarios could we model with these results?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Greene textbook, Chapters 7.1--7.2.1 and 14.1--14.6
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: Tuesdays at 2:00-3:00 in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 1 is posted, due September 24
+    \end{itemize}
+\end{frame}
+
+\end{document}
