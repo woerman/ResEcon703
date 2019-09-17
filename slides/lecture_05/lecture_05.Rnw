@@ -175,7 +175,7 @@ options(width = 70)
     \vspace{3ex}
     Suppose Hummer lowers the price of the H2 to gain more market share
     \begin{itemize}
-    	\item Will that attract a greater proportion of Excalade drivers of Pure EV drivers?
+    	\item Will that attract a greater proportion of Escalade drivers or Pure EV drivers?
     	\item The logit model says that substitution to the H2 will be proportionally equal for these very different vehicles!
     \end{itemize}
 \end{frame}
