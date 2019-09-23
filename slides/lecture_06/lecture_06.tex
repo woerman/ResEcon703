@@ -62,7 +62,6 @@
     	\item Nonlinear Regression Models
         \item Maximum Likelihood Estimation
         \item Properties of the Maximum Likelihood Estimator
-        \item MLE Goodness of Fit and Hypothesis Tests
     \end{itemize}
     \vspace{2ex}
     Upcoming
@@ -344,13 +343,20 @@
     \end{enumerate}
 \end{frame}
 
-\begin{frame}\frametitle{}
-    \vfill
-    \centering
-    \begin{beamercolorbox}[center]{title}
-        \Large MLE Goodness of Fit and Hypothesis Tests
-    \end{beamercolorbox}
-    \vfill
+\begin{frame}\frametitle{MLE Variance Estimator}
+    From the asymptotic normality of MLE, we have
+    $$Var(\hat{\theta}) = \left\{ -E_0 \left[ \frac{\partial^2 \ln L(\theta_0)}{\partial \theta_0 \partial \theta_0'} \right] \right\}^{-1}$$
+    \begin{itemize}
+        \item Variance of the MLE is evaluated at $\theta_0$, the true parameter value(s)
+        \item But we do not know the true value(s), so we also need an estimator for the variance of the MLE
+    \end{itemize}
+    \vspace{2ex}
+    We can estimate this variance by evaluating it at the MLE, $\hat{\theta}$
+    $$\widehat{Var}(\hat{\theta}) = \left\{ - \left[ \frac{\partial^2 \ln L(\theta)}{\partial \theta \partial \theta'} \right]_{\hat{\theta}} \right\}^{-1}$$
+    \begin{itemize}
+        \item The innermost term is the Hessian of the log-likelihood function
+        \item More robust estimators exist, but we will stick with this most basic variance estimator for now
+    \end{itemize}
 \end{frame}
 
 \begin{frame}\frametitle{Value of Likelihood Function}
