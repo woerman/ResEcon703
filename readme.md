@@ -17,4 +17,4 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 
 ## Problem Sets
 
-1. [Problem Set 1](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/travel_datasets.zip)
+1. [Problem Set 1](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/travel_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_1/problem_set_1_solutions.R)
