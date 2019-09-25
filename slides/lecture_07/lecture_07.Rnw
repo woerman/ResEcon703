@@ -1,54 +1,4 @@
-\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
-% maxwidth is the original width if it is less than linewidth
-% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-\let\hlipl\hlkwb
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
+\documentclass{beamer}
 \usetheme{Boadilla}
 
 \makeatother
@@ -92,9 +42,13 @@
 \title[Lecture 7:\ Numerical Optimization]{Lecture 7:\ Numerical Optimization}
 \author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
 \date{Matt Woerman\\University of Massachusetts Amherst}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\begin{document}
 
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
 
 {\setbeamertemplate{footline}{} 
 \begin{frame}[noframenumbering]
@@ -433,63 +387,37 @@
     	\item \texttt{c}: Alternative-specific variables with alternative-specific coefficients
     \end{itemize}
     \vspace{2ex}
-    
-    
-\begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{## Model choice as multinomial logit with common cost/income coefficient,}
-\hlcom{## alternative intercepts, and alternative-specific time coefficients}
-\hlstd{model_mlogit} \hlkwb{<-} \hlstd{data_mlogit} \hlopt{%>%}
-  \hlkwd{mlogit}\hlstd{(mode} \hlopt{~} \hlkwd{I}\hlstd{(cost} \hlopt{/} \hlstd{income)} \hlopt{|} \hlnum{1} \hlopt{|} \hlstd{time,} \hlkwc{data} \hlstd{= .)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
+    <<include = FALSE>>=
+    ### Load and look at dataset
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset
+    data_multi <- read_csv('travel_multinomial.csv')
+    ## Look at dataset
+    data_multi
+    @
+    <<include = FALSE>>=
+    ### Estimate multinomial logit model using mlogit
+    ## Convert dataset to mlogit format
+    data_mlogit <- data_multi %>% 
+      mlogit.data(shape = 'wide', choice = 'mode', varying = 2:9, sep = '_')
+    @
+    <<>>=
+    ## Model choice as multinomial logit with common cost/income coefficient,
+    ## alternative intercepts, and alternative-specific time coefficients
+    model_mlogit <- data_mlogit %>% 
+      mlogit(mode ~ I(cost / income) | 1 | time, data = .)
+    @
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{\texttt{mlogit()} Results in R}
     \vspace{1ex}
-\begin{knitrout}\tiny
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{## Summarize model results}
-\hlstd{model_mlogit} \hlopt{%>%}
-  \hlkwd{summary}\hlstd{()}
-\end{alltt}
-\begin{verbatim}
-## 
-## Call:
-## mlogit(formula = mode ~ I(cost/income) | 1 | time, data = ., 
-##     method = "nr")
-## 
-## Frequencies of alternatives:
-##  bike   bus   car  walk 
-## 0.103 0.290 0.465 0.142 
-## 
-## nr method
-## 11 iterations, 0h:0m:0s 
-## g'(-H)^-1g = 7.46E-06 
-## successive function values within tolerance limits 
-## 
-## Coefficients :
-##                    Estimate Std. Error  z-value  Pr(>|z|)    
-## bus:(intercept)    3.392381   0.279235  12.1488 < 2.2e-16 ***
-## car:(intercept)    6.650311   0.464905  14.3047 < 2.2e-16 ***
-## walk:(intercept)   3.711605   0.338860  10.9532 < 2.2e-16 ***
-## I(cost/income)   -76.745551   5.590969 -13.7267 < 2.2e-16 ***
-## bike:time         -0.362973   0.026469 -13.7129 < 2.2e-16 ***
-## bus:time          -0.232457   0.023900  -9.7263 < 2.2e-16 ***
-## car:time          -0.475974   0.045422 -10.4790 < 2.2e-16 ***
-## walk:time         -0.401968   0.034372 -11.6946 < 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Log-Likelihood: -760.7
-## McFadden R^2:  0.3797 
-## Likelihood ratio test : chisq = 931.28 (p.value = < 2.22e-16)
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    model_mlogit %>% 
+      summary()
+    @
 \end{frame}
 
 \begin{frame}\frametitle{Announcements}

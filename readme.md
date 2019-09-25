@@ -12,7 +12,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 4. [Logit Model I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_04/lecture_04.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_04/lecture_04.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_04/ac_renters.csv)
 5. [Logit Model II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_05/lecture_05.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_05/lecture_05.R)
 6. [Maximum Likelihood Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_06/lecture_06.pdf)
-7. [Numerical Optimization](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_07/lecture_07.pdf)
+7. [Numerical Optimization](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_07/lecture_07.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_07/lecture_07.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_07/travel_multinomial.csv)
 8. [Logit Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_08/lecture_08.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_08/lecture_08.R)
 
 ## Problem Sets
