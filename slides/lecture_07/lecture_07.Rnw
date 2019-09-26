@@ -339,7 +339,7 @@ options(width = 70)
     We estimate the logit model by finding the set of parameters that best fit our data
     \begin{itemize}
     	\item Parameters: $\alpha_b$, $\alpha_c$, $\alpha_w$, $\beta_1$, $\beta_2$, $\beta_3$, $\beta_4$, and $\beta_5$
-    	\item What set of parameters makes it most likely to observe to the data that we do observe?
+    	\item What set of parameters makes it most likely to observe the data that we do observe?
     \end{itemize}
     \vspace{3ex}
     Two options for estimation
