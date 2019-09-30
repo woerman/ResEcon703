@@ -87,9 +87,11 @@ data_binary <- data_binary %>%
          car_probability_logit_income = 1 / (1 + exp(-utility_logit_income)))
 ## Calculate mean marginal effects
 coef(reg_logit_income)[2:4] * 
-  mean(data_binary$car_probability_logit_income * 
-         (1 - data_binary$car_probability_logit_income)) / 
-  c(1, 1, mean(data_binary$income))
+  c(rep(mean(data_binary$car_probability_logit_income * 
+               (1 - data_binary$car_probability_logit_income)), 2),
+    mean(data_binary$car_probability_logit_income * 
+           (1 - data_binary$car_probability_logit_income) /
+           data_binary$income))
 ## Calculate hourly time-values at different income levels
 rep(-abs(coef(reg_logit_income)[2:3]), 3) / coef(reg_logit_income)[4] * 60 * 
   c(15, 15, 25, 25, 35, 35)
