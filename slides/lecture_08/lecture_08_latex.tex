@@ -57,9 +57,8 @@
     \vspace{2ex}
     Today
     \begin{itemize}
-    	\item Logit Estimation
-    	\item Logit Estimation Example in R
-        \item Bayer et al. (2009)
+        \item Logit Estimation
+        \item Logit Estimation Example in R
     \end{itemize}
     \vspace{2ex}
     Upcoming
@@ -70,8 +69,8 @@
         \end{itemize}
         \item Problem sets
         \begin{itemize}
-            \item Problem Set 1 solutions are posted
-            \item Problem Set 2 will be posted soon, due October 17
+            \item Problem Set 1 solutions are posted, will be returned soon
+            \item Problem Set 2 is posted, due October 17
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -203,6 +202,37 @@
 
 \begin{frame}[fragile]\frametitle{Optimization in R}
     <<R CODE HERE>>
+    \vspace{2ex}
+    \texttt{optim()} requires that you create a function, \texttt{fn}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and data as inputs
+        \item Calculates your objective function given those parameters
+        \item Returns this value of the objective function
+    \end{enumerate}
+    \vspace{2ex}
+    You also have to give \texttt{optim()} arguments for
+    \begin{itemize}
+        \item \texttt{par}: starting parameter values
+        \item \texttt{\ldots}: dataset and other things needed by your function
+        \item \texttt{method}: optimization algorithm
+        \begin{itemize}
+            \item I recommend \texttt{method = 'BFGS'} for our estimation
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Calculating the Log-Likelihood}
+    Steps to calculate the value of the log-likelihood function for a given set of parameters
+    \begin{enumerate}
+        \item Calculate the representative utility for each alternative and for each decision maker.
+        \item Calculate the choice probability of the chosen alternative for each decision maker.
+        \item Sum the log of these choice probabilities to get the log-likelihood.
+        \item Return the negative of the log-likelihood.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Base Model}
+    $$U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj}$$
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Function to Calculate Log-Likelihood}
@@ -230,7 +260,11 @@
     <<R CODE HERE>>
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Heterogeneous Coefficients}
+\begin{frame}\frametitle{Heterogeneous Coefficients Model}
+    $$U_{nj} = \alpha_j + \frac{\beta_1}{I_n} IC_{nj} + \frac{\beta_2}{I_n} OC_{nj} + \varepsilon_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Heterogeneous Coefficients Estimation}
     \vspace{1ex}
     <<R CODE HERE>>
 \end{frame}
@@ -243,7 +277,11 @@
     <<R CODE HERE>>
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients}
+\begin{frame}\frametitle{Alternative-Specific Coefficients Model}
+    $$U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n + \varepsilon_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Estimation}
     <<R CODE HERE>>
 \end{frame}
 
@@ -332,9 +370,14 @@
         \item Greene textbook, Chapters 7.2.2--7.2.8 (Chapters 7.2.2--7.2.6 in the Seventh Edition)
     \end{itemize}
     \vspace{3ex}
+    Office hours
+    \begin{itemize}
+        \item Reminder: Tuesdays     at 2:00--3:00 in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
     Upcoming
     \begin{itemize}
-        \item Problem Set 2 will be posted soon, due October 17
+        \item Problem Set 2 is posted, due October 17
     \end{itemize}
 \end{frame}
 
