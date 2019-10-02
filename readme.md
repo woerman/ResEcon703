@@ -14,6 +14,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 6. [Maximum Likelihood Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_06/lecture_06.pdf)
 7. [Numerical Optimization](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_07/lecture_07.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_07/lecture_07.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_07/travel_multinomial.csv)
 8. [Logit Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_08/lecture_08.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_08/lecture_08.R)
+9. [Nonlinear Least Squares I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_09/lecture_09.pdf)
 
 ## Problem Sets
 
