@@ -1,0 +1,741 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmin}{argmin}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 10:\ Nonlinear Least Squares II]{Lecture 10:\ Nonlinear Least Squares II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Nonlinear Least Squares
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Nonlinear Least Squares Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Greene textbook, Chapters 13.1--13.5
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 2 is posted, due October 17
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nonlinear Least Squares}
+    $$y_i = h(x_i, \beta) + \varepsilon_i$$ \\
+    \vspace{2ex}
+    The nonlinear lest squares estimator minimizes the sum of squared errors for this model
+    $$\hat{\beta} = \argmin_{\beta} \sum_{i = 1}^n [y_i - h(x_i, \beta)]^2$$ \\
+    \vspace{2ex}
+    This estimator does not require a distributional assumption about our data (unlike MLE), but it has fewer nice properties
+    \begin{itemize}
+        \item Consistent
+        \item Asymptotically normal
+        \item Does not achieve the Cramer-Rao lower bound
+        \item Does not have the ``invariance'' property
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Nonlinear Least Squares Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Logit Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 900 households in California and the type of heating system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GC: gas central
+		    	\item GR: gas room
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    	\item HP: heat pump
+		    \end{itemize}
+		    \vspace{8ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item IC: installation cost
+		    	\item OC: annual operating cost
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    	\item agehed: age of household head
+		    	\item rooms: number of rooms
+                \item region: home location
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load and look at dataset}
+\hlcom{## Load tidyverse and mlogit}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\hlcom{## Load dataset from mlogit package}
+\hlkwd{data}\hlstd{(}\hlstr{'Heating'}\hlstd{,} \hlkwc{package} \hlstd{=} \hlstr{'mlogit'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlkwd{as_tibble}\hlstd{(Heating)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 900 x 16
+##    idcase depvar ic.gc ic.gr ic.ec ic.er ic.hp oc.gc oc.gr oc.ec oc.er
+##     <dbl> <fct>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+##  1      1 gc      866   963.  860.  996. 1136.  200.  152.  553.  506.
+##  2      2 gc      728.  759.  797.  895.  969.  169.  169.  520.  486.
+##  3      3 gc      599.  783.  720.  900. 1048.  166.  138.  439.  405.
+##  4      4 er      835.  793.  761.  831. 1049.  181.  147.  483   425.
+##  5      5 er      756.  846.  859.  986.  883.  175.  139.  404.  390.
+##  6      6 gc      666.  842.  694.  863.  859.  136.  141.  398.  371.
+##  7      7 gc      670.  941.  634.  952. 1087.  192.  148.  478.  446.
+##  8      8 gc      778. 1022.  813. 1012.  990.  188.  159.  502.  465.
+##  9      9 gc      928. 1212.  876. 1025. 1232.  169.  190.  553.  452.
+## 10     10 gc      683. 1045.  776.  874.  878.  176.  136.  532.  472.
+## # ... with 890 more rows, and 5 more variables: oc.hp <dbl>,
+## #   income <dbl>, agehed <dbl>, rooms <dbl>, region <fct>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Two Models to Estimate}
+    \vspace{-4ex}
+    \begin{align*}
+        \intertext{Base model}
+        U_{nj} &= \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj} \\
+        \vspace{3ex}
+        \intertext{Alternative-specific coefficients model}
+        U_{nj} &= \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n + \varepsilon_{nj}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Optimization in R}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Optimization in R}
+\hlcom{## Help file for the optimization function, optim}
+\hlopt{?}\hlstd{optim}
+\hlcom{## Arguments for optim function}
+\hlkwd{optim}\hlstd{(par, fn, gr, ..., method, lower, upper, control, hessian)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+    \vspace{2ex}
+    \texttt{optim()} requires that you create a function, \texttt{fn}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and data as inputs
+        \item Calculates your objective function given those parameters
+        \item Returns this value of the objective function
+    \end{enumerate}
+    \vspace{2ex}
+    You also have to give \texttt{optim()} arguments for
+    \begin{itemize}
+        \item \texttt{par}: starting parameter values
+        \item \texttt{\ldots}: dataset and other things needed by your function
+        \item \texttt{method}: optimization algorithm
+        \begin{itemize}
+            \item I recommend \texttt{method = 'BFGS'} for our estimation
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Calculating the Sum of Squared Error in a Logit Model}
+    Steps to calculate the sum of squared errors for a given set of parameters in a logit model
+    \begin{enumerate}
+        \item Calculate the representative utility for each alternative and for each decision maker.
+        \item Calculate the choice probability of driving for each decision maker.
+        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+        \item Sum the square of these residuals.
+        \item Return the sum of squares.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Base Model}
+    \begin{alignat*}{2}
+    &\text{Random utility model:} \quad &&U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj} \\
+    \intertext{}
+    &\text{NLS regression model:} \quad &&y_{ni} =  \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_{j = 1}^J e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}} + \omega_{ni}
+    \end{alignat*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Sum of Squares}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate NLS estimator for multinomial logit heating choice using cost data }
+\hlcom{### and alternative effects}
+\hlcom{## Function to calculate sum of squares using two variables and four }
+\hlcom{## alternative effects}
+\hlstd{least_squares_long} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract individual parameters}
+  \hlstd{alphas} \hlkwb{<-} \hlstd{parameters[}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{]}
+  \hlstd{beta_1} \hlkwb{<-} \hlstd{parameters[}\hlnum{5}\hlstd{]}
+  \hlstd{beta_2} \hlkwb{<-} \hlstd{parameters[}\hlnum{6}\hlstd{]}
+  \hlcom{## Assign constant parameters to alternatives}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+    \hlkwd{arrange}\hlstd{(idcase, alt)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{constant} \hlstd{=} \hlkwd{c}\hlstd{(alphas,} \hlnum{0}\hlstd{))} \hlopt{%>%}
+    \hlkwd{ungroup}\hlstd{()}
+  \hlcom{## Calculate utility for each alternative given the parameters}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility} \hlstd{= constant} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{var_1} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{var_2)}
+  \hlcom{## Calculate logit probability denominator given the parameters}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{probability_denominator} \hlstd{=} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(utility)))} \hlopt{%>%}
+    \hlkwd{ungroup}\hlstd{()}
+  \hlcom{## Calculate logit choice probability given the parameters}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{probability} \hlstd{=} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{probability_denominator)}
+  \hlcom{## Calculate regression residual given the parameters}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{residual} \hlstd{= choice} \hlopt{-} \hlstd{probability)}
+  \hlcom{## Calculate the sum of squares given the parameters}
+  \hlstd{sum_squares} \hlkwb{<-} \hlkwd{sum}\hlstd{(data}\hlopt{$}\hlstd{residual}\hlopt{^}\hlnum{2}\hlstd{)}
+  \hlkwd{return}\hlstd{(sum_squares)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate NLS Parameters}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Gather heating dataset into a long dataset}
+\hlstd{heating_long} \hlkwb{<-} \hlstd{Heating} \hlopt{%>%}
+  \hlkwd{gather}\hlstd{(key, value,} \hlkwd{starts_with}\hlstd{(}\hlstr{'ic.'}\hlstd{),} \hlkwd{starts_with}\hlstd{(}\hlstr{'oc.'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(key,} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(cost, value)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{= (depvar} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{depvar)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{var_1} \hlstd{= ic,} \hlkwc{var_2} \hlstd{= oc)}
+\hlcom{## Minimize the sum of squared errors}
+\hlstd{model_nls_long} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{6}\hlstd{), least_squares_long,}
+                        \hlkwc{data} \hlstd{= heating_long,} \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show NLS estimation results}
+\hlstd{model_nls_long}
+\end{alltt}
+\begin{verbatim}
+## $par
+## [1]  1.862237887  2.048949391  1.561910402  0.127548314 -0.001782635
+## [6] -0.008059906
+## 
+## $value
+## [1] 496.7162
+## 
+## $counts
+## function gradient 
+##      268       36 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{NLS Variance-Covariance Matrix Estimator}
+    $$\widehat{Var}(\hat{\beta}) = \hat{\sigma}^2 \left[ \sum_{i = 1}^n \left( \frac{\partial h(x_i, \beta)}{\partial \beta} \right)_{\hat{\beta}} \left( \frac{\partial h(x_i, \beta)}{\partial \beta'} \right)_{\hat{\beta}} \right]^{-1}$$
+    Steps to estimate this variance-covariance matrix
+    \begin{enumerate}
+        \item Write down the derivative of the nonlinear regression model with respect to each of the $K$ parameters.
+        \item Calculate this $K \times 1$ vector of derivatives, at the estimated parameters, for each decision maker.
+        \item Calculate the $K \times K$ matrix that is the product of the above vector and its transpose for each decision maker.
+        \item Sum these matrices for all decision makers.
+        \item Estimate the variance of the econometric error as the mean sum of squares at the estimated parameters.
+        \item Calculate the variance-covariance matrix, which is a function of the above $K \times K$ matrix and the estimated error variance.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Gradient of Logit Choice Probabilities}
+    \begin{align*}
+        \frac{\partial P_{ni}}{\partial \alpha_i} &= P_{ni} (1 - P_{ni}) \\
+        \frac{\partial P_{ni}}{\partial \alpha_{j \mid j \neq i}} &= -P_{ni} P_{nj} \\
+        \frac{\partial P_{ni}}{\partial \beta_1} &= P_{ni} (IC_{ni} - \sum_{j= 1}^J P_{nj} IC_{nj}) \\
+        \frac{\partial P_{ni}}{\partial \beta_2} &= P_{ni} (OC_{ni} - \sum_{j= 1}^J P_{nj} OC_{nj})
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimating the NLS Variance-Covariance Matrix}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Estimate the variance of the previous NLS model}
+\hlcom{## Assign constant parameters to alternatives}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{heating_long} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(idcase, alt)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{constant} \hlstd{=} \hlkwd{c}\hlstd{(model_nls_long}\hlopt{$}\hlstd{par[}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{],} \hlnum{0}\hlstd{))} \hlopt{%>%}
+  \hlkwd{ungroup}\hlstd{()}
+\hlcom{## Calculate utility for each alternative at the NLS parameters}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{utility} \hlstd{= constant} \hlopt{+}
+           \hlstd{model_nls_long}\hlopt{$}\hlstd{par[}\hlnum{5}\hlstd{]} \hlopt{*} \hlstd{var_1} \hlopt{+} \hlstd{model_nls_long}\hlopt{$}\hlstd{par[}\hlnum{6}\hlstd{]} \hlopt{*} \hlstd{var_2)}
+\hlcom{## Calculate logit probability denominator at the NLS parameters}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{probability_denominator} \hlstd{=} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(utility)))} \hlopt{%>%}
+  \hlkwd{ungroup}\hlstd{()}
+\hlcom{## Calculate logit choice probability at the NLS parameters}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{probability} \hlstd{=} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{probability_denominator)}
+\hlcom{## Create vectors of individual probabilities}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(idcase, alt, probability)} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(alt, probability)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{probability_all} \hlstd{=} \hlkwd{pmap}\hlstd{(}\hlkwd{list}\hlstd{(.}\hlopt{$}\hlstd{ec, .}\hlopt{$}\hlstd{er, .}\hlopt{$}\hlstd{gc, .}\hlopt{$}\hlstd{er),}
+                                \hlopt{~} \hlkwd{c}\hlstd{(..1, ..2, ..3, ..4)))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(idcase, probability_all)} \hlopt{%>%}
+  \hlkwd{full_join}\hlstd{(variance_data,} \hlkwc{by} \hlstd{=} \hlstr{'idcase'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimating the NLS Variance-Covariance Matrix}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate the probability-weighted average of each cost for each individual}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{ic_weighted} \hlstd{=} \hlkwd{sum}\hlstd{(probability} \hlopt{*} \hlstd{ic),}
+         \hlkwc{oc_weighted} \hlstd{=} \hlkwd{sum}\hlstd{(probability} \hlopt{*} \hlstd{oc))} \hlopt{%>%}
+  \hlkwd{ungroup}\hlstd{()}
+\hlcom{## Calculate the gradient for each alternative and individual}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(idcase, alt)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{alt_order} \hlstd{=} \hlnum{1}\hlopt{:}\hlkwd{n}\hlstd{())} \hlopt{%>%}
+  \hlkwd{ungroup}\hlstd{()} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{constant_vector} \hlstd{=} \hlkwd{map}\hlstd{(.}\hlopt{$}\hlstd{alt_order,} \hlopt{~} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{, .x} \hlopt{-} \hlnum{1}\hlstd{),}
+                                                \hlnum{1}\hlstd{,}
+                                                \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5} \hlopt{-} \hlstd{.x))[}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{]))} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{gradient_alpha} \hlstd{=} \hlkwd{pmap}\hlstd{(}\hlkwd{list}\hlstd{(.}\hlopt{$}\hlstd{probability,}
+                                    \hlstd{.}\hlopt{$}\hlstd{probability_all,}
+                                    \hlstd{.}\hlopt{$}\hlstd{constant_vector),}
+                               \hlopt{~} \hlstd{..1} \hlopt{*} \hlstd{(..3} \hlopt{-} \hlstd{..2)))} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{gradient} \hlstd{=} \hlkwd{pmap}\hlstd{(}\hlkwd{list}\hlstd{(.}\hlopt{$}\hlstd{gradient_alpha, .}\hlopt{$}\hlstd{probability,}
+                              \hlstd{.}\hlopt{$}\hlstd{ic, .}\hlopt{$}\hlstd{ic_weighted, .}\hlopt{$}\hlstd{oc, .}\hlopt{$}\hlstd{oc_weighted),}
+                         \hlopt{~} \hlkwd{c}\hlstd{(..1,}
+                             \hlstd{..2} \hlopt{*} \hlstd{(..3} \hlopt{-} \hlstd{..4),}
+                             \hlstd{..2} \hlopt{*} \hlstd{(..5} \hlopt{-} \hlstd{..6))))}
+\hlcom{## Calculate the gradient product matrix for each alternative and individual}
+\hlstd{variance_data} \hlkwb{<-} \hlstd{variance_data} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{gradient_matrix} \hlstd{=} \hlkwd{map}\hlstd{(.}\hlopt{$}\hlstd{gradient,} \hlopt{~} \hlstd{.x} \hlopt{%*%} \hlkwd{t}\hlstd{(.x)))}
+\hlcom{## Sum the gradient product matrices over all alternatives and individuals}
+\hlstd{gradient_matrix_sum} \hlkwb{<-} \hlstd{variance_data}\hlopt{$}\hlstd{gradient_matrix} \hlopt{%>%} \hlkwd{reduce}\hlstd{(`+`)}
+\hlcom{## Estimate the variance of the econometric errors}
+\hlstd{error_variance} \hlkwb{<-} \hlkwd{least_squares_long}\hlstd{(model_nls_long}\hlopt{$}\hlstd{par, heating_long)} \hlopt{/}
+  \hlkwd{nrow}\hlstd{(heating_long)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Variance-Covariance Matrix}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate the variance-covariance matrix}
+\hlstd{variance_covariance} \hlkwb{<-} \hlstd{error_variance} \hlopt{*} \hlkwd{solve}\hlstd{(gradient_matrix_sum)}
+\hlstd{variance_covariance}
+\end{alltt}
+\begin{verbatim}
+##               [,1]          [,2]         [,3]          [,4]
+## [1,]  1.415897e-01  9.891294e-02 1.383776e-02 -1.377707e-03
+## [2,]  9.891294e-02  9.403330e-02 8.352834e-03 -9.076836e-04
+## [3,]  1.383776e-02  8.352834e-03 3.131992e-02  2.679804e-02
+## [4,] -1.377707e-03 -9.076836e-04 2.679804e-02  3.308934e-02
+## [5,]  5.294321e-05  1.959156e-05 4.990586e-05  2.008979e-05
+## [6,] -4.093777e-04 -3.346047e-04 7.533308e-05  1.170280e-04
+##               [,5]          [,6]
+## [1,]  5.294321e-05 -4.093777e-04
+## [2,]  1.959156e-05 -3.346047e-04
+## [3,]  4.990586e-05  7.533308e-05
+## [4,]  2.008979e-05  1.170280e-04
+## [5,]  2.252765e-07 -3.809546e-08
+## [6,] -3.809546e-08  1.838542e-06
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Parameters and Standard Errors}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Report estimated parameters and standard errors}
+\hlstd{model_nls_long}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+## [1]  1.862237887  2.048949391  1.561910402  0.127548314 -0.001782635
+## [6] -0.008059906
+\end{verbatim}
+\begin{alltt}
+\hlstd{variance_covariance} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.376284032 0.306648496 0.176974339 0.181904744 0.000474633
+## [6] 0.001355928
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{NLS Hypothesis Test}
+    Test that the alternative-specific intercepts are jointly significant
+    $$H_0:
+    \begin{pmatrix}
+        \alpha_1 \\
+        \alpha_2 \\
+        \alpha_3 \\
+        \alpha_4
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{pmatrix}$$
+\end{frame}
+
+\begin{frame}\frametitle{NLS Wald Test}
+    \begin{alignat*}{2}
+        &\text{Hypothesis:} &&H_0 \text{: } r(\beta_0) = q \\
+        &\text{Test statistic:} &&W = [r(\hat{\beta}) - q]' [ R(\hat{\beta}) \widehat{Var}(\hat{\beta}) R'(\hat{\beta})]^{-1} [r(\hat{\beta}) - q] \\
+        &\text{Jacobian matrix:} \quad &&R(\hat{\beta}) = \left( \frac{\partial r(\beta)}{\partial \beta'} \right)_{\hat{\beta}}
+    \end{alignat*} \\
+    \vspace{2ex}
+    Steps to conduct a Wald Test using NLS estimators
+    \begin{enumerate}
+        \item Create a vector of $J$ parameter restrictions, $r(\beta_0) = q$.
+        \item Calculate the $J \times K$ Jacobian matrix by differentiating each restriction with respect to each of the $K$ parameters.
+        \item Calculate the Wald test statistic, which is a function of the vector of restrictions, the Jacobian matrix, and the variance-covariance matrix.
+        \item Conduct the Wald test using this test statistic, which is distributed $\chi^2$.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Calculating the NLS Wald Test Statistic}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Conduct a Wald test that alternative-specific intercepts equal zero}
+\hlcom{## Calculate the restriction vector}
+\hlstd{restriction_vector} \hlkwb{<-} \hlstd{model_nls_long}\hlopt{$}\hlstd{par[}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{]}
+\hlcom{## Construct the restriction Jacobian}
+\hlstd{restriction_jacobian} \hlkwb{<-} \hlkwd{diag}\hlstd{(}\hlnum{4}\hlstd{)} \hlopt{%>%}
+  \hlkwd{cbind}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{4}\hlstd{))} \hlopt{%>%}
+  \hlkwd{cbind}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{4}\hlstd{))}
+\hlcom{## Calculate the Wald test statistic}
+\hlstd{wald_test_stat} \hlkwb{<-} \hlkwd{t}\hlstd{(restriction_vector)} \hlopt{%*%}
+  \hlkwd{solve}\hlstd{(restriction_jacobian} \hlopt{%*%}
+          \hlstd{variance_covariance} \hlopt{%*%}
+          \hlkwd{t}\hlstd{(restriction_jacobian))} \hlopt{%*%}
+  \hlstd{restriction_vector} \hlopt{%>%}
+  \hlkwd{c}\hlstd{()}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Wald Test Results}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Test if Wald test statitsic is greater than critical value}
+\hlstd{wald_test_stat} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{,} \hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate p-value of Wald test}
+\hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(wald_test_stat,} \hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Alternative-Specific Coefficients Model}
+    \begin{alignat*}{2}
+    &\text{Random utility model:} \quad &&U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n + \varepsilon_{nj} \\
+    \intertext{}
+    &\text{NLS regression model:} \quad &&y_{ni} =  \frac{e^{ \alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni} + \beta_{3j} R_n}}{\sum_{j = 1}^J e^{ \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n}} + \omega_{ni}
+    \end{alignat*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Estimation}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate NLS estimator for multinomial logit heating choice using cost }
+\hlcom{### data, alternative effects, and alternative-specific coefficients on rooms}
+\hlcom{## Function to calculate sum of squares using flexible matrices}
+\hlstd{least_squares_matrix} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variables}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlnum{1}\hlstd{)}
+  \hlcom{## Extract choice data}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlnum{2}\hlstd{)}
+  \hlcom{## Calculate utility for each alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlstd{.x} \hlopt{%*%} \hlstd{parameters)}
+  \hlcom{## Calculate logit probability denominator given the parameters}
+  \hlstd{probability_denominator} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(.x)))}
+  \hlcom{## Calculate logit probability numerator given the parameters}
+  \hlstd{probability_numerator} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{exp}\hlstd{(.x))}
+  \hlcom{## Calculate logit choice probability given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlstd{probability_numerator} \hlopt{%>%}
+    \hlkwd{map2}\hlstd{(probability_denominator,} \hlopt{~} \hlstd{.x} \hlopt{/} \hlstd{.y)}
+  \hlcom{## Calculate square residual given the parameters}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{%>%}
+    \hlkwd{map2}\hlstd{(probability_choice,} \hlopt{~} \hlstd{.x} \hlopt{-} \hlstd{.y)}
+  \hlcom{## Calculate the sum of squares given the parameters}
+  \hlstd{sum_squares} \hlkwb{<-} \hlstd{residuals} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{sum}\hlstd{(.x}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{%>%}
+    \hlkwd{unlist}\hlstd{()} \hlopt{%>%}
+    \hlkwd{sum}\hlstd{()}
+  \hlkwd{return}\hlstd{(sum_squares)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Estimation Data}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Split heating dataset into list of household data frames}
+\hlstd{heating_split} \hlkwb{<-} \hlstd{heating_long} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(idcase, alt)} \hlopt{%>%}
+  \hlkwd{group_split}\hlstd{()}
+\hlcom{## Crate matrix of dummy variables (intercepts) to bind to data}
+\hlstd{constant_matrix} \hlkwb{<-} \hlkwd{diag}\hlstd{(}\hlnum{4}\hlstd{)} \hlopt{%>%}
+  \hlkwd{rbind}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{))}
+\hlcom{## Function to create list of datasets for estimation}
+\hlstd{create_data_matrix} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{data}\hlstd{)\{}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{constant_matrix} \hlopt{%>%}
+    \hlkwd{cbind}\hlstd{(data_x)}
+  \hlstd{rooms} \hlkwb{<-} \hlstd{data}\hlopt{$}\hlstd{rooms[}\hlnum{1}\hlstd{]}
+  \hlstd{data_x} \hlkwb{<-}
+    \hlstd{data_x} \hlopt{%>%}
+    \hlkwd{cbind}\hlstd{(rooms} \hlopt{*} \hlstd{constant_matrix)}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(choice)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{choice)} \hlopt{%>%}
+    \hlkwd{pull}\hlstd{(choice)}
+  \hlkwd{return}\hlstd{(}\hlkwd{list}\hlstd{(}\hlkwc{x} \hlstd{= data_x,} \hlkwc{y} \hlstd{= data_y))}
+\hlstd{\}}
+\hlcom{## Create list of datasets for estimation}
+\hlstd{heating_matrix} \hlkwb{<-} \hlstd{heating_split} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlkwc{.x} \hlstd{= .,} \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{create_data_matrix}\hlstd{(.x))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Optimization}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Minimize the sum of square errors}
+\hlstd{model_matrix} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{10}\hlstd{), least_squares_matrix,}
+                      \hlkwc{data} \hlstd{= heating_matrix,} \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients NLS Results}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show NLS parameters}
+\hlstd{model_matrix}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+##  [1]  1.738552715  2.198846013  1.666259660  0.334077782 -0.001848879
+##  [6] -0.008319251  0.030034988 -0.030596610 -0.031776661 -0.054900639
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Greene textbook, Chapters 13.1--13.5
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+        \item Reminder: Tuesdays at 2:00--3:00 in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 2 is posted, due October 17
+    \end{itemize}
+\end{frame}
+
+\end{document}
