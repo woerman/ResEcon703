@@ -78,7 +78,7 @@
 \begin{frame}\frametitle{Nonlinear Least Squares}
     $$y_i = h(x_i, \beta) + \varepsilon_i$$ \\
     \vspace{2ex}
-    The nonlinear lest squares estimator minimizes the sum of squared errors for this model
+    The nonlinear least squares estimator minimizes the sum of squared errors for this model
     $$\hat{\beta} = \argmin_{\beta} \sum_{i = 1}^n [y_i - h(x_i, \beta)]^2$$ \\
     \vspace{2ex}
     This estimator does not require a distributional assumption about our data (unlike MLE), but it has fewer nice properties
@@ -167,7 +167,7 @@
         \item \texttt{\ldots}: dataset and other things needed by your function
         \item \texttt{method}: optimization algorithm
         \begin{itemize}
-            \item I recommend \texttt{method = 'BFGS'} for our estimation
+            \item I recommend \texttt{method = `BFGS'} for our estimation
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -176,8 +176,8 @@
     Steps to calculate the sum of squared errors for a given set of parameters in a logit model
     \begin{enumerate}
         \item Calculate the representative utility for each alternative and for each decision maker.
-        \item Calculate the choice probability of driving for each decision maker.
-        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+        \item Calculate the choice probability for each alternative and for each decision maker.
+        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each alternative and for each decision maker.
         \item Sum the square of these residuals.
         \item Return the sum of squares.
     \end{enumerate}
