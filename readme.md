@@ -16,6 +16,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 8. [Logit Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_08/lecture_08.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_08/lecture_08.R)
 9. [Nonlinear Least Squares I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_09/lecture_09.pdf)
 10. [Nonlinear Least Squares II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_10/lecture_10.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_10/lecture_10.R)
+11. [Generalized Method of Moments I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_11/lecture_11.pdf)
 
 ## Problem Sets
 
