@@ -368,12 +368,39 @@
     \end{align*}
 \end{frame}
 
+\begin{frame}\frametitle{Test of Overidentifying Restrictions}
+    When we have more moment conditions than parameters, the model is ``overidentified,'' and we cannot ensure all moments equal zero simultaneously. But we can test if the moments are sufficiently close to zero.
+    $$H_0: E[m(w_i, \theta)] = 0$$ \\
+    \vspace{3ex}
+    When $\hat{\theta}$ is estimated by optimal GMM, the test statistic is
+    $$J = \left( \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) \right)' \widehat{S}^{-1} \left( \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) \right)$$
+    which is asymptotically distributed $\chi^2$ with $L - K$ degrees of freedom
+\end{frame}
+
+\begin{frame}\frametitle{Hypothesis Tests}
+    We have seen two hypothesis tests so far
+    \begin{itemize}
+    	\item MLE: Likelihood ratio test
+    	\item NLS: Wald test
+    \end{itemize}
+    \vspace{2ex}
+    Both MLE and NLS are special cases of GMM, so there are generalized versions of each test to use with GMM estimators
+    \begin{itemize}
+    	\item See the Greene textbook for a description of these GMM hypothesis testing procedures
+    \end{itemize}
+\end{frame}
+
 \begin{frame}\frametitle{Announcements}
 	No class on Tuesday! Monday schedule. \\
 	\vspace{3ex}
     Reading for next time
     \begin{itemize}
         \item Optional: Crawford and Yurukoglu (2012)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item 10:00--11:15 am and 2:00--3:00 pm on Tuesday (9/15) in 218 Stockbridge
     \end{itemize}
     \vspace{3ex}
     Upcoming
