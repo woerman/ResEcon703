@@ -1,0 +1,361 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 12:\ Generalized Method of Moments II]{Lecture 12:\ Generalized Method of Moments II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Generalized Method of Moments
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Generalized Method of Moments Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 4
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 2 is due
+            \item Problem Set 3 will be posted soon, due October 31
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments}
+    We have population moment conditions
+    \begin{align*}
+        E[m(w_i, \theta_0)] &= 0 \\
+        \intertext{The GMM estimator uses the sample analogs of these moment conditions}
+        \frac{1}{n} \sum_{i = 1}^n m(w_i, \theta) & \\
+        \intertext{The GMM estimator is the set of parameters that solves}
+        \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) &= 0
+    \end{align*} \\
+    \vspace{2ex}
+    The GMM estimator is more flexible and less parametric (semi-parametric?) than MLE or NLS
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Generalized Method of Moments Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model Example}
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes. We have data on 600 households who rent a studio apartment and whether or not they choose to purchase a window air conditioning unit. For each household, we observe the purchase price of the air conditioner, its annual operating cost, and some household-level data. (To simplify things, we assume there is only one ``representative'' air conditioner for each household.)
+    \vspace{3ex}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Alternative-specific data
+            \begin{itemize}
+                \item cost\_system: system cost (price)
+                \item cost\_operating: annual operating cost
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Household data
+            \begin{itemize}
+                \item elec\_price: electricity price
+                \item square\_feet: apartment square footage
+            \end{itemize}
+            \vspace{2ex}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ### Load and look at dataset
+    ## Load tidyverse
+    library(tidyverse)
+    ## Load dataset
+    data <- read_csv('ac_renters.csv')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    data
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model to Estimate with GMM}
+    The representative utility from having the window air conditioner is (we implicitly normalize the utility of no air conditioner to be zero)
+    $$V_n = \beta_0 + \beta_1 SC_n + \beta_2 OC_n$$ \\
+    \vspace{2ex}
+    From the logit model, the probability of purchasing the air conditioner is
+    \begin{align*}
+        P_n &= \frac{e^{\beta_0 + \beta_1 SC_n + \beta_2 OC_n}}{1 + e^{\beta_0 + \beta_1 SC_n + \beta_2 OC_n}} \\
+        &= \frac{1}{1 + e^{-(\beta_0 + \beta_1 SC_n + \beta_2 OC_n)}}
+    \end{align*} \\
+    \vspace{2ex}
+    We will estimate this model using the moments we derived from the MLE first-order conditions (see previous slides or Train textbook)
+    \begin{align*}
+        &E[[y_n - P_n(x_n, \beta_0)] x_n] = 0 \\
+        \Rightarrow \quad &\frac{1}{N} \sum_{n = 1}^N [y_n - P_n(x_n, \hat{\beta})] x_n = 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Generalized Method of Moments in R}
+    <<message = FALSE>>=
+    ### Generalized Method of Moments in R
+    ## Load the gmm package
+    library(gmm)
+    @
+    <<eval = FALSE>>=
+    ## Help file for the gmm function
+    ?gmm
+    ## Arguments for gmm function
+    gmm(g, x, t0, ...)
+    @
+    \texttt{gmm()} requires that you create a function, \texttt{g}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and a data \emph{matrix} as inputs
+        \item Calculates the empirical moments for each observation
+        \item Returns a $N \times L$ matrix of empirical moments
+    \end{enumerate}
+    You also have to give \texttt{gmm()} arguments for
+    \begin{itemize}
+        \item \texttt{x}: your data \emph{matrix}
+        \item \texttt{t0}: parameter starting values
+        \item Many other optional arguments
+        \begin{itemize}
+            \item \texttt{gmm()} can be very finicky with the optimization arguments
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Calculating Empirical Moments in a Binary Logit Model}
+    Steps to calculate this set of empirical moments for a given set of parameters in a binary logit model
+    \begin{enumerate}
+        \item Calculate the representative utility of the air conditioner for each decision maker.
+        \item Calculate the choice probability of the air conditioner for each decision maker.
+        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+        \item Multiply this residual vector ($N \times 1$) by each column of the explanatory data matrix ($N \times K$).
+        \item Return the resulting $N \times K$ matrix of empirical moments.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model and Moments}
+    The representative utility of the air conditioner is
+    $$V_n = \beta_0 + \beta_1 SC_n + \beta_2 OC_n$$ \\
+    \vspace{2ex}
+    The choice probability is
+    $$P_n = \frac{1}{1 + e^{-(\beta_0 + \beta_1 SC_n + \beta_2 OC_n)}}$$ \\
+    \vspace{2ex}
+    The empirical moments for each decision maker are
+    $$[y_n - P_n(x_n, \hat{\beta})] x_n$$ \\
+    \vspace{2ex}
+    This model is just-identified, so we will actually use the MM estimator
+    \begin{itemize}
+        \item Three parameters and three moment conditions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Moments}
+    <<>>=
+    ### Calculate GMM estimator for binary logit AC choice using cost data 
+    ## Function to calculate binary logit moments
+    calculate_moments <- function(parameters, data){
+      ## Extract explanatory variable data from matrix
+      data_x <- data[, -1]
+      ## Extract choice data from matrix
+      data_y <- data[, 1]
+      ## Calculate net utility of alternative given the parameters
+      utility <- data_x %*% parameters
+      ## Caclculate logit probability of alternative given the parameters
+      probability_choice <- 1 / (1 + exp(-utility))
+      ## Calculate residuals
+      residuals <- data_y - probability_choice
+      ## Create moment matrix
+      moments <- c(residuals) * data_x
+      return(moments)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate MM Parameters}
+    <<>>=
+    ## Create dataset for use in GMM moment function
+    data_gmm <- data %>% 
+      mutate(air_conditioning = 1 * air_conditioning,
+             constant = 1) %>% 
+      select(air_conditioning, constant, cost_system, cost_operating) %>% 
+      as.matrix()
+    ## Find the GMM estimator
+    model_gmm <- gmm(calculate_moments, data_gmm, rep(0, 3), vcov = 'iid',
+                     control = list(reltol = 1e-25, maxit = 10000))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<size = 'tiny'>>=
+    ## Summarize GMM model results
+    model_gmm %>% 
+      summary()
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model with Instruments}
+    We may be concerned that the annual operating cost is endogenous
+    $$E[OC_n \varepsilon_n] \neq 0$$ \\
+    \begin{itemize}
+        \item Why might this be true?
+    \end{itemize}
+    \vspace{3ex}
+    We can re-write our moments with instruments instead of the explanatory variables
+    \begin{align*}
+        &E[[y_n - P_n(x_n, \beta_0)] z_n] = 0 \\
+        \Rightarrow \quad &\frac{1}{N} \sum_{n = 1}^N [y_n - P_n(x_n, \hat{\beta})] z_n = 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Instruments to include in model}
+    Exogenous variables: constant term and system cost
+    \begin{itemize}
+        \item These variables are their own instruments
+    \end{itemize}
+    \vspace{2ex}
+    Endogenous variable: operating cost
+    \begin{itemize}
+        \item Instrument with electricity price and square footage
+    \end{itemize}
+    \vspace{2ex}
+    But now we have four moment conditions (one for each instrument) but only three parameters
+    \begin{itemize}
+        \item This model is now overidentified
+        \item We will use optimal (two-step) GMM to estimate it
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Moments with Instruments}
+    <<>>=
+    ### Calculate GMM estimator for binary logit AC choice using cost data
+    ### instrumenting for operating cost with elec price and square feet
+    ## Function to calculate binary logit moments with instruments
+    calculate_moments_iv <- function(parameters, data){
+      ## Extract explanatory variable data from matrix
+      data_x <- data[, 2:4]
+      ## Extract choice data from matrix
+      data_y <- data[, 1]
+      ## Extract instrument data from matrix
+      data_z <- data[, c(2:3, 5:6)]
+      ## Calculate net utility of alternative given the parameters
+      utility <- data_x %*% parameters
+      ## Caclculate logit probability of alternative given the parameters
+      probability_choice <- 1 / (1 + exp(-utility))
+      ## Calculate residuals
+      residuals <- data_y - probability_choice
+      ## Create moment matrix
+      moments <- c(residuals) * data_z
+      return(moments)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate GMM Parameters}
+    <<>>=
+    ## Create dataset for use in GMM IV moment function
+    data_gmm_iv <- data %>% 
+      mutate(air_conditioning = 1 * air_conditioning,
+             constant = 1) %>% 
+      select(air_conditioning, constant, cost_system, cost_operating,
+             elec_price, square_feet) %>% 
+      as.matrix()
+    ## Find the GMM IV estimator
+    model_gmm_iv <- gmm(calculate_moments_iv, data_gmm_iv, rep(0, 3), 
+                        vcov = 'iid', 
+                        control = list(reltol = 1e-25, maxit = 10000))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<size = 'tiny'>>=
+    ## Summarize GMM IV model results
+    model_gmm_iv %>% 
+      summary()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Test of Overidentifying Restrictions}
+    <<>>=
+    ## Test overidentifying restrictions
+    model_gmm_iv %>% 
+      specTest()
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 4
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 3 will be posted soon, due October 31
+    \end{itemize}
+\end{frame}
+
+\end{document}

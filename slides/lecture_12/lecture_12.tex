@@ -1,0 +1,529 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 12:\ Generalized Method of Moments II]{Lecture 12:\ Generalized Method of Moments II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Generalized Method of Moments
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Generalized Method of Moments Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 4
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 2 is due
+            \item Problem Set 3 will be posted soon, due October 31
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments}
+    We have population moment conditions
+    \begin{align*}
+        E[m(w_i, \theta_0)] &= 0 \\
+        \intertext{The GMM estimator uses the sample analogs of these moment conditions}
+        \frac{1}{n} \sum_{i = 1}^n m(w_i, \theta) & \\
+        \intertext{The GMM estimator is the set of parameters that solves}
+        \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) &= 0
+    \end{align*} \\
+    \vspace{2ex}
+    The GMM estimator is more flexible and less parametric (semi-parametric?) than MLE or NLS
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Generalized Method of Moments Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model Example}
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes. We have data on 600 households who rent a studio apartment and whether or not they choose to purchase a window air conditioning unit. For each household, we observe the purchase price of the air conditioner, its annual operating cost, and some household-level data. (To simplify things, we assume there is only one ``representative'' air conditioner for each household.)
+    \vspace{3ex}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Alternative-specific data
+            \begin{itemize}
+                \item cost\_system: system cost (price)
+                \item cost\_operating: annual operating cost
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Household data
+            \begin{itemize}
+                \item elec\_price: electricity price
+                \item square\_feet: apartment square footage
+            \end{itemize}
+            \vspace{2ex}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load and look at dataset}
+\hlcom{## Load tidyverse}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlcom{## Load dataset}
+\hlstd{data} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'ac_renters.csv'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlstd{data}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 600 x 8
+##    air_conditioning cost_system cost_operating elec_price square_feet
+##    <lgl>                  <dbl>          <dbl>      <dbl>       <dbl>
+##  1 FALSE                    620            258       13.1         828
+##  2 FALSE                    685            141        9.7         553
+##  3 FALSE                    570            152       10.1         410
+##  4 TRUE                     497            193       11.3         397
+##  5 TRUE                     541            162       10.4         395
+##  6 FALSE                    663            160       10.3         584
+##  7 FALSE                    579            185       11.1         515
+##  8 FALSE                    502            158       10.3         333
+##  9 TRUE                     562            132        9.4         349
+## 10 FALSE                    495            111        8.6         227
+## # ... with 590 more rows, and 3 more variables: income <dbl>,
+## #   residents <dbl>, city <dbl>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model to Estimate with GMM}
+    The representative utility from having the window air conditioner is (we implicitly normalize the utility of no air conditioner to be zero)
+    $$V_n = \beta_0 + \beta_1 SC_n + \beta_2 OC_n$$ \\
+    \vspace{2ex}
+    From the logit model, the probability of purchasing the air conditioner is
+    \begin{align*}
+        P_n &= \frac{e^{\beta_0 + \beta_1 SC_n + \beta_2 OC_n}}{1 + e^{\beta_0 + \beta_1 SC_n + \beta_2 OC_n}} \\
+        &= \frac{1}{1 + e^{-(\beta_0 + \beta_1 SC_n + \beta_2 OC_n)}}
+    \end{align*} \\
+    \vspace{2ex}
+    We will estimate this model using the moments we derived from the MLE first-order conditions (see previous slides or Train textbook)
+    \begin{align*}
+        &E[[y_n - P_n(x_n, \beta_0)] x_n] = 0 \\
+        \Rightarrow \quad &\frac{1}{N} \sum_{n = 1}^N [y_n - P_n(x_n, \hat{\beta})] x_n = 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Generalized Method of Moments in R}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Generalized Method of Moments in R}
+\hlcom{## Load the gmm package}
+\hlkwd{library}\hlstd{(gmm)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Help file for the gmm function}
+\hlopt{?}\hlstd{gmm}
+\hlcom{## Arguments for gmm function}
+\hlkwd{gmm}\hlstd{(g, x, t0, ...)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+    \texttt{gmm()} requires that you create a function, \texttt{g}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and a data \emph{matrix} as inputs
+        \item Calculates the empirical moments for each observation
+        \item Returns a $N \times L$ matrix of empirical moments
+    \end{enumerate}
+    You also have to give \texttt{gmm()} arguments for
+    \begin{itemize}
+        \item \texttt{x}: your data \emph{matrix}
+        \item \texttt{t0}: parameter starting values
+        \item Many other optional arguments
+        \begin{itemize}
+            \item \texttt{gmm()} can be very finicky with the optimization arguments
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Calculating Empirical Moments in a Binary Logit Model}
+    Steps to calculate this set of empirical moments for a given set of parameters in a binary logit model
+    \begin{enumerate}
+        \item Calculate the representative utility of the air conditioner for each decision maker.
+        \item Calculate the choice probability of the air conditioner for each decision maker.
+        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+        \item Multiply this residual vector ($N \times 1$) by each column of the explanatory data matrix ($N \times K$).
+        \item Return the resulting $N \times K$ matrix of empirical moments.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model and Moments}
+    The representative utility of the air conditioner is
+    $$V_n = \beta_0 + \beta_1 SC_n + \beta_2 OC_n$$ \\
+    \vspace{2ex}
+    The choice probability is
+    $$P_n = \frac{1}{1 + e^{-(\beta_0 + \beta_1 SC_n + \beta_2 OC_n)}}$$ \\
+    \vspace{2ex}
+    The empirical moments for each decision maker are
+    $$[y_n - P_n(x_n, \hat{\beta})] x_n$$ \\
+    \vspace{2ex}
+    This model is just-identified, so we will actually use the MM estimator
+    \begin{itemize}
+        \item Three parameters and three moment conditions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Moments}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate GMM estimator for binary logit AC choice using cost data }
+\hlcom{## Function to calculate binary logit moments}
+\hlstd{calculate_moments} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variable data from matrix}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{]}
+  \hlcom{## Extract choice data from matrix}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate residuals}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{-} \hlstd{probability_choice}
+  \hlcom{## Create moment matrix}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{data_x}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate MM Parameters}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create dataset for use in GMM moment function}
+\hlstd{data_gmm} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{air_conditioning} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{air_conditioning,}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(air_conditioning, constant, cost_system, cost_operating)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Find the GMM estimator}
+\hlstd{model_gmm} \hlkwb{<-} \hlkwd{gmm}\hlstd{(calculate_moments, data_gmm,} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                 \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize GMM model results}
+\hlstd{model_gmm} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = calculate_moments, x = data_gmm, t0 = rep(0, 3), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]   4.9913e+00   9.3515e-01   5.3374e+00   9.4292e-08
+## Theta[2]  -5.4848e-03   1.4633e-03  -3.7483e+00   1.7801e-04
+## Theta[3]  -1.0045e-02   2.1869e-03  -4.5934e+00   4.3609e-06
+## 
+## J-Test: degrees of freedom is 0 
+##                 J-test                P-value             
+## Test E(g)=0:    1.57492779993196e-20  *******             
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  0 
+## Function eval. =  1036 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model with Instruments}
+    We may be concerned that the annual operating cost is endogenous
+    $$E[OC_n \varepsilon_n] \neq 0$$ \\
+    \begin{itemize}
+        \item Why might this be true?
+    \end{itemize}
+    \vspace{3ex}
+    We can re-write our moments with instruments instead of the explanatory variables
+    \begin{align*}
+        &E[[y_n - P_n(x_n, \beta_0)] z_n] = 0 \\
+        \Rightarrow \quad &\frac{1}{N} \sum_{n = 1}^N [y_n - P_n(x_n, \hat{\beta})] z_n = 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Instruments to include in model}
+    Exogenous variables: constant term and system cost
+    \begin{itemize}
+        \item These variables are their own instruments
+    \end{itemize}
+    \vspace{2ex}
+    Endogenous variable: operating cost
+    \begin{itemize}
+        \item Instrument with electricity price and square footage
+    \end{itemize}
+    \vspace{2ex}
+    But now we have four moment conditions (one for each instrument) but only three parameters
+    \begin{itemize}
+        \item This model is now overidentified
+        \item We will use optimal (two-step) GMM to estimate it
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Moments with Instruments}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Calculate GMM estimator for binary logit AC choice using cost data}
+\hlcom{### instrumenting for operating cost with elec price and square feet}
+\hlcom{## Function to calculate binary logit moments with instruments}
+\hlstd{calculate_moments_iv} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variable data from matrix}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[,} \hlnum{2}\hlopt{:}\hlnum{4}\hlstd{]}
+  \hlcom{## Extract choice data from matrix}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Extract instrument data from matrix}
+  \hlstd{data_z} \hlkwb{<-} \hlstd{data[,} \hlkwd{c}\hlstd{(}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{,} \hlnum{5}\hlopt{:}\hlnum{6}\hlstd{)]}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate residuals}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{-} \hlstd{probability_choice}
+  \hlcom{## Create moment matrix}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{data_z}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate GMM Parameters}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create dataset for use in GMM IV moment function}
+\hlstd{data_gmm_iv} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{air_conditioning} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{air_conditioning,}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(air_conditioning, constant, cost_system, cost_operating,}
+         \hlstd{elec_price, square_feet)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Find the GMM IV estimator}
+\hlstd{model_gmm_iv} \hlkwb{<-} \hlkwd{gmm}\hlstd{(calculate_moments_iv, data_gmm_iv,} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{),}
+                    \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                    \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize GMM IV model results}
+\hlstd{model_gmm_iv} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = calculate_moments_iv, x = data_gmm_iv, t0 = rep(0, 3), 
+##     vcov = "iid", control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]   5.0037e+00   9.3613e-01   5.3451e+00   9.0385e-08
+## Theta[2]  -5.4824e-03   1.4640e-03  -3.7449e+00   1.8046e-04
+## Theta[3]  -1.0135e-02   2.1874e-03  -4.6334e+00   3.5967e-06
+## 
+## J-Test: degrees of freedom is 1 
+##                 J-test     P-value  
+## Test E(g)=0:    0.0091463  0.9238094
+## 
+## Initial values of the coefficients
+##     Theta[1]     Theta[2]     Theta[3] 
+##  5.023667023 -0.005509947 -0.010157435 
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  0 
+## Function eval. =  463 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Test of Overidentifying Restrictions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Test overidentifying restrictions}
+\hlstd{model_gmm_iv} \hlopt{%>%}
+  \hlkwd{specTest}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+##  ##  J-Test: degrees of freedom is 1  ## 
+## 
+##                 J-test     P-value  
+## Test E(g)=0:    0.0091463  0.9238094
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 4
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 3 will be posted soon, due October 31
+    \end{itemize}
+\end{frame}
+
+\end{document}
