@@ -1,0 +1,750 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 2}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three, and all group members can submit the same code and output; indicate in your writeup who you worked with. You must submit a unique writeup that answers the problems below. You can discuss answers with your fellow group members, but your writeup must be in your own words. This problem set requires you to code your own estimators, rather than using R's ``canned routines.''
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_2/travel_datasets.zip}{\texttt{travel\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website (\texttt{github.com/woerman/ResEcon703})}. This zipped file contains two datasets, \texttt{travel\_binary.csv} and \texttt{travel\_multinomial.csv}, that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students commuting to campus. The \texttt{travel\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options (assume the weather is too severe for even the heartiest graduate students to ride a bike or walk). The \texttt{travel\_multinomial.csv} dataset corresponds to commuting in spring when riding a bike and walking are feasible alternatives. See the file \texttt{travel\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Attaching packages ------------------------------------ tidyverse 1.2.1 --}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# v ggplot2 3.2.1\ \ \ \  v purrr\ \  0.3.2\\\#\# v tibble\ \ 2.1.3\ \ \ \  v dplyr\ \  0.8.3\\\#\# v tidyr\ \  1.0.0\ \ \ \  v stringr 1.4.0\\\#\# v readr\ \  1.3.1\ \ \ \  v forcats 0.4.0}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Conflicts --------------------------------------- tidyverse\_conflicts() --\\\#\# x dplyr::filter() masks stats::filter()\\\#\# x dplyr::lag()\ \ \ \ masks stats::lag()}}\end{kframe}
+\end{knitrout}
+
+\section*{Problem 1: Maximum Likelihood Estimation}
+
+Use the \texttt{travel\_multinomial.csv} dataset for this question.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the travel mode choice to commute to campus during spring as a multinomial logit model. Include the cost and the time of each alternative as explanatory variables with common coefficients; do not include alternative-specific intercepts. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj}$$
+	where $C_{nj}$ is the cost of alternative $j$ and $T_{nj}$ is the time of alternative $j$. Estimate the parameters of this model by maximum likelihood estimation. The following steps can provide a rough guide to creating your own maximum likelihood estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function that takes a set of parameters and data as inputs: \texttt{function(parameters, data)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the representative utility for each alternative and for each decision maker.
+			\item Calculate the choice probability of the chosen alternative for each decision maker.
+			\item Sum the log of these choice probabilities to get the log-likelihood.
+			\item Return the negative of the log-likelihood.
+		\end{enumerate}
+		\item Maximize the log-likelihood (or minimize its negative) using \texttt{optim()}. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = your\_starting\_guesses, fn = your\_function, data = your\_data,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS', hessian = TRUE)}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Create functions to calculate log likelihood, summarize MLE models, and}
+\hlcom{### conduct likelihood ratio tests}
+\hlcom{## Function to calculate logit log-likelihood}
+\hlstd{calculate_log_likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data_x}\hlstd{,} \hlkwc{data_y}\hlstd{)\{}
+  \hlcom{## Calculate utility for each alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlstd{.x} \hlopt{%*%} \hlstd{parameters)}
+  \hlcom{## Calculate logit probability denominator given the parameters}
+  \hlstd{probability_denominator} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(.x)))} \hlopt{%>%}
+    \hlkwd{unlist}\hlstd{()}
+  \hlcom{## Calculate logit probability numerator given the parameters}
+  \hlstd{probability_numerator} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{map2}\hlstd{(data_y,} \hlopt{~} \hlkwd{exp}\hlstd{(}\hlkwd{sum}\hlstd{(.x} \hlopt{*} \hlstd{.y)))} \hlopt{%>%}
+    \hlkwd{unlist}\hlstd{()}
+  \hlcom{## Calculate logit choice probability given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-}  \hlstd{probability_numerator} \hlopt{/} \hlstd{probability_denominator}
+  \hlcom{## Calculate log of logit choice probability given the parameters}
+  \hlstd{log_probability_choice} \hlkwb{<-} \hlkwd{log}\hlstd{(probability_choice)}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{log_likelihood} \hlkwb{<-} \hlkwd{sum}\hlstd{(log_probability_choice)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{log_likelihood)}
+\hlstd{\}}
+\hlcom{## Function to summarize MLE model results}
+\hlstd{summarize_mle} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{model}\hlstd{,} \hlkwc{names}\hlstd{)\{}
+  \hlcom{## Extract model parameter estimates}
+  \hlstd{parameters} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{par}
+  \hlcom{## Calculate parameters standard errors}
+  \hlstd{std_errors} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+    \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+    \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+    \hlkwd{sqrt}\hlstd{()}
+  \hlcom{## Calculate parameter z-stats}
+  \hlstd{z_stats} \hlkwb{<-} \hlstd{parameters} \hlopt{/} \hlstd{std_errors}
+  \hlcom{## Calculate parameter p-values}
+  \hlstd{p_values} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlkwd{pnorm}\hlstd{(}\hlopt{-}\hlkwd{abs}\hlstd{(z_stats))}
+  \hlcom{## Summarize results in a list}
+  \hlstd{model_summary} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{names} \hlstd{= names,}
+                        \hlkwc{parameters} \hlstd{= parameters,}
+                        \hlkwc{std_errors} \hlstd{= std_errors,}
+                        \hlkwc{z_stats} \hlstd{= z_stats,}
+                        \hlkwc{p_values} \hlstd{= p_values)}
+  \hlcom{## Return model_summary object}
+  \hlkwd{return}\hlstd{(model_summary)}
+\hlstd{\}}
+\hlcom{## Function to conduct likelihood ratio test}
+\hlstd{test_likelihood_ratio} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{model_restricted}\hlstd{,} \hlkwc{model_unrestricted}\hlstd{)\{}
+  \hlcom{## Calculate likelihood ratio test statistic}
+  \hlstd{test_statistic} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlstd{(model_restricted}\hlopt{$}\hlstd{value} \hlopt{-} \hlstd{model_unrestricted}\hlopt{$}\hlstd{value)}
+  \hlcom{## Calculate the number of restrictions}
+  \hlstd{df} \hlkwb{<-} \hlkwd{length}\hlstd{(model_unrestricted}\hlopt{$}\hlstd{par)} \hlopt{-} \hlkwd{length}\hlstd{(model_restricted}\hlopt{$}\hlstd{par)}
+  \hlcom{## Test if likelihood ratio test statitsic is greater than critical value}
+  \hlstd{test} \hlkwb{<-} \hlstd{test_statistic} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{, df)}
+  \hlcom{## Calculate p-value of test}
+  \hlstd{p_value} \hlkwb{<-} \hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(test_statistic, df)}
+  \hlcom{## Return test result and p-value}
+  \hlkwd{return}\hlstd{(}\hlkwd{list}\hlstd{(}\hlkwc{reject} \hlstd{= test,} \hlkwc{p_value} \hlstd{= p_value))}
+\hlstd{\}}
+
+\hlcom{### Part a}
+\hlcom{## Load dataset}
+\hlstd{data_multinomial} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'travel_multinomial.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  mode = col\_character(),\\\#\#\ \  time\_car = col\_double(),\\\#\#\ \  cost\_car = col\_double(),\\\#\#\ \  time\_bus = col\_double(),\\\#\#\ \  cost\_bus = col\_double(),\\\#\#\ \  time\_bike = col\_double(),\\\#\#\ \  cost\_bike = col\_double(),\\\#\#\ \  time\_walk = col\_double(),\\\#\#\ \  cost\_walk = col\_double(),\\\#\#\ \  age = col\_double(),\\\#\#\ \  income = col\_double(),\\\#\#\ \  marital\_status = col\_character()\\\#\# )}}\begin{alltt}
+\hlcom{## Gather wide dataset into a long dataset}
+\hlstd{data_multinomial_long} \hlkwb{<-} \hlstd{data_multinomial} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{id} \hlstd{=} \hlnum{1}\hlopt{:}\hlkwd{n}\hlstd{())} \hlopt{%>%}
+  \hlkwd{gather}\hlstd{(key, value,} \hlkwd{starts_with}\hlstd{(}\hlstr{'cost_'}\hlstd{),} \hlkwd{starts_with}\hlstd{(}\hlstr{'time_'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(key,} \hlkwd{c}\hlstd{(}\hlstr{'key'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(key, value)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{= (mode} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{mode)}
+\hlcom{## Split heating dataset into list of household data frames}
+\hlstd{data_multinomial_split} \hlkwb{<-} \hlstd{data_multinomial_long} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(id)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(id, alt)} \hlopt{%>%}
+  \hlkwd{group_split}\hlstd{()}
+\hlcom{## Create matrices for choice outcomes}
+\hlstd{data_choice_1} \hlkwb{<-} \hlstd{data_multinomial_split} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~} \hlstd{.x} \hlopt{%>%}
+        \hlkwd{select}\hlstd{(choice)} \hlopt{%>%}
+        \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{choice)} \hlopt{%>%}
+        \hlkwd{pull}\hlstd{(choice))}
+\hlcom{## Create matrices of explanatory variables}
+\hlstd{data_explanatory_1a} \hlkwb{<-} \hlstd{data_multinomial_split} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~}\hlstd{.x} \hlopt{%>%}
+        \hlkwd{select}\hlstd{(cost, time)} \hlopt{%>%}
+        \hlkwd{as.matrix}\hlstd{())}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1a} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{), calculate_log_likelihood,}
+                  \hlkwc{data_x} \hlstd{= data_explanatory_1a,} \hlkwc{data_y} \hlstd{= data_choice_1,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlcom{## Summarize model results}
+\hlstd{model_1a} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "cost" "time"
+## 
+## $parameters
+## [1]  0.005921936 -0.077191067
+## 
+## $std_errors
+## [1] 0.048334999 0.006541943
+## 
+## $z_stats
+## [1]   0.1225186 -11.7994092
+## 
+## $p_values
+## [1] 9.024883e-01 3.930612e-32
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+	
+	The cost parameter is positive but not statistically significant, indicating that cost has no effect on the choice of travel mode. The time parameter is negative and statistically significant, indicating that time spent commuting reduces utility. The time result is intuitive, but the cost result does not have an economic explanation, suggesting that the model may be incorrect.
+
+	\item Again model the travel mode choice to commute to campus during spring as a multinomial logit model, but now add alternative-specific intercepts for all but one alternative. That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta_1 C_{nj} + \beta_2 T_{nj}$$
+	where $\alpha_j$ is an alternative-specific intercept, $C_{nj}$ is the cost of alternative $j$ and $T_{nj}$ is the time of alternative $j$. Estimate the parameters of this model by maximum likelihood estimation. Follow the same set of steps as in (a), but now you have five parameters and the representative utility calculation has an additional component. You can use matrix multiplication in your log-likelihood function to flexibly accommodate different models, or you can create a different function for each model. Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part b}
+\hlcom{## Create matrices of explanatory variables}
+\hlstd{data_explanatory_1b} \hlkwb{<-} \hlstd{data_multinomial_split} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{)} \hlopt{%>%}
+        \hlkwd{rbind}\hlstd{(}\hlkwd{diag}\hlstd{(}\hlnum{3}\hlstd{))} \hlopt{%>%}
+        \hlkwd{cbind}\hlstd{(.x} \hlopt{%>%}
+                \hlkwd{select}\hlstd{(cost, time))} \hlopt{%>%}
+        \hlkwd{as.matrix}\hlstd{())}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1b} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{), calculate_log_likelihood,}
+                  \hlkwc{data_x} \hlstd{= data_explanatory_1b,} \hlkwc{data_y} \hlstd{= data_choice_1,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlcom{## Summarize model results}
+\hlstd{model_1b} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'bus'}\hlstd{,} \hlstr{'car'}\hlstd{,} \hlstr{'walk'}\hlstd{,} \hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "bus"  "car"  "walk" "cost" "time"
+## 
+## $parameters
+## [1]  1.6773063  1.7915827  1.8117712 -0.7082199 -0.1129539
+## 
+## $std_errors
+## [1] 0.267522222 0.373361834 0.153299220 0.164312061 0.008254052
+## 
+## $z_stats
+## [1]   6.269783   4.798516  11.818528  -4.310212 -13.684659
+## 
+## $p_values
+## [1] 3.615517e-10 1.598455e-06 3.131223e-32 1.630979e-05 1.253941e-42
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	All three alternative intercepts are positive and significant, indicating that, \emph{ceteris paribus}, all other modes are preferred to biking; these three modes do not appear to be statistically different from one another. The cost parameter is now negative and statistically significant, indicating that the cost of commuting reduces utility. The time parameter is again negative and statistically significant, indicating that time spent commuting reduces utility. The cost and time results are now intuitive, implying that people like both money and time.
+	
+	\item Conduct a likelihood ratio test on the model in part (b) to test the joint significance of the alternative-specific intercepts. That is, test the null hypothesis:
+	$$H_0 \text{: } \alpha_b = \alpha_c = \alpha_w = 0$$
+	Your null hypothesis may be slightly different, depending on what you consider your ``reference alternative.'' Do you reject this null hypothesis? What is the p-value of the test?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part c}
+\hlcom{## Conduct likelihood ratio test of models 1a and 1b}
+\hlstd{test_1c} \hlkwb{<-} \hlkwd{test_likelihood_ratio}\hlstd{(model_1a, model_1b)}
+\hlcom{## Display test results}
+\hlstd{test_1c}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] TRUE
+## 
+## $p_value
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	We reject this null hypothesis; the three alternative intercepts are jointly significant. That is, the model in part (b) provides a better fit than the model in part (a), which restricted these parameters to all be zero.
+	
+	\item Again model the travel mode choice to commute to campus during spring as a multinomial logit model, but now add alternative-specific coefficients on the time variable. That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta_1 C_{nj} + \beta_j T_{nj}$$
+	where $\alpha_j$ is an alternative-specific intercept, $C_{nj}$ is the cost of alternative $j$, $T_{nj}$ is the time of alternative $j$, and $\beta_j$ varies for each alternative. Estimate the parameters of this model by maximum likelihood estimation. Follow the same set of steps as in (a), but now you have eight parameters and the representative utility calculation is different. You can use matrix multiplication in your log-likelihood function to flexibly accommodate different models, or you can create a different function for each model. Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part d}
+\hlcom{## Create matrices of explanatory variables}
+\hlstd{data_explanatory_1d} \hlkwb{<-} \hlstd{data_multinomial_split} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{)} \hlopt{%>%}
+        \hlkwd{rbind}\hlstd{(}\hlkwd{diag}\hlstd{(}\hlnum{3}\hlstd{))} \hlopt{%>%}
+        \hlkwd{cbind}\hlstd{(.x}\hlopt{$}\hlstd{cost)} \hlopt{%>%}
+        \hlkwd{cbind}\hlstd{(}\hlkwd{diag}\hlstd{(.x}\hlopt{$}\hlstd{time))} \hlopt{%>%}
+        \hlkwd{as.matrix}\hlstd{())}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1d} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{8}\hlstd{), calculate_log_likelihood,}
+                  \hlkwc{data_x} \hlstd{= data_explanatory_1d,} \hlkwc{data_y} \hlstd{= data_choice_1,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlcom{## Summarize model results}
+\hlstd{model_1d} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'bus'}\hlstd{,} \hlstr{'car'}\hlstd{,} \hlstr{'walk'}\hlstd{,} \hlstr{'cost'}\hlstd{,}
+                  \hlstr{'time_bike'}\hlstd{,} \hlstr{'time_bus'}\hlstd{,} \hlstr{'time_car'}\hlstd{,} \hlstr{'time_walk'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "bus"       "car"       "walk"      "cost"      "time_bike" "time_bus" 
+## [7] "time_car"  "time_walk"
+## 
+## $parameters
+## [1]  3.0835866  6.1870964  3.6096535 -2.8727780 -0.3222726 -0.2248886
+## [7] -0.4602647 -0.3878172
+## 
+## $std_errors
+## [1] 0.31611786 0.57498330 0.32667525 0.28725797 0.02515921 0.02322886
+## [7] 0.04488185 0.03363322
+## 
+## $z_stats
+## [1]   9.754547  10.760480  11.049669 -10.000691 -12.809328  -9.681429
+## [7] -10.255030 -11.530777
+## 
+## $p_values
+## [1] 1.763860e-22 5.289383e-27 2.200235e-28 1.513379e-23 1.453890e-37
+## [6] 3.616258e-22 1.123409e-24 9.230635e-31
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	All three alternative intercepts are again positive and significant, indicating that, \emph{ceteris paribus}, all other modes are preferred to biking; it now appears that the intercept for driving is statistically larger than the others, indicating it is the most preferred alternative, \emph{ceteris paribus}. The cost parameter is again negative and statistically significant, indicating that the cost of commuting reduces utility; this parameter is even larger than it was in previous models. All four time parameters are negative and statistically significant, indicating the time spent commuting by each mode reduces utility; the time parameters appear to be statistically different for most alternatives, with each minute driving a car yielding the greatest disutility and each minute riding the bus yielding the least disutility.
+	
+	\item Conduct a likelihood ratio test on the model in part (d) to test that the alternative-specific coefficients on time are significantly different from one another. That is, test the null hypothesis:
+	$$H_0 \text{: } \beta_k = \beta_b = \beta_c = \beta_w$$
+	Do you reject this null hypothesis? What is the p-value of the test?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part e}
+\hlcom{## Conduct likelihood ratio test of models 1a and 1b}
+\hlstd{test_1e} \hlkwb{<-} \hlkwd{test_likelihood_ratio}\hlstd{(model_1b, model_1d)}
+\hlcom{## Display test results}
+\hlstd{test_1e}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] TRUE
+## 
+## $p_value
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	We reject this null hypothesis; the four alternative-specific time parameters are not equal. That is, the model in part (d) provides a better fit than the model in part (b), which restricted these parameters to be equal.
+\end{enumerate}
+
+\section*{Problem 2: Nonlinear Least Squares}
+
+Use the \texttt{travel\_binary.csv} dataset for this question.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Include the cost and the time of each alternative as explanatory variables with common coefficients; do not include an intercept. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj}$$
+	where $C_j$ is the cost of alternative $j$ and $T_j$ is the time of alternative $j$. Estimate the parameters of this model by nonlinear least squares. The following steps can provide a rough guide to creating your own nonlinear least squares estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function that takes a set of parameters and data as inputs: \texttt{function(parameters, data)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the representative utility for each alternative and for each decision maker.
+			\item Calculate the choice probability of driving for each decision maker.
+			\item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+			\item Sum the square of these residuals.
+			\item Return the sum of squares.
+		\end{enumerate}
+		\item Minimize the sum of squares using \texttt{optim()}. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = your\_starting\_guesses, fn = your\_function, data = your\_data,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS')}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates and briefly interpret them. You do not have to estimate standard errors yet.
+
+	Hint: For a binary logit model, characterizing one choice probability is sufficient because the two probabilities must sum to 100\%. The probability of driving is
+	\begin{align*}
+		P_{nc} &= \frac{e^{V_{nc}}}{e^{V_{nc}} + e^{V_{nb}}} \\
+		&= \frac{1}{1 + e^{-V_{nc} + V_{nb}}}
+	\end{align*}
+	Both of these expressions for the probability of driving may be useful as you solve this problem.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Create function to calculate sum of squares}
+\hlcom{## Function to calculate binary logit sum of squares}
+\hlstd{calculate_sum_of_squares} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data_x}\hlstd{,} \hlkwc{data_y}\hlstd{)\{}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate sum of squares}
+  \hlstd{sum_of_squares} \hlkwb{<-} \hlkwd{sum}\hlstd{((data_y} \hlopt{-} \hlstd{probability_choice)}\hlopt{^}\hlnum{2}\hlstd{)}
+  \hlkwd{return}\hlstd{(sum_of_squares)}
+\hlstd{\}}
+
+\hlcom{### Part a}
+\hlcom{## Load dataset}
+\hlstd{data_binary} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'travel_binary.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  mode = col\_character(),\\\#\#\ \  time\_car = col\_double(),\\\#\#\ \  cost\_car = col\_double(),\\\#\#\ \  time\_bus = col\_double(),\\\#\#\ \  cost\_bus = col\_double(),\\\#\#\ \  age = col\_double(),\\\#\#\ \  income = col\_double(),\\\#\#\ \  marital\_status = col\_character()\\\#\# )}}\begin{alltt}
+\hlcom{## Create vector for choice outcomes}
+\hlstd{data_choice_2} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{pull}\hlstd{(choice)}
+\hlcom{## Create matrix of explanatory variables}
+\hlstd{data_explanatory_2a} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cost_difference} \hlstd{= cost_car} \hlopt{-} \hlstd{cost_bus,}
+         \hlkwc{time_difference} \hlstd{= time_car} \hlopt{-} \hlstd{time_bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(cost_difference, time_difference)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Minimize the sum of squares}
+\hlstd{model_2a} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{), calculate_sum_of_squares,}
+                  \hlkwc{data_x} \hlstd{= data_explanatory_2a,} \hlkwc{data_y} \hlstd{= data_choice_2,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{)}
+\hlcom{## Show parameter estimates}
+\hlkwd{list}\hlstd{(}\hlkwc{names} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{),}
+     \hlkwc{parameters} \hlstd{= model_2a}\hlopt{$}\hlstd{par)}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "cost" "time"
+## 
+## $parameters
+## [1] -0.41262415 -0.06482335
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	Both the cost parameter and the time parameter are negative, indicating that the cost and time of commuting reduce utility.
+
+	\item Again model the choice to drive to campus during winter as a binary logit model, but now add an intercept term and alternative-specific coefficients. That is, the representative utilities for the alternatives are
+	\begin{align*}
+		V_{nc} &= \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} \\
+		V_{nb} &= \beta_3 C_{nb} + \beta_4 T_{nb}
+	\end{align*}
+	where $C_{nj}$ is the cost of alternative $j$ and $T_{nj}$ is the time of alternative $j$. Estimate the parameters of this model by nonlinear least squares. Follow the same set of steps as in (a), but now you have five parameters and the representative utility calculation is different. You can use matrix multiplication in your sum of squares function to flexibly accommodate different models, or you can create a different function for each model. Report your parameter estimates and briefly interpret them. You do not have to estimate standard errors yet.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part b}
+\hlcom{## Create matrix of explanatory variables}
+\hlstd{data_explanatory_2b} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{,}
+         \hlkwc{cost_bus} \hlstd{=} \hlopt{-}\hlstd{cost_bus,}
+         \hlkwc{time_bus} \hlstd{=} \hlopt{-}\hlstd{time_bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(constant, cost_car, time_car, cost_bus, time_bus)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Minimize the sum of squares}
+\hlstd{model_2b} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{), calculate_sum_of_squares,}
+                  \hlkwc{data_x} \hlstd{= data_explanatory_2b,} \hlkwc{data_y} \hlstd{= data_choice_2,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{)}
+\hlcom{## Show parameter estimates}
+\hlkwd{list}\hlstd{(}\hlkwc{names} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'car'}\hlstd{,} \hlstr{'cost_car'}\hlstd{,} \hlstr{'time_car'}\hlstd{,} \hlstr{'cost_bus'}\hlstd{,} \hlstr{'time_bus'}\hlstd{),}
+     \hlkwc{parameters} \hlstd{= model_2b}\hlopt{$}\hlstd{par)}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "car"      "cost_car" "time_car" "cost_bus" "time_bus"
+## 
+## $parameters
+## [1]  2.1204264 -2.4413778 -0.5353962 -2.8834812 -0.2536593
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The car intercept is positive, indicating that, \emph{ceteris paribus}, driving a car is preferred to taking the bus. The alternative-specific parameters for cost and time are all negative, indicating that the cost and time of commuting by either alternative reduce utility.
+
+	\item Conduct a Wald test on the model in part (b) to test that the alternative-specific coefficients on cost are significantly different from one another. That is, test the null hypothesis:
+	$$H_0 \text{: } \beta_1 = \beta_3$$
+	To conduct a Wald test, you need the variance-covariance matrix of your parameters estimates. For now, use the following parameter variances:
+	\begin{align*}
+		Var(\beta_0) &= 1.61 \\
+		Var(\beta_1) &= 0.86 \\
+		Var(\beta_2) &= 0.09 \\
+		Var(\beta_3) &= 0.31 \\
+		Var(\beta_4) &= 0.03
+	\end{align*}
+	and assume no covariances between parameters. The following steps can provide a rough guide to performing a Wald test:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a vector of $J$ parameter restrictions, $r(\theta) = q$.
+		\item Calculate the $J \times K$ Jacobian matrix by differentiating each restriction with respect to each of the $K$ parameters.
+		\item Calculate the Wald test statistic, which is a function of the vector of restrictions, the Jacobian matrix, and the variance-covariance matrix.
+		\item Conduct the Wald test using this test statistic, which is distributed $\chi^2$.
+	\end{enumerate}
+	Do you reject the null hypothesis? What is the p-value of the test?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part c}
+\hlcom{## Create the variance-covariance matrix from the given standard erros}
+\hlstd{variance_covariance_2c} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1.61}\hlstd{,} \hlnum{0.86}\hlstd{,} \hlnum{0.09}\hlstd{,} \hlnum{0.31}\hlstd{,} \hlnum{0.03}\hlstd{)} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()}
+\hlcom{## Calculate the restriction vector}
+\hlstd{restriction_vector_2c} \hlkwb{<-} \hlstd{model_2b}\hlopt{$}\hlstd{par[}\hlnum{2}\hlstd{]} \hlopt{-} \hlstd{model_2b}\hlopt{$}\hlstd{par[}\hlnum{4}\hlstd{]}
+\hlcom{## Construct the restriction Jacobian}
+\hlstd{restriction_jacobian_2c} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{0}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{0}\hlstd{)} \hlopt{%>%}
+  \hlkwd{t}\hlstd{()}
+\hlcom{## Calculate the Wald test statistic}
+\hlstd{wald_test_stat_2c} \hlkwb{<-} \hlkwd{t}\hlstd{(restriction_vector_2c)} \hlopt{%*%}
+  \hlkwd{solve}\hlstd{(restriction_jacobian_2c} \hlopt{%*%}
+          \hlstd{variance_covariance_2c} \hlopt{%*%}
+          \hlkwd{t}\hlstd{(restriction_jacobian_2c))} \hlopt{%*%}
+  \hlstd{restriction_vector_2c} \hlopt{%>%}
+  \hlkwd{c}\hlstd{()}
+\hlcom{## Test if Wald test statitsic is greater than critical value}
+\hlstd{reject_2c} \hlkwb{<-} \hlstd{wald_test_stat_2c} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{,} \hlnum{1}\hlstd{)}
+\hlcom{## Calculate p-value of Wald test}
+\hlstd{p_value_2c} \hlkwb{<-} \hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(wald_test_stat_2c,} \hlnum{1}\hlstd{)}
+\hlcom{## Report Wald test results}
+\hlkwd{list}\hlstd{(}\hlkwc{reject} \hlstd{= reject_2c,}
+     \hlkwc{p_value} \hlstd{= p_value_2c)}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] FALSE
+## 
+## $p_value
+## [1] 0.6827417
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	We cannot reject this null hypothesis that the cost parameters are equal. This result is intuitive; a dollar spent on driving and a dollar spent on riding the bus are identical and there is no reason why the marginal utility of those dollars should differ. Thus, we could simplify the model by using a common cost parameter.
+
+	\item Estimate the variance-covariance matrix for the model in part (a). The following steps can provide a rough guide to estimating the variance-covariance matrix for nonlinear least squares estimators:
+	\begin{enumerate}[label=\Roman*.]
+		\item Write down the derivative of the nonlinear regression model (in this case, the logit choice probability for driving) with respect to each of the $K$ parameters.
+		\item Calculate this $K \times 1$ vector of derivatives, at the estimated parameters, for each decision maker.
+		\item Calculate the $K \times K$ matrix that is the product of the above vector and its transpose for each decision maker.
+		\item Sum these matrices for all decision makers.
+		\item Estimate the variance of the econometric error as the mean sum of squares at the estimated parameters.
+		\item Calculate the variance-covariance matrix, which is a function of the above $K \times K$ matrix and the estimated error variance.
+	\end{enumerate}
+	Report your parameter estimates (from (a)), standard errors, t-stats, and p-values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part d}
+\hlcom{## Calculate net utility of driving at NLS parameters}
+\hlstd{utility_2d} \hlkwb{<-} \hlstd{data_explanatory_2a} \hlopt{%*%} \hlstd{model_2a}\hlopt{$}\hlstd{par}
+\hlcom{## Caclculate logit probability of driving at NLS parameters}
+\hlstd{probability_2d} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility_2d))}
+\hlcom{## Create list of individual derivative vectors}
+\hlstd{derivative_vector_list_2d} \hlkwb{<-} \hlstd{data_explanatory_2a} \hlopt{%>%}
+  \hlkwd{split}\hlstd{(}\hlkwd{row}\hlstd{(.))} \hlopt{%>%}
+  \hlkwd{map2}\hlstd{(}\hlkwd{as.list}\hlstd{(probability_2d),} \hlopt{~} \hlstd{.x} \hlopt{*} \hlstd{.y} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{.y))}
+\hlcom{## Create list of individual derivative product matrices}
+\hlstd{derivative_matrix_list_2d} \hlkwb{<-} \hlstd{derivative_vector_list_2d} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~} \hlstd{.x} \hlopt{%*%} \hlkwd{t}\hlstd{(.x))}
+\hlcom{## Sum individual derivative product matrices}
+\hlstd{derivative_matrix_2d} \hlkwb{<-} \hlstd{derivative_matrix_list_2d} \hlopt{%>%}
+  \hlkwd{reduce}\hlstd{(`+`)}
+\hlcom{## Calculate error variance at NLS parameters}
+\hlstd{error_variance_2d} \hlkwb{<-} \hlkwd{calculate_sum_of_squares}\hlstd{(model_2a}\hlopt{$}\hlstd{par,}
+                                              \hlstd{data_explanatory_2a,}
+                                              \hlstd{data_choice_2)} \hlopt{/}
+  \hlkwd{length}\hlstd{(data_choice_2)}
+\hlcom{## Calculate variance-covariance matrix}
+\hlstd{variance_covariance_2d} \hlkwb{<-} \hlstd{error_variance_2d} \hlopt{*} \hlkwd{solve}\hlstd{(derivative_matrix_2d)}
+\hlcom{## Calculate parameter standard erros}
+\hlstd{standard_errors_2d} \hlkwb{<-} \hlstd{variance_covariance_2d} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\hlcom{## Calculate parameter t-stats}
+\hlstd{t_stats_2d} \hlkwb{<-} \hlstd{model_2a}\hlopt{$}\hlstd{par} \hlopt{/} \hlstd{standard_errors_2d}
+\hlcom{## Calculate parameter p-values}
+\hlstd{p_values_2d} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlkwd{pt}\hlstd{(}\hlopt{-}\hlkwd{abs}\hlstd{(t_stats_2d),}
+                      \hlkwd{length}\hlstd{(data_choice_2)} \hlopt{-} \hlkwd{length}\hlstd{(model_2a}\hlopt{$}\hlstd{par))}
+\hlcom{## Report summary of model results}
+\hlkwd{list}\hlstd{(}\hlkwc{names} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{),}
+     \hlkwc{parameters} \hlstd{= model_2a}\hlopt{$}\hlstd{par,}
+     \hlkwc{std_errors} \hlstd{= standard_errors_2d,}
+     \hlkwc{t_stats} \hlstd{= t_stats_2d,}
+     \hlkwc{p_values} \hlstd{= p_values_2d)}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "cost" "time"
+## 
+## $parameters
+## [1] -0.41262415 -0.06482335
+## 
+## $std_errors
+## [1] 0.086585198 0.008764028
+## 
+## $t_stats
+## [1] -4.765528 -7.396525
+## 
+## $p_values
+## [1] 2.163055e-06 2.959150e-13
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	As before, the cost parameter and the time parameter are negative. We now see both parameters are statistically significant, so the initial interpretation remains correct.
+
+	\item Estimate the variance-covariance matrix for the model in part (b). Follow the same set of steps as in (d), but now you have five parameters to consider. Report your parameter estimates (from (b)), standard errors, t-stats, and p-values. Briefly interpret these results. Additionally, perform the Wald test from part (c) using your estimated variance-covariance matrix. Do you reject the null hypothesis? What is the p-value of the test?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part e}
+\hlcom{## Calculate net utility of driving at NLS parameters}
+\hlstd{utility_2e} \hlkwb{<-} \hlstd{data_explanatory_2b} \hlopt{%*%} \hlstd{model_2b}\hlopt{$}\hlstd{par}
+\hlcom{## Caclculate logit probability of driving at NLS parameters}
+\hlstd{probability_2e} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility_2e))}
+\hlcom{## Create list of individual derivative vectors}
+\hlstd{derivative_vector_list_2e} \hlkwb{<-} \hlstd{data_explanatory_2b} \hlopt{%>%}
+  \hlkwd{split}\hlstd{(}\hlkwd{row}\hlstd{(.))} \hlopt{%>%}
+  \hlkwd{map2}\hlstd{(}\hlkwd{as.list}\hlstd{(probability_2e),} \hlopt{~} \hlstd{.x} \hlopt{*} \hlstd{.y} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{.y)} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{))}
+\hlcom{## Create list of individual derivative product matrices}
+\hlstd{derivative_matrix_list_2e} \hlkwb{<-} \hlstd{derivative_vector_list_2e} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(}\hlopt{~} \hlstd{.x} \hlopt{%*%} \hlkwd{t}\hlstd{(.x))}
+\hlcom{## Sum individual derivative product matrices}
+\hlstd{derivative_matrix_2e} \hlkwb{<-} \hlstd{derivative_matrix_list_2e} \hlopt{%>%}
+  \hlkwd{reduce}\hlstd{(`+`)}
+\hlcom{## Calculate error variance at NLS parameters}
+\hlstd{error_variance_2e} \hlkwb{<-} \hlkwd{calculate_sum_of_squares}\hlstd{(model_2b}\hlopt{$}\hlstd{par,}
+                                              \hlstd{data_explanatory_2b,}
+                                              \hlstd{data_choice_2)} \hlopt{/}
+  \hlkwd{length}\hlstd{(data_choice_2)}
+\hlcom{## Calculate variance-covariance matrix}
+\hlstd{variance_covariance_2e} \hlkwb{<-} \hlstd{error_variance_2e} \hlopt{*} \hlkwd{solve}\hlstd{(derivative_matrix_2e)}
+\hlcom{## Calculate parameter standard erros}
+\hlstd{standard_errors_2e} \hlkwb{<-} \hlstd{variance_covariance_2e} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\hlcom{## Calculate parameter t-stats}
+\hlstd{t_stats_2e} \hlkwb{<-} \hlstd{model_2b}\hlopt{$}\hlstd{par} \hlopt{/} \hlstd{standard_errors_2e}
+\hlcom{## Calculate parameter p-values}
+\hlstd{p_values_2e} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlkwd{pt}\hlstd{(}\hlopt{-}\hlkwd{abs}\hlstd{(t_stats_2e),}
+                      \hlkwd{length}\hlstd{(data_choice_2)} \hlopt{-} \hlkwd{length}\hlstd{(model_2b}\hlopt{$}\hlstd{par))}
+\hlcom{## Report summary of model results}
+\hlkwd{list}\hlstd{(}\hlkwc{names} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'car'}\hlstd{,} \hlstr{'cost_car'}\hlstd{,} \hlstr{'time_car'}\hlstd{,} \hlstr{'cost_bus'}\hlstd{,} \hlstr{'time_bus'}\hlstd{),}
+     \hlkwc{parameters} \hlstd{= model_2b}\hlopt{$}\hlstd{par,}
+     \hlkwc{std_errors} \hlstd{= standard_errors_2e,}
+     \hlkwc{t_stats} \hlstd{= t_stats_2e,}
+     \hlkwc{p_values} \hlstd{= p_values_2e)}
+\end{alltt}
+\begin{verbatim}
+## $names
+## [1] "car"      "cost_car" "time_car" "cost_bus" "time_bus"
+## 
+## $parameters
+## [1]  2.1204264 -2.4413778 -0.5353962 -2.8834812 -0.2536593
+## 
+## $std_errors
+## [1] 1.60537805 0.86494518 0.08746187 0.31250299 0.03247035
+## 
+## $t_stats
+## [1]  1.320827 -2.822581 -6.121482 -9.227052 -7.812028
+## 
+## $p_values
+## [1] 1.868628e-01 4.858813e-03 1.332118e-09 1.624083e-19 1.424491e-14
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Use the restriction vector from 2c}
+\hlstd{restriction_vector_2e} \hlkwb{<-} \hlstd{restriction_vector_2c}
+\hlcom{## Use the restriction Jacobian from 2c}
+\hlstd{restriction_jacobian_2e} \hlkwb{<-} \hlstd{restriction_jacobian_2c}
+\hlcom{## Calculate the Wald test statistic}
+\hlstd{wald_test_stat_2e} \hlkwb{<-} \hlkwd{t}\hlstd{(restriction_vector_2e)} \hlopt{%*%}
+  \hlkwd{solve}\hlstd{(restriction_jacobian_2e} \hlopt{%*%}
+          \hlstd{variance_covariance_2e} \hlopt{%*%}
+          \hlkwd{t}\hlstd{(restriction_jacobian_2e))} \hlopt{%*%}
+  \hlstd{restriction_vector_2e} \hlopt{%>%}
+  \hlkwd{c}\hlstd{()}
+\hlcom{## Test if Wald test statitsic is greater than critical value}
+\hlstd{reject_2e} \hlkwb{<-} \hlstd{wald_test_stat_2e} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{,} \hlnum{1}\hlstd{)}
+\hlcom{## Calculate p-value of Wald test}
+\hlstd{p_value_2e} \hlkwb{<-} \hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(wald_test_stat_2e,} \hlnum{1}\hlstd{)}
+\hlcom{## Report Wald test results}
+\hlkwd{list}\hlstd{(}\hlkwc{reject} \hlstd{= reject_2e,}
+     \hlkwc{p_value} \hlstd{= p_value_2e)}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] FALSE
+## 
+## $p_value
+## [1] 0.6681799
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	As before, the car intercept is positive and the alternative-specific parameters for cost and time are all negative. We now see all parameters are statistically significant, so the initial interpretation remains correct. We again fail to reject the null hypothesis that the cost parameters are equal.
+\end{enumerate}
+
+\end{document}
