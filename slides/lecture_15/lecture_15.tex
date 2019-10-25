@@ -1,0 +1,405 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 15:\ Mixed Logit Model I]{Lecture 15:\ Mixed Logit Model I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Generalized Extreme Value Models Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Mixed Logit Model
+        \item Random Coefficients Logit
+        \item Mixed Logit Substitution Patterns
+        \item Mixed Logit and Panel Data
+        \item Mixed Logit Estimation
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Optional: Revelt and Train (1998)
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 3 is posted, due October 31
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Discrete Choice Models}
+    Logit model
+    \begin{itemize}
+        \item Strong assumption that unobserved components of utility are i.i.d.
+        \item Simple closed-form expressions for choice probabilities
+        \item Taste variation can only be represented by observable data
+        \item Panel data applications are limited by the i.i.d. assumption
+    \end{itemize}
+    \vspace{2ex}
+    Nested logit model
+    \begin{itemize}
+        \item Correlation between unobserved components of utility can be modeled
+        \item Choice probabilities are more complex but still closed-form
+        \item Taste variation can only be represented by observable data
+        \item Panel data applications are limited by an i.i.d. assumption
+    \end{itemize}
+    \vspace{2ex}
+    What if we want a richer representation of taste variation, more flexible substitution patterns, and an ability to use panel data?
+    \begin{itemize}
+        \item Mixed logit
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Model
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model}
+    The mixed logit model overcomes three limitations of the logit model
+    \begin{itemize}
+        \item Random taste variation
+        \item Unrestricted substitution patterns
+        \item Correlations in unobserved factors over time
+    \end{itemize}
+    \vspace{3ex}
+    What is the catch?
+    \begin{itemize}
+        \item Mixed logit does not have a closed-form solution
+        \item Estimation requires simulation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Coefficients}
+    How does the mixed logit model achieves this level of flexibility?
+    \begin{itemize}
+        \item It does not take a set of coefficients, $\beta$
+        \item It takes distributions of coefficients, $f(\beta \mid \theta)$
+    \end{itemize}
+    \vspace{3ex}
+    Distributions of coefficients can
+    \begin{itemize}
+        \item Model distributions of unobserved taste among the sample of decision makers
+        \item Impose correlations in unobserved utility among alternatives
+        \item Represent individual preferences over time
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Choice Probabilities}
+    The choice probability for the mixed logit model is
+    \begin{align*}
+        P_{ni} &= \int L_{ni}(\beta) f(\beta \mid \theta) d \beta \\
+        \intertext{where $L_{ni}(\beta)$ is the logit probability at a given set of coefficients, $\beta$,}
+        L_{ni}(\beta) &= \frac{e^{V_{ni}(\beta)}}{\sum_{j = 1}^J e^{V_{nj}(\beta)}}
+        \intertext{and $f(\beta \mid \theta)$ is a density function of coefficients $\beta$, which depends on a vector of parameters, $\theta$}
+        \intertext{If we assume representative utility is linear, $V_{ni} = \beta' x_{ni}$,}
+        P_{ni} &= \int \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}} f(\beta \mid \theta) d \beta
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Random Coefficients Logit
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Random Coefficients}
+    The utility that decision maker $n$ obtains from alternative $j$ is
+    $$U_{nj} = \beta_n' x_{nj} + \varepsilon_{nj}$$ \\
+    \begin{itemize}
+        \item $x_{nj}$: data for alternative $j$ and decision maker $n$
+        \item $\beta_n$: individual-specific vector of coefficients
+        \item $\varepsilon_{nj}$: i.i.d.\ extreme value error term
+    \end{itemize}
+    \vspace{2ex}
+    Just as we do not observe $\varepsilon_{nj}$, we also do not observe $\beta_n$
+    \begin{itemize}
+        \item We must use the data we observe to infer how $\beta$ varies throughout the population of decision makers
+    \end{itemize}
+    \vspace{2ex}
+    We model $\beta$ as a random variable with density $f(\beta \mid \theta)$
+    \begin{itemize}
+        \item $\theta$ is a set of parameters that describes the density of $\beta$
+        \begin{itemize}
+            \item For example, the means and variance-covariance of $\beta$ in the population
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Random Coefficients Logit}
+    Each decision maker knows their own $\beta_n$ and $\varepsilon_{nj}$, so the choice is deterministic from their perspective
+    \begin{itemize}
+        \item $n$ chooses $i$ if and only if $U_{ni} > U_{nj} ~\forall j \neq i$
+    \end{itemize}
+    \vspace{2ex}
+    We (the researchers) do not observe $\beta_n$ or the $\varepsilon_{nj}$ terms
+    \begin{itemize}
+        \item If we did know $\beta_n$, then the choice probability would be standard logit, and we can write down this \emph{conditional} probability as
+    \end{itemize}
+    \begin{align*}
+        L_{ni}(\beta_n) &= \frac{e^{\beta_n' x_{ni}}}{\sum_{j = 1}^J e^{\beta_n' x_{nj}}} \\
+        \vspace{2ex}
+        \intertext{But we do not know $\beta_n$, so we have to integrate over the density of the random coefficients}
+        P_{ni} &= \int \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}} f(\beta \mid \theta) d \beta
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Distributions of Random Coefficients}
+    We previously used the terms``parameter'' and ``coefficient'' interchangeably, but they mean different things in the mixed logit model
+    \begin{itemize}
+        \item $\beta$: Coefficients that appear in the utility expression
+        \begin{itemize}
+            \item We will not actually estimate these coefficients in the mixed logit model
+        \end{itemize}
+        \item $\theta$: Parameters that define the density of random coefficients
+        \begin{itemize}
+            \item We will estimate these parameters in the mixed logit model
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Some examples of distributions of random coefficients that we can model
+    \begin{itemize}
+        \item Normal: $\beta \sim N(b, W)$, we estimate $\theta = (b, W)$
+        \item Log-normal: $\ln \beta \sim N(b, W)$, we estimate $\theta = (b, W)$
+        \item Uniform: $\beta \sim U(b, s)$, we estimate $\theta = (b, s)$
+        \item Triangular: $\beta \sim Tri(b, s)$, we estimate $\theta = (b, s)$
+        \item Many other distributions to choose from
+        \item We can also model covariances between random coefficients, or model each coefficient as being independent
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Substitution Patterns
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Alternative Motivation for Mixed Logit}
+    The mixed logit model can also be motivated as a way to represent correlations in the utilities of alternatives \\
+    \vspace{3ex}
+    Let the utility of alternative $j$ be expressed as
+    $$U_{nj} = \alpha' x_{nj} + \mu_n' z_{nj} + \varepsilon_{nj}$$ \\
+    \begin{itemize}
+        \item $x_{nj}$, $z_{nj}$: data for alternative $j$ and decision maker $n$
+        \item $\alpha$: vector of fixed coefficients
+        \item $\mu_n$: vector of random coefficients with mean zero
+        \item $\varepsilon_{nj}$: i.i.d.\ extreme value error term
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Correlated Alternatives in Mixed Logit}
+    With this representation of utility, the random or unobserved portion is
+    \begin{align*}
+        \eta_{nj} &= \mu_n' z_{nj} + \varepsilon_{nj} \\
+        \intertext{which creates correlations among utilities}
+        Cov(\eta_{ni}, \eta_{nj}) &= z_{ni}' W z_{nj}'
+    \end{align*}
+    where $W$ is the variance-covariance matrix of $\mu_n$ \\
+    \vspace{2ex}
+    This representation generalizes the logit and GEV models
+    \begin{itemize}
+        \item Logit: $z_{nj} = 0 ~\forall j$
+        \item Nested logit: $z_{nj}$ is a vector of nest dummy variables
+        \item Paired combinatorial logit: $z_{nj}$ is a vector of pairwise dummy variables
+        \item Heteroskedastic logit: $z_{nj}$ is a vector of alternative dummy variables
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Random Coefficients or Correlated Utilities?}
+    We have motivated the mixed logit model in two different ways, but the models are identical \\
+    \vspace{2ex}
+    Starting from the random coefficients expression, we have
+    \begin{align*}
+        U_{nj} &= \beta_n' x_{nj} + \varepsilon_{nj} \\
+        \intertext{We can express $\beta_n$ as $\beta_n = \alpha + \mu_n$ by decomposing $\beta_n$ into a mean, $\alpha$, and a deviation from the mean, $\mu_n$, which gives}
+        U_{nj} &= \alpha' x_{nj} + \mu_n' x_{nj} + \varepsilon_{nj}
+        \intertext{Let $z_{nj}$ be the subset of data with random coefficients, so utility is}
+        U_{nj} &= \alpha' x_{nj} + \mu_n' z_{nj} + \varepsilon_{nj}
+    \end{align*} \\
+    \vspace{2ex}
+    Your motivation will affect which coefficients you model as random and whether to allow correlations between the coefficients
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Substitution Patterns}
+    The mixed logit model does not exhibit independence from irrelevant alternatives
+    \begin{itemize}
+        \item $P_{ni} / P_{nj}$ depends on all the data of all alternatives
+    \end{itemize}
+    \vspace{3ex}
+    The elasticity of alternative $i$ with respect to the $m$th attribute of alternative $j$ is
+    $$E_{nix_{nj}^m} = - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta$$
+    \begin{itemize}
+        \item $x_{nj}^m$: data for the $m$th attribute of alternative $j$
+        \item $\beta^m$: $m$th element of $\beta$
+        \item This expression depends on the covariance between $L_{ni}(\beta)$ and $L_{nj}(\beta)$ as you integrate over the values of $\beta$, which is determined by which parameters you specify as random and which have covariances
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit and Panel Data
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit and Panel Data}
+    The structure of the mixed logit model allows for more flexibility in representing how a single decision maker makes many choices over time, so it provides a better model for most panel data settings
+    \begin{itemize}
+        \item We still treat $\varepsilon$ as an i.i.d.\ error term that represents utility not captured by the rest of the model
+        \item But the mixed logit model allows for unobserved taste heterogeneity through random coefficients, which yields correlations in utility over time
+        \item In the logit and nested logit models, all unobserved factors are represented by $\varepsilon$, which is i.i.d.\, so those models cannot accommodate correlations over time
+    \end{itemize}
+    \vspace{2ex}
+
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model with Panel Data}
+    We add at time index, $t$, to our representation of utility but still assume the coefficients, $\beta_n$, are constant for an individual
+    $$U_{njt} = \beta_n' x_{njt} + \varepsilon_{njt}$$
+    and we consider the vector of alternatives that decision maker $n$ chooses over the $T$ time periods
+    $$i = (i_1, \ldots, i_T)$$
+    Then the conditional logit probability (conditional on a set of coefficients) for a sequence of choices is
+    \begin{align*}
+        L_{ni}(\beta) &= \prod_{t = 1}^T \frac{e^{\beta_n' x_{ni_{t}t}}}{\sum_{j = 1}^J e^{\beta_n' x_{nj_{t}t}}} \\
+        \intertext{and integrating over the density of coefficients gives the choice probability}
+        P_{ni} &= \int L_{ni}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Dynamics in a Mixed Logit Model}
+    Some ``dynamics'' can be represented in a mixed logit model using panel data
+    \begin{itemize}
+        \item Past and future exogenous variables can be included to model lagged or anticipatory behavior
+        \item Lagged dependent variables can be included to represent state dependence 
+    \end{itemize}
+    \vspace{3ex}
+    This approach is a relatively naive way of incorporating dynamics into a discrete choice model
+    \begin{itemize}
+        \item We are essentially modeling a sequence of static choices
+        \item A fully ``dynamic discrete choice model'' would model how every choice affects all subsequent choices
+        \item More on this later in the semester\ldots
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Estimation
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Estimation}
+    Mixed logit choice probabilities do not have a closed-form expression
+    $$P_{ni} = \int \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}} f(\beta \mid \theta) d \beta$$ \\
+    \begin{itemize}
+        \item We cannot estimate a mixed logit model using MLE, as we did for logit and nested logit
+    \end{itemize}
+    \vspace{2ex}
+    Instead, we can approximate choice probabilities through simulation and estimate the simulated maximum likelihood estimator (MSLE)
+    \begin{itemize}
+        \item More on MSLE (and other simulation-based estimation methods) next week\ldots
+    \end{itemize}
+    \vspace{2ex}
+    The \texttt{mlogit} package in R has the functionality to estimate a mixed logit model
+    \begin{itemize}
+        \item More on estimating a mixed logit model with \texttt{mlogit} next time
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit with Market-Level Data}
+    The mixed logit model can also be estimated from market-level data
+    \begin{itemize}
+        \item You observe the price, market share, and characteristics of every cereal brand at the grocery store, and you want to estimate the structural parameters of consumer decision making that explain those purchases
+    \end{itemize}
+    \vspace{2ex}
+    When aggregated over many consumers, choice probabilities become market shares
+    $$S_i = \int \frac{e^{\beta' x_i}}{\sum_{j = 1}^J e^{\beta' x_j}} f(\beta \mid \theta) d \beta$$
+    \begin{itemize}
+        \item Because of the integral, mixed logit market shares do not reduce to a linear model as they did for logit and nested logit
+        \item Demand estimation using random coefficients logit is known as ``BLP'' after Berry, Levinsohn, and Pakes (1995)
+        \item More on BLP later in the semester\ldots
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Optional: Revelt and Train (1998)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: 2:00--3:00 on Tuesdays in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 3 is posted, due October 31
+    \end{itemize}
+\end{frame}
+
+\end{document}
