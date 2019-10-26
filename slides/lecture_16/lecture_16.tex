@@ -1,0 +1,830 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 16:\ Mixed Logit Model II]{Lecture 16:\ Mixed Logit Model II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Mixed Logit Model
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Mixed Logit Model Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 10
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 3 is due
+            \item Problem Set 4 will be posted soon, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit}
+	The utility that decision maker $n$ obtains from alternative $j$ is
+	\begin{align*}
+		U_{nj} &= \beta_n' x_{nj} + \varepsilon_{nj} \\
+	    \intertext{For a given $\beta_n$, the conditional choice probability is a standard logit}
+	    L_{ni}(\beta_n) &= \frac{e^{\beta_n' x_{ni}}}{\sum_{j = 1}^J e^{\beta_n' x_{nj}}} \\
+	    \intertext{We model $\beta$ as a random variable with density $f(\beta \mid \theta)$ and integrate over this density to get the choice probability}
+	    P_{ni} &= \int \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}} f(\beta \mid \theta) d \beta
+	\end{align*}
+	We estimate $\theta$, the parameters that define the distributions of coefficients
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Model Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GCC: gas central with AC
+		    	\item ECC: electric central with AC
+		    	\item ERC: electric room with AC
+		    	\item HPC: heat pump with AC
+		    	\item GC: gas central
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    \end{itemize}
+		    \vspace{2ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item ICH: installation cost for heat
+		    	\item ICCA: installation cost for AC
+		    	\item OCH: operating cost for heat
+		    	\item OCCA: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load and look at dataset}
+\hlcom{## Load tidyverse and mlogit}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\hlcom{## Load dataset from mlogit package}
+\hlkwd{data}\hlstd{(}\hlstr{'HC'}\hlstd{,} \hlkwc{package} \hlstd{=} \hlstr{'mlogit'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlkwd{as_tibble}\hlstd{(HC)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 250 x 18
+##    depvar ich.gcc ich.ecc ich.erc ich.hpc ich.gc ich.ec ich.er  icca
+##    <fct>    <dbl>   <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl> <dbl>
+##  1 erc       9.7     7.86    8.79   11.4    24.1   24.5   7.37  27.3
+##  2 hpc       8.77    8.69    7.09    9.37   28     32.7   9.33  26.5
+##  3 gcc       7.43    8.86    6.94   11.7    25.7   31.7   8.14  22.6
+##  4 gcc       9.18    8.93    7.22   12.1    29.7   26.7   8.04  25.3
+##  5 gcc       8.05    7.02    8.44   10.5    23.9   28.4   7.15  25.4
+##  6 gcc       9.32    8.03    6.22   12.6    27.0   21.4   8.6   19.9
+##  7 gc        7.11    8.78    7.36   12.4    22.9   28.6   6.41  27.0
+##  8 hpc       9.38    7.48    6.72    8.93   26.2   27.9   7.3   18.1
+##  9 gcc       8.08    7.39    8.79   11.2    23.0   22.6   7.85  22.6
+## 10 gcc       6.24    4.88    7.46    8.28   19.8   27.5   6.88  25.8
+## # ... with 240 more rows, and 9 more variables: och.gcc <dbl>,
+## #   och.ecc <dbl>, och.erc <dbl>, och.hpc <dbl>, och.gc <dbl>,
+## #   och.ec <dbl>, och.er <dbl>, occa <dbl>, income <dbl>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Format dataset}
+\hlcom{## Gather into a long dataset}
+\hlstd{hvac_long} \hlkwb{<-} \hlstd{HC} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{id} \hlstd{=} \hlnum{1}\hlopt{:}\hlkwd{n}\hlstd{())} \hlopt{%>%}
+  \hlkwd{gather}\hlstd{(key, value,} \hlkwd{starts_with}\hlstd{(}\hlstr{'ich.'}\hlstd{),} \hlkwd{starts_with}\hlstd{(}\hlstr{'och.'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(key,} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(cost, value)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{= (depvar} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{depvar)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at long dataset}
+\hlkwd{as_tibble}\hlstd{(hvac_long)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 8
+##     icca  occa income    id alt     ich   och choice
+##    <dbl> <dbl>  <dbl> <int> <chr> <dbl> <dbl> <lgl> 
+##  1  17    2.79     60   133 ec    20.3   4.52 FALSE 
+##  2  17    2.79     60   133 ecc    8.46  4.52 FALSE 
+##  3  17    2.79     60   133 er     7.7   4.32 FALSE 
+##  4  17    2.79     60   133 erc    8.16  4.32 FALSE 
+##  5  17    2.79     60   133 gc    25.3   2.26 FALSE 
+##  6  17    2.79     60   133 gcc    6.33  2.26 TRUE  
+##  7  17    2.79     60   133 hpc   11.1   1.63 FALSE 
+##  8  18.1  2.55     50    14 ec    25.6   5.21 FALSE 
+##  9  18.1  2.55     50    14 ecc   11.2   5.21 FALSE 
+## 10  18.1  2.55     50    14 er     9.3   3.8  FALSE 
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Combine heating and cooling costs into one variable}
+\hlstd{hvac_clean} \hlkwb{<-} \hlstd{hvac_long} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cooling} \hlstd{= (}\hlkwd{nchar}\hlstd{(alt)} \hlopt{==} \hlnum{3}\hlstd{),}
+         \hlkwc{ic} \hlstd{=} \hlkwd{if_else}\hlstd{(cooling, ich} \hlopt{+} \hlstd{icca, ich),}
+         \hlkwc{oc} \hlstd{=} \hlkwd{if_else}\hlstd{(cooling, och} \hlopt{+} \hlstd{occa, och))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(id, alt, choice, ic, oc, income)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at cleaned dataset}
+\hlkwd{as_tibble}\hlstd{(hvac_clean)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 6
+##       id alt   choice    ic    oc income
+##    <int> <chr> <lgl>  <dbl> <dbl>  <dbl>
+##  1   133 ec    FALSE   20.3  4.52     60
+##  2   133 ecc   FALSE   25.5  7.31     60
+##  3   133 er    FALSE    7.7  4.32     60
+##  4   133 erc   FALSE   25.2  7.11     60
+##  5   133 gc    FALSE   25.3  2.26     60
+##  6   133 gcc   TRUE    23.3  5.05     60
+##  7   133 hpc   FALSE   28.1  4.42     60
+##  8    14 ec    FALSE   25.6  5.21     50
+##  9    14 ecc   FALSE   29.2  7.76     50
+## 10    14 er    FALSE    9.3  3.8      50
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Convert cleaned dataset to mlogit format}
+\hlstd{hvac_mlogit} \hlkwb{<-} \hlkwd{mlogit.data}\hlstd{(hvac_clean,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                           \hlkwc{choice} \hlstd{=} \hlstr{'choice'}\hlstd{,} \hlkwc{alt.var} \hlstd{=} \hlstr{'alt'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at data in mlogit format}
+\hlkwd{as_tibble}\hlstd{(hvac_mlogit)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 6
+##       id alt   choice    ic    oc income
+##    <int> <fct> <lgl>  <dbl> <dbl>  <dbl>
+##  1   133 ec    FALSE   20.3  4.52     60
+##  2   133 ecc   FALSE   25.5  7.31     60
+##  3   133 er    FALSE    7.7  4.32     60
+##  4   133 erc   FALSE   25.2  7.11     60
+##  5   133 gc    FALSE   25.3  2.26     60
+##  6   133 gcc   TRUE    23.3  5.05     60
+##  7   133 hpc   FALSE   28.1  4.42     60
+##  8    14 ec    FALSE   25.6  5.21     50
+##  9    14 ecc   FALSE   29.2  7.76     50
+## 10    14 er    FALSE    9.3  3.8      50
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Models to Estimate with \texttt{mlogit()}}
+    The representative utility of each alternative is
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$ \\
+    \vspace{3ex}
+    Random coefficients to consider
+    \begin{itemize}
+    	\item $\beta_1$ and $\beta_2$ distributed normal
+    	\item $\beta_1$ and $\beta_2$ distributed log-normal
+    	\item $\beta_1$ and $\beta_2$ distributed log-normal and correlated
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Models in R}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Mixed logit model using the mlogit package}
+\hlcom{## Help file for the mlogit function}
+\hlopt{?}\hlstd{mlogit}
+\hlcom{## Arguments for mlogit mixed logit functionality}
+\hlkwd{mlogit}\hlstd{(formula, data, reflevel, rpar, correlation, R, seed, ...)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+    \vspace{2ex}
+    \texttt{mlogit()} arguments for mixed logit
+    \begin{enumerate}
+        \item \texttt{formula, data, reflevel}: same as a multinomial logit model
+        \item \texttt{rpar}: named vector of random coefficients and their distributions
+        \item \texttt{correlation}: \texttt{TRUE} models random coefficient correlations
+        \item \texttt{R}: number of simulations in MSLE
+        \item \texttt{seed}: seed for random draws in simulation
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit with Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit}
+\hlcom{## Model choice using alternative intercepts and cost data with normal }
+\hlcom{## coefficients}
+\hlstd{model_1} \hlkwb{<-} \hlstd{hvac_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= choice} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hpc'}\hlstd{,}
+         \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{ic} \hlstd{=} \hlstr{'n'}\hlstd{,} \hlkwc{oc} \hlstd{=} \hlstr{'n'}\hlstd{),} \hlkwc{R} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{321}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Results with Normal Distributions}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_1} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = choice ~ ic + oc | 1 | 0, data = ., reflevel = "hpc", 
+##     rpar = c(ic = "n", oc = "n"), R = 1000, seed = 321)
+## 
+## Frequencies of alternatives:
+##   hpc    ec   ecc    er   erc    gc   gcc 
+## 0.104 0.004 0.016 0.032 0.004 0.096 0.744 
+## 
+## bfgs method
+## 23 iterations, 0h:0m:19s 
+## g'(-H)^-1g = 2.33E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##                  Estimate Std. Error z-value Pr(>|z|)   
+## ec:(intercept)  -13.59196    6.59838 -2.0599 0.039409 * 
+## ecc:(intercept)   4.55227    1.91196  2.3809 0.017268 * 
+## er:(intercept)  -26.84257   15.08477 -1.7794 0.075166 . 
+## erc:(intercept)   3.34782    2.28886  1.4627 0.143560   
+## gc:(intercept)  -15.47410    7.12512 -2.1718 0.029873 * 
+## gcc:(intercept)   4.60586    1.42533  3.2314 0.001232 **
+## ic               -0.53396    0.24426 -2.1860 0.028816 * 
+## oc               -3.80889    1.41603 -2.6898 0.007149 **
+## sd.ic             0.34764    0.24761  1.4040 0.160331   
+## sd.oc            -1.22028    0.82478 -1.4795 0.139003   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -192.75
+## McFadden R^2:  0.14416 
+## Likelihood ratio test : chisq = 64.932 (p.value = 2.6595e-13)
+## 
+## random coefficients
+##    Min.    1st Qu.    Median      Mean    3rd Qu. Max.
+## ic -Inf -0.7684342 -0.533955 -0.533955 -0.2994758  Inf
+## oc -Inf -4.6319524 -3.808889 -3.808889 -2.9858263  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Normally Distributed Coefficients}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Plot distributions of random coefficients}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{=} \hlkwd{data.frame}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{8}\hlstd{,} \hlnum{1}\hlstd{)),} \hlkwd{aes}\hlstd{(x))} \hlopt{+}
+  \hlkwd{stat_function}\hlstd{(}\hlkwc{fun} \hlstd{= dnorm,} \hlkwc{n} \hlstd{=} \hlnum{1001}\hlstd{,}
+                \hlkwc{args} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mean} \hlstd{= model_1}\hlopt{$}\hlstd{coefficients[}\hlnum{7}\hlstd{],}
+                            \hlkwc{sd} \hlstd{=} \hlkwd{abs}\hlstd{(model_1}\hlopt{$}\hlstd{coefficients[}\hlnum{9}\hlstd{])))} \hlopt{+}
+  \hlkwd{stat_function}\hlstd{(}\hlkwc{fun} \hlstd{= dnorm,} \hlkwc{n} \hlstd{=} \hlnum{1001}\hlstd{,}
+                \hlkwc{args} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mean} \hlstd{= model_1}\hlopt{$}\hlstd{coefficients[}\hlnum{8}\hlstd{],}
+                            \hlkwc{sd} \hlstd{=} \hlkwd{abs}\hlstd{(model_1}\hlopt{$}\hlstd{coefficients[}\hlnum{10}\hlstd{])),}
+                \hlkwc{linetype} \hlstd{=} \hlstr{'dashed'}\hlstd{)} \hlopt{+}
+  \hlkwd{xlab}\hlstd{(}\hlkwa{NULL}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwa{NULL}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Normally Distributed Coefficients Plot}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-14-1} 
+
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit with Log-Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit}
+\hlcom{## Model choice using alternative intercepts and cost data with }
+\hlcom{## log-normal coefficients}
+\hlstd{model_2} \hlkwb{<-} \hlstd{hvac_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= choice} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hpc'}\hlstd{,}
+         \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{ic} \hlstd{=} \hlstr{'ln'}\hlstd{,} \hlkwc{oc} \hlstd{=} \hlstr{'ln'}\hlstd{),} \hlkwc{R} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{321}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning in log(start[ln]): NaNs produced}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in if (abs(x - oldx) < ftol) \{: missing value where TRUE/FALSE needed}}\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset for Log-Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Reformat dataset with negative costs}
+\hlcom{## Convert cleaned dataset to mlogit format with negative costs}
+\hlstd{hvac_mlogit_neg} \hlkwb{<-} \hlkwd{mlogit.data}\hlstd{(hvac_clean,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                               \hlkwc{choice} \hlstd{=} \hlstr{'choice'}\hlstd{,} \hlkwc{alt.var} \hlstd{=} \hlstr{'alt'}\hlstd{,}
+                               \hlkwc{opposite} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'ic'}\hlstd{,} \hlstr{'oc'}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset Formatted for Log-Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at data in mlogit format}
+\hlkwd{as_tibble}\hlstd{(hvac_mlogit_neg)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 6
+##       id alt   choice    ic    oc income
+##    <int> <fct> <lgl>  <dbl> <dbl>  <dbl>
+##  1   133 ec    FALSE  -20.3 -4.52     60
+##  2   133 ecc   FALSE  -25.5 -7.31     60
+##  3   133 er    FALSE   -7.7 -4.32     60
+##  4   133 erc   FALSE  -25.2 -7.11     60
+##  5   133 gc    FALSE  -25.3 -2.26     60
+##  6   133 gcc   TRUE   -23.3 -5.05     60
+##  7   133 hpc   FALSE  -28.1 -4.42     60
+##  8    14 ec    FALSE  -25.6 -5.21     50
+##  9    14 ecc   FALSE  -29.2 -7.76     50
+## 10    14 er    FALSE   -9.3 -3.8      50
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit with Log-Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit}
+\hlcom{## Model choice using alternative intercepts and cost data with }
+\hlcom{## log-normal coefficients}
+\hlstd{model_2} \hlkwb{<-} \hlstd{hvac_mlogit_neg} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= choice} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hpc'}\hlstd{,}
+         \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{ic} \hlstd{=} \hlstr{'ln'}\hlstd{,} \hlkwc{oc} \hlstd{=} \hlstr{'ln'}\hlstd{),} \hlkwc{R} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{321}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Results with Log-Normal Distributions}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_2} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = choice ~ ic + oc | 1 | 0, data = ., reflevel = "hpc", 
+##     rpar = c(ic = "ln", oc = "ln"), R = 1000, seed = 321)
+## 
+## Frequencies of alternatives:
+##   hpc    ec   ecc    er   erc    gc   gcc 
+## 0.104 0.004 0.016 0.032 0.004 0.096 0.744 
+## 
+## bfgs method
+## 40 iterations, 0h:0m:30s 
+## g'(-H)^-1g = 6.71E-08 
+## gradient close to zero 
+## 
+## Coefficients :
+##                  Estimate Std. Error z-value  Pr(>|z|)    
+## ec:(intercept)  -17.93432    9.93335 -1.8055 0.0710020 .  
+## ecc:(intercept)   4.72345    2.07762  2.2735 0.0229964 *  
+## er:(intercept)  -39.61551   27.17697 -1.4577 0.1449269    
+## erc:(intercept)   3.43598    2.51989  1.3635 0.1727113    
+## gc:(intercept)  -19.91239    9.68510 -2.0560 0.0397843 *  
+## gcc:(intercept)   4.60527    1.39448  3.3025 0.0009583 ***
+## ic               -0.43815    0.45590 -0.9611 0.3365171    
+## oc                1.36185    0.36511  3.7300 0.0001915 ***
+## sd.ic             0.53322    0.25379  2.1010 0.0356401 *  
+## sd.oc             0.41586    0.13312  3.1240 0.0017839 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -189.72
+## McFadden R^2:  0.15761 
+## Likelihood ratio test : chisq = 70.993 (p.value = 1.4006e-14)
+## 
+## random coefficients
+##    Min.   1st Qu.    Median      Mean   3rd Qu. Max.
+## ic    0 0.4503169 0.6452267 0.7437927 0.9244988  Inf
+## oc    0 2.9486763 3.9034016 4.2559472 5.1672487  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Log-Normally Distributed Coefficients}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Plot distributions of random coefficients}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{=} \hlkwd{data.frame}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{10}\hlstd{)),} \hlkwd{aes}\hlstd{(x))} \hlopt{+}
+  \hlkwd{stat_function}\hlstd{(}\hlkwc{fun} \hlstd{= dlnorm,} \hlkwc{n} \hlstd{=} \hlnum{1001}\hlstd{,}
+                \hlkwc{args} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mean} \hlstd{= model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{7}\hlstd{],}
+                            \hlkwc{sd} \hlstd{=} \hlkwd{abs}\hlstd{(model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{9}\hlstd{])))} \hlopt{+}
+  \hlkwd{stat_function}\hlstd{(}\hlkwc{fun} \hlstd{= dlnorm,} \hlkwc{n} \hlstd{=} \hlnum{1001}\hlstd{,}
+                \hlkwc{args} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mean} \hlstd{= model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{8}\hlstd{],}
+                            \hlkwc{sd} \hlstd{=} \hlkwd{abs}\hlstd{(model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{10}\hlstd{])),}
+                \hlkwc{linetype} \hlstd{=} \hlstr{'dashed'}\hlstd{)} \hlopt{+}
+  \hlkwd{xlab}\hlstd{(}\hlkwa{NULL}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwa{NULL}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Log-Normally Distributed Coefficients Plot}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-21-1} 
+
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit with Correlated Log-Normal Distributions}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit}
+\hlcom{## Model choice using alternative intercepts and cost data with }
+\hlcom{## correlated log-normal coefficients}
+\hlstd{model_3} \hlkwb{<-} \hlstd{hvac_mlogit_neg} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= choice} \hlopt{~} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{1} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,} \hlkwc{reflevel} \hlstd{=} \hlstr{'hpc'}\hlstd{,}
+         \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{ic} \hlstd{=} \hlstr{'ln'}\hlstd{,} \hlkwc{oc} \hlstd{=} \hlstr{'ln'}\hlstd{),} \hlkwc{correlation} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{R} \hlstd{=} \hlnum{1000}\hlstd{,}
+         \hlkwc{seed} \hlstd{=} \hlnum{321}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Results with Correlated Log-Normal Distributions}
+    \vspace{1ex}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_3} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = choice ~ ic + oc | 1 | 0, data = ., reflevel = "hpc", 
+##     rpar = c(ic = "ln", oc = "ln"), R = 1000, correlation = TRUE, 
+##     seed = 321)
+## 
+## Frequencies of alternatives:
+##   hpc    ec   ecc    er   erc    gc   gcc 
+## 0.104 0.004 0.016 0.032 0.004 0.096 0.744 
+## 
+## bfgs method
+## 34 iterations, 0h:0m:35s 
+## g'(-H)^-1g = 6.52E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##                  Estimate Std. Error z-value  Pr(>|z|)    
+## ec:(intercept)  -18.13141    6.29638 -2.8797  0.003981 ** 
+## ecc:(intercept)   3.64970    1.45116  2.5150  0.011902 *  
+## er:(intercept)  -38.22791   16.94682 -2.2558  0.024086 *  
+## erc:(intercept)   2.43339    1.96325  1.2395  0.215172    
+## gc:(intercept)  -21.53875    7.32033 -2.9423  0.003258 ** 
+## gcc:(intercept)   3.79386    0.88938  4.2657 1.992e-05 ***
+## ic               -0.45353    0.30527 -1.4857  0.137368    
+## oc                1.26077    0.26512  4.7555 1.979e-06 ***
+## chol.ic:ic        0.56759    0.24467  2.3198  0.020350 *  
+## chol.ic:oc        0.39855    0.19520  2.0418  0.041174 *  
+## chol.oc:oc        0.22016    0.23527  0.9358  0.349388    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -187.07
+## McFadden R^2:  0.16936 
+## Likelihood ratio test : chisq = 76.283 (p.value = 5.0216e-15)
+## 
+## random coefficients
+##    Min.   1st Qu.    Median      Mean   3rd Qu. Max.
+## ic    0 0.4332821 0.6353812 0.7464334 0.9317469  Inf
+## oc    0 2.5951979 3.5281300 3.9134675 4.7964363  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Choleski Transformation for Multivariate Normals}
+    One way to draw multivariate (log-)normal random variables is to draw independent normal random variables and apply a Choleski transformation \\
+    \vspace{2ex}
+    We want $\beta_1$ and $\beta_2$ to be multivariate log-normal
+	$$\ln
+		\begin{pmatrix}
+    		\beta_1 \\
+    		\beta_2
+    	\end{pmatrix}
+    	\sim N \left(
+    	\begin{pmatrix}
+    		\mu_{\beta_1} \\
+    		\mu_{\beta_2}
+    	\end{pmatrix},
+      \Omega \right)$$
+    We draw two standard normal random variables, $\omega_1$ and $\omega_2$, and apply
+    $$\ln
+		\begin{pmatrix}
+    		\beta_1 \\
+    		\beta_2
+    	\end{pmatrix}
+    	= 
+    	\begin{pmatrix}
+    		\mu_{\beta_1} \\
+    		\mu_{\beta_2}
+    	\end{pmatrix}
+    	+
+    	\begin{pmatrix}
+    		s_{11} & 0 \\
+    		s_{21} & s_{22}
+    	\end{pmatrix}
+    	\begin{pmatrix}
+    		\omega_1 \\
+    		\omega_2
+    	\end{pmatrix}$$
+    The elements of the variance-covariance matrix, $\Omega$, are
+    \begin{align*}
+    	Var(\ln \beta_1) &= s_{11}^2 \\
+    	Var(\ln \beta_2) &= s_{21}^2 + s_{22}^2 \\
+    	Cov(\ln \beta_1, \ln \beta_2) &= s_{11} s_{21}	
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance and Covariance of Log-Normal Coefficients}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate coefficient variances and covariance}
+\hlstd{model_3_vcov} \hlkwb{<-} \hlkwd{c}\hlstd{(model_3}\hlopt{$}\hlstd{coefficients[}\hlnum{9}\hlstd{]}\hlopt{^}\hlnum{2}\hlstd{,}
+                  \hlstd{model_3}\hlopt{$}\hlstd{coefficients[}\hlnum{10}\hlstd{]}\hlopt{^}\hlnum{2} \hlopt{+}
+                    \hlstd{model_3}\hlopt{$}\hlstd{coefficients[}\hlnum{11}\hlstd{]}\hlopt{^}\hlnum{2}\hlstd{,}
+                  \hlstd{model_3}\hlopt{$}\hlstd{coefficients[}\hlnum{9}\hlstd{]} \hlopt{*}
+                    \hlstd{model_3}\hlopt{$}\hlstd{coefficients[}\hlnum{10}\hlstd{])} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'var.ic'}\hlstd{,} \hlstr{'var.oc'}\hlstd{,} \hlstr{'cov.ic:oc'}\hlstd{))}
+\hlstd{model_3_vcov}
+\end{alltt}
+\begin{verbatim}
+##    var.ic    var.oc cov.ic:oc 
+## 0.3221626 0.2073116 0.2262136
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Implied Discount Rate}
+    What is the implied discount rate of consumers? Assume (for simplicity) that the operating cost accrues in perpetuity.
+    \begin{align*}
+        U_{ni} &= \alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni} + \varepsilon_{ni} \\
+        \intertext{Divide by $\beta_1$ to express in terms of present day dollars}
+        \frac{U_{ni}}{\beta_1} &= \frac{\alpha_i}{\beta_1} + IC_{ni} + \frac{\beta_2}{\beta_1} OC_{ni} + \frac{\varepsilon_{ni}}{\beta_1} \\
+        \intertext{The net present value of a stream of future payments in perpetuity is}
+        NPV_{ni} &= \frac{1}{r} OC_{ni}\\
+        \intertext{The last two equations give that}
+        r &= \frac{\beta_1}{\beta_2}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Distribution of Implied Discount Rate}
+	If $\beta_1$ and $\beta_2$ are distributed log-normal with
+	\begin{align*}
+		\ln \beta_1 &\sim N(\mu_{\beta_1}, \sigma_{\beta_1}^2) \\
+		\ln \beta_2 &\sim N(\mu_{\beta_2}, \sigma_{\beta_2}^2)
+		\intertext{then the ratio is distributed log-normal with}
+		\ln \frac{\beta_1}{\beta_2} &\sim N(\mu_{\beta_1} - \mu_{\beta_2}, \sigma_{\beta_1}^2 + \sigma_{\beta_2}^2 - 2 \sigma_{\beta_1 \beta_2})
+	\end{align*}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Plot distribution of implied discount rate}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{=} \hlkwd{data.frame}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0.5}\hlstd{)),} \hlkwd{aes}\hlstd{(x))} \hlopt{+}
+  \hlkwd{stat_function}\hlstd{(}\hlkwc{fun} \hlstd{= dlnorm,} \hlkwc{n} \hlstd{=} \hlnum{1001}\hlstd{,}
+                \hlkwc{args} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mean} \hlstd{= model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{7}\hlstd{]} \hlopt{-}
+                              \hlstd{model_2}\hlopt{$}\hlstd{coefficients[}\hlnum{8}\hlstd{],}
+                            \hlkwc{sd} \hlstd{=} \hlkwd{sqrt}\hlstd{(model_3_vcov[}\hlnum{1}\hlstd{]} \hlopt{+} \hlstd{model_3_vcov[}\hlnum{2}\hlstd{]} \hlopt{-}
+                                        \hlnum{2} \hlopt{*} \hlstd{model_3_vcov[}\hlnum{3}\hlstd{])))} \hlopt{+}
+  \hlkwd{xlab}\hlstd{(}\hlkwa{NULL}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwa{NULL}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Implied Discount Rate Plot}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-26-1} 
+
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 10
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 will be posted soon, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}

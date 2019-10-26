@@ -21,6 +21,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 13. [Generalized Extreme Value Models I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_13/lecture_13.pdf)
 14. [Generalized Extreme Value Models II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_14/lecture_14.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_14/lecture_14.R)
 15. [Mixed Logit Model I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_15/lecture_15.pdf)
+16. [Mixed Logit Model II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_16/lecture_16.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_16/lecture_16.R)
 
 ## Problem Sets
 
