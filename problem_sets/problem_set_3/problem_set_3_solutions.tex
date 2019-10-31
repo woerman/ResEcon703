@@ -1,0 +1,689 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc} 
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 3}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three, and all group members can submit the same code and output; indicate in your writeup who you worked with. You must submit a unique writeup that answers the problems below. You can discuss answers with your fellow group members, but your writeup must be in your own words. Problem 1 requires you to code your own estimators, while Problem 2 allows you to use R's ``canned routines.'' Each problem will indicate which R function to use.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_3/ps3_datasets.zip}{\texttt{ps3\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website (\texttt{github.com/woerman/ResEcon703})}. This zipped file contains two datasets, \texttt{travel\_binary.csv} and \texttt{phones.csv}, that you will use for this problem set. The \texttt{travel\_binary.csv} dataset contains simulated data on the travel mode choice of 1000 UMass graduate students commuting to campus in the middle of winter when only driving a car or taking a bus are feasible options (assume the weather is too severe for even the heartiest graduate students to ride a bike or walk). The \texttt{phones.csv} dataset contains simulated data from 1000 customers on the purchases or pre-orders of highly-anticipated phone models recently released by Apple and Google: iPhone 11 and Pixel 4. See the file \texttt{data\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Attaching packages ------------------------------------ tidyverse 1.2.1 --}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# v ggplot2 3.2.1\ \ \ \  v purrr\ \  0.3.2\\\#\# v tibble\ \ 2.1.3\ \ \ \  v dplyr\ \  0.8.3\\\#\# v tidyr\ \  1.0.0\ \ \ \  v stringr 1.4.0\\\#\# v readr\ \  1.3.1\ \ \ \  v forcats 0.4.0}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Conflicts --------------------------------------- tidyverse\_conflicts() --\\\#\# x dplyr::filter() masks stats::filter()\\\#\# x dplyr::lag()\ \ \ \ masks stats::lag()}}\begin{alltt}
+\hlkwd{library}\hlstd{(gmm)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: sandwich}}\begin{alltt}
+\hlkwd{library}\hlstd{(mlogit)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: Formula}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: zoo}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# Attaching package: 'zoo'}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# The following objects are masked from 'package:base':\\\#\# \\\#\#\ \ \ \  as.Date, as.Date.numeric}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: lmtest}}\end{kframe}
+\end{knitrout}
+
+\section*{Problem 1: Generalized Method of Moments}
+
+Use the \texttt{travel\_binary.csv} dataset for this question.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Include the cost and the time of each alternative as explanatory variables with common coefficients; do not include an intercept. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj}$$
+	where $C_j$ is the cost of alternative $j$ and $T_j$ is the time of alternative $j$. Estimate the parameters of this model by method of moments. The following steps can provide a rough guide to creating your own method of moments estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Write down moment conditions for this model. In this case, a set of two moment conditions based on residuals and data.
+		\item Create a function that takes a set of parameters and a \emph{matrix} of data as inputs: \texttt{function(parameters, data\_matrix)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the representative utility for each alternative and for each decision maker.
+			\item Calculate the choice probability of driving for each decision maker.
+			\item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+			\item Calculate each of the $M$ moments for each decision maker.
+			\item Return the $N \times M$ matrix of individual moments.
+		\end{enumerate}
+		\item Find the MM estimator using \texttt{gmm()}. Your call of the \texttt{gmm()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{gmm(g = your\_function, x = your\_data\_matrix, t0 = your\_starting\_guesses, }} \\
+			&\qquad~ \text{\texttt{vcov = `iid', control = list(reltol = 1e-25, maxit = 10000))}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results.
+
+	Hint: For a binary logit model, characterizing one choice probability is sufficient because the two probabilities must sum to 100\%. The probability of driving is
+	\begin{align*}
+		P_{nc} &= \frac{e^{V_{nc}}}{e^{V_{nc}} + e^{V_{nb}}} \\
+		&= \frac{1}{1 + e^{-V_{nc} + V_{nb}}}
+	\end{align*}
+	Both of these expressions for the probability of driving may be useful as you solve this problem.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part a}
+\hlcom{## Load dataset}
+\hlstd{travel_binary} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'travel_binary.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  mode = col\_character(),\\\#\#\ \  time\_car = col\_double(),\\\#\#\ \  cost\_car = col\_double(),\\\#\#\ \  time\_bus = col\_double(),\\\#\#\ \  cost\_bus = col\_double(),\\\#\#\ \  price\_gas = col\_double(),\\\#\#\ \  snowfall = col\_double(),\\\#\#\ \  car\_in\_shop = col\_double(),\\\#\#\ \  age = col\_double(),\\\#\#\ \  income = col\_double(),\\\#\#\ \  marital\_status = col\_character()\\\#\# )}}\begin{alltt}
+\hlcom{## Create matrix of data}
+\hlstd{data_1a} \hlkwb{<-} \hlstd{travel_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{),}
+         \hlkwc{cost_difference} \hlstd{= cost_car} \hlopt{-} \hlstd{cost_bus,}
+         \hlkwc{time_difference} \hlstd{= time_car} \hlopt{-} \hlstd{time_bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(choice, cost_difference, time_difference)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Function to calculate binary logit moments}
+\hlstd{calculate_moments_1a} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variable data from matrix}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{]}
+  \hlcom{## Extract choice data from matrix}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate residuals}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{-} \hlstd{probability_choice}
+  \hlcom{## Create moment matrix}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{data_x}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\hlcom{## Use GMM to estimate model}
+\hlstd{model_1a} \hlkwb{<-} \hlkwd{gmm}\hlstd{(calculate_moments_1a, data_1a,} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlstd{model_1a} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = calculate_moments_1a, x = data_1a, t0 = c(0, 0), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]  -4.9646e-01   8.8151e-02  -5.6320e+00   1.7816e-08
+## Theta[2]  -5.8354e-02   6.5891e-03  -8.8561e+00   8.2867e-19
+## 
+## J-Test: degrees of freedom is 0 
+##                 J-test                P-value             
+## Test E(g)=0:    9.46762506511059e-23  *******             
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  0 
+## Function eval. =  191 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The cost and time parameters are both negative and statistically significant, indicating that both money and time spent commuting reduce utility. These results are intuitive, as we generally think that people like having both money and time.
+
+	\item Again model the choice to drive to campus during winter as a binary logit model, but now add an intercept term and alternative-specific coefficients. That is, the representative utilities for the alternatives are
+	\begin{align*}
+		V_{nc} &= \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} \\
+		V_{nb} &= \beta_3 C_{nb} + \beta_4 T_{nb}
+	\end{align*}
+	where $C_{nj}$ is the cost of alternative $j$ and $T_{nj}$ is the time of alternative $j$. Estimate the parameters of this model by method of moments. Follow the same set of steps as in (a), but now you have five parameters and the representative utility calculation is different. Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part b}
+\hlcom{## Create matrix of data}
+\hlstd{data_1b} \hlkwb{<-} \hlstd{travel_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{),}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{,}
+         \hlkwc{cost_bus} \hlstd{=} \hlopt{-}\hlstd{cost_bus,}
+         \hlkwc{time_bus} \hlstd{=} \hlopt{-}\hlstd{time_bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(choice, constant, cost_car, time_car, cost_bus, time_bus)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Function to calculate binary logit moments}
+\hlstd{calculate_moments_1b} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variable data from matrix}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{]}
+  \hlcom{## Extract choice data from matrix}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate residuals}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{-} \hlstd{probability_choice}
+  \hlcom{## Create moment matrix}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{data_x}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\hlcom{## Use GMM to estimate model}
+\hlstd{model_1b} \hlkwb{<-} \hlkwd{gmm}\hlstd{(calculate_moments_1b, data_1b,} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlstd{model_1b} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = calculate_moments_1b, x = data_1b, t0 = rep(0, 5), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]   3.6826e+00   1.5654e+00   2.3525e+00   1.8647e-02
+## Theta[2]  -3.2852e+00   8.3576e-01  -3.9308e+00   8.4650e-05
+## Theta[3]  -4.8187e-01   7.6660e-02  -6.2858e+00   3.2617e-10
+## Theta[4]  -2.9441e+00   2.6936e-01  -1.0930e+01   8.3086e-28
+## Theta[5]  -2.4268e-01   2.5520e-02  -9.5092e+00   1.9218e-21
+## 
+## J-Test: degrees of freedom is 0 
+##                 J-test                P-value             
+## Test E(g)=0:    8.74728598718018e-22  *******             
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  0 
+## Function eval. =  3908 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The car intercept is positive and statistically significant, indicating that, \emph{ceteris paribus}, driving a car is preferred to taking the bus. The alternative-specific parameters for cost and time are all negative and statistically significant, indicating that the cost and time of commuting by either alternative reduce utility.
+
+	\item You might be concerned that the cost and time of driving to campus are endogenous; for example, a student who enjoys driving is more likely to live farther from campus because they do not mind the extra time spent driving. The \texttt{travel\_binary.csv} dataset includes three possible instruments: gasoline price (the cost of driving is proportional to the gasoline price), snowfall (the time to drive includes the time to clean off the car and the added time from driving cautiously), and an indicator if the student's car is in the shop (extra time or cost is required to borrow someone else's car). Again model the choice to drive to campus during winter as in (b). That is, the representative utilities for the alternatives are
+	\begin{align*}
+		V_{nc} &= \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} \\
+		V_{nb} &= \beta_3 C_{nb} + \beta_4 T_{nb}
+	\end{align*}
+	where $C_{nj}$ is the cost of alternative $j$ and $T_{nj}$ is the time of alternative $j$. In this model, however, instrument for the cost and time of driving with the instruments described above. Thus, you will have six instruments: constant term, cost to take the bus, time to take the bus, gasoline price, snowfall, and an indicator if car is in the shop. Estimate the parameters of this model by generalized method of moments. Follow the same set of steps as in (a), but now you have five parameters and six moment conditions. Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results. Also test for overidentifying restrictions in this model and interpret the results of this test.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part c}
+\hlcom{## Create matrix of data}
+\hlstd{data_1c} \hlkwb{<-} \hlstd{travel_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{),}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{,}
+         \hlkwc{cost_bus} \hlstd{=} \hlopt{-}\hlstd{cost_bus,}
+         \hlkwc{time_bus} \hlstd{=} \hlopt{-}\hlstd{time_bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(choice, constant, cost_car, time_car, cost_bus, time_bus,}
+         \hlstd{price_gas, snowfall, car_in_shop)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Function to calculate binary logit moments}
+\hlstd{calculate_moments_1c} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract explanatory variable data from matrix}
+  \hlstd{data_x} \hlkwb{<-} \hlstd{data[,} \hlnum{2}\hlopt{:}\hlnum{6}\hlstd{]}
+  \hlcom{## Extract choice data from matrix}
+  \hlstd{data_y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Extract instrument data from matrix}
+  \hlstd{data_z} \hlkwb{<-} \hlstd{data[,} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{5}\hlopt{:}\hlnum{9}\hlstd{)]}
+  \hlcom{## Calculate net utility of alternative given the parameters}
+  \hlstd{utility} \hlkwb{<-} \hlstd{data_x} \hlopt{%*%} \hlstd{parameters}
+  \hlcom{## Caclculate logit probability of alternative given the parameters}
+  \hlstd{probability_choice} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate residuals}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{data_y} \hlopt{-} \hlstd{probability_choice}
+  \hlcom{## Create moment matrix}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{data_z}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\hlcom{## Use GMM to estimate model}
+\hlstd{model_1c} \hlkwb{<-} \hlkwd{gmm}\hlstd{(calculate_moments_1c, data_1c,} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlstd{model_1c} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = calculate_moments_1c, x = data_1c, t0 = rep(0, 5), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]   1.1607e+01   5.6793e+00   2.0437e+00   4.0980e-02
+## Theta[2]  -7.4920e+00   3.0683e+00  -2.4417e+00   1.4618e-02
+## Theta[3]  -1.8632e-01   2.0063e-01  -9.2865e-01   3.5307e-01
+## Theta[4]  -3.2721e+00   5.4418e-01  -6.0129e+00   1.8218e-09
+## Theta[5]  -2.0915e-01   4.6169e-02  -4.5301e+00   5.8952e-06
+## 
+## J-Test: degrees of freedom is 1 
+##                 J-test   P-value
+## Test E(g)=0:    0.28316  0.59464
+## 
+## Initial values of the coefficients
+##     Theta[1]     Theta[2]     Theta[3]     Theta[4]     Theta[5] 
+## -2.455663276  0.001196173 -0.681169864 -2.599205971 -0.257323604 
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  10 
+## Function eval. =  1892 
+## Gradian eval. =  NA
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Test overidentifying restrictions}
+\hlstd{model_1c} \hlopt{%>%}
+  \hlkwd{specTest}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+##  ##  J-Test: degrees of freedom is 1  ## 
+## 
+##                 J-test   P-value
+## Test E(g)=0:    0.28316  0.59464
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	When using these instruments, the parameters all have the same signs as in (b). The magnitudes are different and the parameter on the cost of driving is no longer significant, but the general interpretation of this model is roughly consistent with the model in (b). The overidentifying test fails to reject the null hypothesis, so we conclude that all empirical moments are sufficiently close to zero, implying that this model provides a good fit for our data.
+\end{enumerate}
+
+\section*{Problem 2: Generalized Extreme Value Models}
+
+Use the \texttt{phones.csv} dataset for this question.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item We are interested in understanding how consumers value two phone characteristics: internal storage and screen size. Model the purchase of a phone as a multinomial logit model. Include the amount of storage, the screen size, and the price of each phone as explanatory variables with common coefficients; do not include intercepts. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Estimate this multinomial logit model using the \texttt{mlogit()} function in R. 
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item Calculate the value consumers place on each gigabyte of internal storage and each 0.1 inch of diagonal screen size.
+		\item Apple sees that the iPhone 11 with 256 GB of internal storage has the greatest market share, so they are considering raising the price. Calculate the elasticity of each other phone with respect to the price of the iPhone 11 with 256 GB. (That is, calculate 10 different elasticities, although some might be equal.) Describe the substitution patterns Apple should expect based on these elasticities.
+	\end{enumerate}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part a}
+\hlcom{## Load dataset}
+\hlstd{phones} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'phones.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  customer\_id = col\_double(),\\\#\#\ \  phone\_id = col\_double(),\\\#\#\ \  purchase = col\_double(),\\\#\#\ \  phone = col\_character(),\\\#\#\ \  storage = col\_double(),\\\#\#\ \  screen = col\_double(),\\\#\#\ \  price = col\_double()\\\#\# )}}\begin{alltt}
+\hlcom{## Convert dataset to mlogit format}
+\hlstd{data_2} \hlkwb{<-} \hlstd{phones} \hlopt{%>%}
+  \hlkwd{mlogit.data}\hlstd{(}\hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,} \hlkwc{choice} \hlstd{=} \hlstr{'purchase'}\hlstd{,} \hlkwc{alt.var} \hlstd{=} \hlstr{'phone_id'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Setting row names on a tibble is deprecated.}}\begin{alltt}
+\hlcom{## Model phone purchase as a multinomial logit}
+\hlstd{model_2a} \hlkwb{<-} \hlstd{data_2} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(purchase} \hlopt{~} \hlstd{storage} \hlopt{+} \hlstd{screen} \hlopt{+} \hlstd{price} \hlopt{|} \hlnum{0} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .)}
+\hlcom{## Summarize model results}
+\hlstd{model_2a} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = purchase ~ storage + screen + price | 0 | 0, 
+##     data = ., method = "nr")
+## 
+## Frequencies of alternatives:
+##     1     2     3     4     5     6     7     8     9    10 
+## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
+## 
+## nr method
+## 5 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 9.32E-06 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##            Estimate  Std. Error z-value  Pr(>|z|)    
+## storage  0.01014179  0.00038324  26.463 < 2.2e-16 ***
+## screen   1.88293072  0.15827858  11.896 < 2.2e-16 ***
+## price   -0.00728440  0.00026080 -27.930 < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1832.7
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate estimated probabilities for each phone}
+\hlstd{probability_2a} \hlkwb{<-} \hlkwd{fitted}\hlstd{(model_2a,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[}\hlnum{1}\hlstd{, ]}
+\hlcom{## Calculate value of storage and screen size}
+\hlstd{model_2a}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlopt{:}\hlnum{2}\hlstd{]} \hlopt{/ -}\hlstd{model_2a}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0.1}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##   storage    screen 
+##  1.392263 25.848822
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate elasticities with respect to the price of alternative 6}
+\hlstd{model_2a}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*}
+  \hlkwd{c}\hlstd{(}\hlnum{1} \hlopt{-} \hlstd{probability_2a[}\hlnum{6}\hlstd{],} \hlopt{-}\hlstd{probability_2a[}\hlnum{6}\hlstd{])} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'own'}\hlstd{,} \hlstr{'cross'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##       own     cross 
+## -3.735641  2.448812
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The parameter estimates on both storage and screen size are positive, and the parameter estimate on price is negative; all estimates are statistically significant. These result indicate that consumers get more utility from a phone with more storage and a larger screen size but lose utility as the price of a phone increases, all of which are intuitive. Using these parameter estimates, we see that each gigabyte of storage is worth \$1.39 and each 0.1 inch of screen size is worth \$25.85. The own-price elasticity of the iPhone 11 with 256 GB is -3.74, and the cross-price elasticity of all other phones with respect to the price of the iPhone 11 with 256 GB is 2.45. If Apple raises the price of the iPhone 11 with 256 GB, this model implies that consumers will substitute proportionally to all other phones in the choice set.
+
+	\item The multinomial logit model of (a) is not be the best model for this setting if we think a consumer's unobserved utility includes brand preference, which would create correlations among phones of the same brand. Model the purchase of a phone as a nested logit model with two nests, one for each brand. Model the purchase of a phone as in (a) with the addition of these nests. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Estimate this nested logit model using the \texttt{mlogit()} function in R. 
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item Calculate the value consumers place on each gigabyte of internal storage and each 0.1 inch of diagonal screen size.
+		\item Apple is still interested in raising the price of the iPhone 11 with 256 GB. Calculate the elasticity of each other phone with respect to the price of the iPhone 11 with 256 GB. (That is, calculate 10 different elasticities, although some might be equal.) Describe the substitution patterns Apple should expect based on these elasticities. Why are these substitution patterns different from what you found in (a)?
+	\end{enumerate}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part b}
+\hlcom{## Model phone purchase as a nested logit with brand nests}
+\hlstd{model_2b} \hlkwb{<-} \hlstd{data_2} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(purchase} \hlopt{~} \hlstd{storage} \hlopt{+} \hlstd{screen} \hlopt{+} \hlstd{price} \hlopt{|} \hlnum{0} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,}
+         \hlkwc{nests} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{google} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{4}\hlstd{,} \hlkwc{apple} \hlstd{=} \hlnum{5}\hlopt{:}\hlnum{10}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlstd{model_2b} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = purchase ~ storage + screen + price | 0 | 0, 
+##     data = ., nests = list(google = 1:4, apple = 5:10))
+## 
+## Frequencies of alternatives:
+##     1     2     3     4     5     6     7     8     9    10 
+## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
+## 
+## bfgs method
+## 11 iterations, 0h:0m:0s 
+## g'(-H)^-1g =  21.8 
+## last step couldn't find higher value 
+## 
+## Coefficients :
+##              Estimate  Std. Error  z-value  Pr(>|z|)    
+## storage    0.00620166  0.00046368  13.3749 < 2.2e-16 ***
+## screen     1.02238660  0.15984596   6.3961 1.594e-10 ***
+## price     -0.00461945  0.00037303 -12.3836 < 2.2e-16 ***
+## iv:google  0.17941856  0.08697237   2.0629   0.03912 *  
+## iv:apple   0.67752903  0.05502902  12.3122 < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1829
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate estimated probabilities for each phone}
+\hlstd{probability_2b} \hlkwb{<-} \hlkwd{fitted}\hlstd{(model_2b,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[}\hlnum{1}\hlstd{, ]}
+\hlcom{## Calculate value of storage and screen size}
+\hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlopt{:}\hlnum{2}\hlstd{]} \hlopt{/ -}\hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0.1}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##  storage   screen 
+##  1.34251 22.13221
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate elasticities with respect to the price of alternative 6}
+\hlkwd{c}\hlstd{(model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*}
+    \hlstd{((}\hlnum{1} \hlopt{/} \hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{5}\hlstd{])} \hlopt{-}
+       \hlstd{((}\hlnum{1} \hlopt{-} \hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{5}\hlstd{])} \hlopt{/} \hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{5}\hlstd{]} \hlopt{*}
+          \hlstd{(probability_2b[}\hlnum{6}\hlstd{]} \hlopt{/} \hlkwd{sum}\hlstd{(probability_2b[}\hlnum{5}\hlopt{:}\hlnum{10}\hlstd{])))} \hlopt{-}
+       \hlstd{probability_2b[}\hlnum{6}\hlstd{]),}
+  \hlopt{-}\hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*} \hlstd{probability_2b[}\hlnum{6}\hlstd{]} \hlopt{*}
+    \hlstd{(}\hlnum{1} \hlopt{+} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{5}\hlstd{])} \hlopt{/} \hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{5}\hlstd{]} \hlopt{*}
+       \hlnum{1} \hlopt{/} \hlkwd{sum}\hlstd{(probability_2b[}\hlnum{5}\hlopt{:}\hlnum{10}\hlstd{])),}
+  \hlopt{-}\hlstd{model_2b}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*} \hlstd{probability_2b[}\hlnum{6}\hlstd{])} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'own'}\hlstd{,} \hlstr{'within nest'}\hlstd{,} \hlstr{'other nest'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##         own within nest  other nest 
+##   -3.371083    2.417472    1.534494
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The coefficient estimates are roughly comparable to those in (a). We also now estimate independence (or correlation) parameters for each brand and find both parameters are between zero and one and are statistically significant. These parameters indicate that the unobserved component of utility that a consumer receives from all phones of the same brand is correlated, suggesting unmodeled brand preferences among consumers. Using the coefficient estimates, we see that each gigabyte of storage is worth \$1.34 and each 0.1 inch of screen size is worth \$22.13. The own-price elasticity of the iPhone 11 with 256 GB is -3.37, the cross-price elasticity of all other Apple phones with respect to the price of the iPhone 11 with 256 GB is 2.42, and the cross-price elasticity of all Google phones with respect to the price of the iPhone 11 with 256 GB is 1.53. If Apple raises the price of the iPhone 11 with 256 GB, this model implies that consumers will substitute proportionally more to other Apple phones than to the Google phones.
+
+	\item Conduct a likelihood ratio test to compare the models in (a) and (b). Write down the null hypothesis that you are testing and describe this hypothesis in words. Conduct this likelihood ratio test using the function \texttt{lrtest()} in R. Do you reject your null hypothesis? What is the p-value of the test?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part c}
+\hlcom{## Conduct likelihood ratio test of the models in parts a and b}
+\hlkwd{lrtest}\hlstd{(model_2a, model_2b)}
+\end{alltt}
+\begin{verbatim}
+## Likelihood ratio test
+## 
+## Model 1: purchase ~ storage + screen + price | 0 | 0
+## Model 2: purchase ~ storage + screen + price | 0 | 0
+##   #Df  LogLik Df  Chisq Pr(>Chisq)  
+## 1   3 -1832.8                       
+## 2   5 -1829.0  2 7.5081    0.02342 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The null hypothesis we are testing is
+	$$H_0 \text{: } \lambda_{Apple} = \lambda_{Google} = 1$$
+	which means there is no correlation in the unobserved components of utility. We reject this null hypothesis; the likelihood ratio test has a p-value of 0.023. Thus, we conclude there is correlation in unobserved utility within a brand, so the model in (b) provides a better fit than the model in (a).
+
+	\item Consumer preferences for a specific phone model may be stronger than brand preferences. We can nest by each phone model (i.e., Google Pixel 4, Google Pixel 4 XL, iPhone 11, etc.) to incorporate these phone model preferences into our nested logit model. Model the purchase of a phone as a nested logit model with five nests, one for each phone model. Model the purchase of a phone as in (a) with the addition of these nests. That is, the representative utility for alternative $j$ is simply
+	$$V_{nj} = \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Estimate this nested logit model using the \texttt{mlogit()} function in R. 
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item Calculate the value consumers place on each gigabyte of internal storage and each 0.1 inch of diagonal screen size.
+		\item Apple is still interested in raising the price of the iPhone 11 with 256 GB. Calculate the elasticity of each other phone with respect to the price of the iPhone 11 with 256 GB. (That is, calculate 10 different elasticities, although some might be equal.) Describe the substitution patterns Apple should expect based on these elasticities. Why are these substitution patterns different from what you found in (a) and (b)?
+	\end{enumerate}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Part d}
+\hlcom{## Model phone purchase as a nested logit with model nests}
+\hlstd{model_2d} \hlkwb{<-} \hlstd{data_2} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(purchase} \hlopt{~} \hlstd{storage} \hlopt{+} \hlstd{screen} \hlopt{+} \hlstd{price} \hlopt{|} \hlnum{0} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,}
+         \hlkwc{nests} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{model_1} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{2}\hlstd{,}
+                      \hlkwc{model_2} \hlstd{=} \hlnum{3}\hlopt{:}\hlnum{4}\hlstd{,}
+                      \hlkwc{model_3} \hlstd{=} \hlnum{5}\hlopt{:}\hlnum{6}\hlstd{,}
+                      \hlkwc{model_4} \hlstd{=} \hlnum{7}\hlopt{:}\hlnum{8}\hlstd{,}
+                      \hlkwc{model_5} \hlstd{=} \hlnum{9}\hlopt{:}\hlnum{10}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlstd{model_2d} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = purchase ~ storage + screen + price | 0 | 0, 
+##     data = ., nests = list(model_1 = 1:2, model_2 = 3:4, model_3 = 5:6, 
+##         model_4 = 7:8, model_5 = 9:10))
+## 
+## Frequencies of alternatives:
+##     1     2     3     4     5     6     7     8     9    10 
+## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
+## 
+## bfgs method
+## 15 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 3.68E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##               Estimate  Std. Error  z-value  Pr(>|z|)    
+## storage     0.00695180  0.00050983  13.6355 < 2.2e-16 ***
+## screen      1.50203616  0.17404636   8.6301 < 2.2e-16 ***
+## price      -0.00526048  0.00042449 -12.3924 < 2.2e-16 ***
+## iv:model_1  0.03687200  0.01091284   3.3788 0.0007281 ***
+## iv:model_2  0.02945388  0.00867669   3.3946 0.0006873 ***
+## iv:model_3  1.00915663  0.13884278   7.2683 3.639e-13 ***
+## iv:model_4  0.55181846  0.09364091   5.8929 3.794e-09 ***
+## iv:model_5  0.52297779  0.07551492   6.9255 4.345e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1759.3
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate estimated probabilities for each phone}
+\hlstd{probability_2d} \hlkwb{<-} \hlkwd{fitted}\hlstd{(model_2d,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[}\hlnum{1}\hlstd{, ]}
+\hlcom{## Calculate value of storage and screen size}
+\hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlopt{:}\hlnum{2}\hlstd{]} \hlopt{/ -}\hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{0.1}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##   storage    screen 
+##  1.321514 28.553201
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate elasticities with respect to the price of alternative 6}
+\hlkwd{c}\hlstd{(model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*}
+    \hlstd{((}\hlnum{1} \hlopt{/} \hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{6}\hlstd{])} \hlopt{-}
+       \hlstd{((}\hlnum{1} \hlopt{-} \hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{6}\hlstd{])} \hlopt{/} \hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{6}\hlstd{]} \hlopt{*}
+          \hlstd{(probability_2d[}\hlnum{6}\hlstd{]} \hlopt{/} \hlkwd{sum}\hlstd{(probability_2d[}\hlnum{5}\hlopt{:}\hlnum{6}\hlstd{])))} \hlopt{-}
+       \hlstd{probability_2d[}\hlnum{6}\hlstd{]),}
+  \hlopt{-}\hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*} \hlstd{probability_2d[}\hlnum{6}\hlstd{]} \hlopt{*}
+    \hlstd{(}\hlnum{1} \hlopt{+} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{6}\hlstd{])} \hlopt{/} \hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{6}\hlstd{]} \hlopt{*}
+       \hlnum{1} \hlopt{/} \hlkwd{sum}\hlstd{(probability_2d[}\hlnum{5}\hlopt{:}\hlnum{6}\hlstd{])),}
+  \hlopt{-}\hlstd{model_2d}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{phones}\hlopt{$}\hlstd{price[}\hlnum{6}\hlstd{]} \hlopt{*} \hlstd{probability_2d[}\hlnum{6}\hlstd{])} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'own'}\hlstd{,} \hlstr{'within nest'}\hlstd{,} \hlstr{'other nest'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##         own within nest  other nest 
+##   -2.860307    1.565319    1.590929
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The coefficient estimates are roughly comparable to those in (a) and (b). The independence (or correlation) parameter for the iPhoine 11 is not statistically different from one, indicating that there is no correlation of unobserved utility between the two phones of that model. The independence (or correlation) parameters for the other models are all between zero and one and are statistically significant, indicating that the unobserved component of utility that a consumer receives from phones of the same model is correlated for all models other than the iPhone 11. Using the coefficient estimates, we see that each gigabyte of storage is worth \$1.32 and each 0.1 inch of screen size is worth \$28.55. The own-price elasticity of the iPhone 11 with 256 GB is -2.86, the cross-price elasticity of the other iPhone 11 with respect to the price of the iPhone 11 with 256 GB is 1.56, and the cross-price elasticity of all other models with respect to the price of the iPhone 11 with 256 GB is 1.59. If Apple raises the price of the iPhone 11 with 256 GB, this model implies that consumers will substitute roughly proportionally to all other phones in the choice set.
+
+	\item Suppose you want to compare the models in (b) and (d). Can you use a likelihood ratio test to compare these models? If so, write down the null hypothesis of your test, conduct the test using the function \texttt{lrtest()} in R, and describe your conclusion. If not, explain specifically why the likelihood ratio test is not appropriate for this model comparison.
+
+	The likelihood ratio test is used to test a restricted model against an unrestricted model. In this case, however, neither model imposes a restriction on the other. Instead, when moving from brand nests to model nests, some parameters are restricted, but other parameter restrictions are relaxed; for example, we impose a restriction on the correlation between different models by the same brand, but we also allow for greater flexibility by estimating a separate parameter for each model. Thus, the likelihood ratio test cannot be used to compare these models.
+\end{enumerate}
+
+\end{document}
