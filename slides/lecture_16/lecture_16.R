@@ -120,6 +120,9 @@ model_3_vcov <- c(model_3$coefficients[9]^2,
                     model_3$coefficients[10]) %>% 
   setNames(c('var.ic', 'var.oc', 'cov.ic:oc'))
 model_3_vcov
+## Calculate coefficient variances and covariance using vcov
+vcov(model_3, what = 'rpar') %>% 
+  summary()
 ## Plot distribution of implied discount rate
 ggplot(data = data.frame(x = c(0, 0.5)), aes(x)) +
   stat_function(fun = dlnorm, n = 1001, 

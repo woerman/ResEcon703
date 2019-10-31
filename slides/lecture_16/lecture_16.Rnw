@@ -383,7 +383,7 @@ options(width = 70)
 
 \begin{frame}[fragile]\frametitle{Model Results with Correlated Log-Normal Distributions}
     \vspace{1ex}
-    <<>>=
+    <<size = 'tiny'>>=
     ## Summarize model results
     model_3 %>% 
       summary()
@@ -443,6 +443,9 @@ options(width = 70)
                         model_3$coefficients[10]) %>% 
       setNames(c('var.ic', 'var.oc', 'cov.ic:oc'))
     model_3_vcov
+    ## Calculate coefficient variances and covariance using vcov
+    vcov(model_3, what = 'rpar') %>% 
+      summary()
     @
 \end{frame}
 

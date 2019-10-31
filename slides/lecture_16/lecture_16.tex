@@ -575,7 +575,7 @@
 ## 0.104 0.004 0.016 0.032 0.004 0.096 0.744 
 ## 
 ## bfgs method
-## 40 iterations, 0h:0m:30s 
+## 40 iterations, 0h:0m:35s 
 ## g'(-H)^-1g = 6.71E-08 
 ## gradient close to zero 
 ## 
@@ -653,7 +653,7 @@
 
 \begin{frame}[fragile]\frametitle{Model Results with Correlated Log-Normal Distributions}
     \vspace{1ex}
-\begin{knitrout}\footnotesize
+\begin{knitrout}\tiny
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlcom{## Summarize model results}
@@ -672,7 +672,7 @@
 ## 0.104 0.004 0.016 0.032 0.004 0.096 0.744 
 ## 
 ## bfgs method
-## 34 iterations, 0h:0m:35s 
+## 34 iterations, 0h:0m:34s 
 ## g'(-H)^-1g = 6.52E-07 
 ## gradient close to zero 
 ## 
@@ -764,6 +764,17 @@
 \begin{verbatim}
 ##    var.ic    var.oc cov.ic:oc 
 ## 0.3221626 0.2073116 0.2262136
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate coefficient variances and covariance using vcov}
+\hlkwd{vcov}\hlstd{(model_3,} \hlkwc{what} \hlstd{=} \hlstr{'rpar'}\hlstd{)} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##           Estimate Std. Error z-value Pr(>|z|)
+## var.ic     0.32216    0.27775  1.1599   0.2461
+## var.oc     0.20731    0.16139  1.2845   0.1990
+## cov.ic:oc  0.22621    0.18578  1.2177   0.2234
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
