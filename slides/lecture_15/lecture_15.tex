@@ -287,7 +287,10 @@
     \end{itemize}
     \vspace{3ex}
     The elasticity of alternative $i$ with respect to the $m$th attribute of alternative $j$ is
-    $$E_{nix_{nj}^m} = - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta$$
+    \begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
     \begin{itemize}
         \item $x_{nj}^m$: data for the $m$th attribute of alternative $j$
         \item $\beta^m$: $m$th element of $\beta$
