@@ -62,7 +62,7 @@
     	\item Simulated Choice Probabilities
         \item Simulation-Based Estimators
         \item Simulation Technicalities
-        \item SImulation Bias and Noise
+        \item Simulation Bias and Noise
     \end{itemize}
     \vspace{2ex}
     Upcoming
@@ -127,7 +127,7 @@
     \vfill
 \end{frame}
 
-\begin{frame}\frametitle{Simulated-Based Estimation}
+\begin{frame}\frametitle{Simulation-Based Estimation}
     Simulation-based estimators are roughly equivalent to their traditional analogs
     \begin{itemize}
         \item We replace terms that are difficult or impossible to calculate with their simulated counterparts
@@ -157,7 +157,7 @@
         \intertext{so the MSLE estimator is}
         \hat{\theta} &= \argmax_\theta \sum_{n = 1}^N \sum_{j = 1}^J y_{nj} \ln \check{P}_{nj}(\theta) \\
         \intertext{which yields the first-order condition}
-        0 &= \frac{\partial \ln \check{P}_n(\hat{\theta})}{\partial \theta}
+        0 &= \sum_{n = 1}^N \frac{\partial \ln \check{P}_n(\hat{\theta})}{\partial \theta}
     \end{align*}
     where $ \check{P}_n(\theta)$ is the simulated choice probability of the chosen alternative
 \end{frame}
@@ -278,7 +278,7 @@
         \intertext{ Maximum likelihood estimation of a discrete choice model}
         g_n(\theta) &= \frac{\partial \ln P_n(\theta)}{\partial \theta} \\
         \intertext{Generalized method of moments estimation of a discrete choice model}
-        g_n(\theta) &= \sum_{j = 1}^J (y_{nj} - P_{nj}) z_{nj}
+        g_n(\theta) &= \sum_{j = 1}^J [y_{nj} - P_{nj}(\theta)] z_{nj}
     \end{align*}
     When the some assumptions are met, these estimators yield consistent estimates of the true set of parameters, $\theta^*$
 \end{frame}
