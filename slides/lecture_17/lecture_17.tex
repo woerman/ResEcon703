@@ -61,6 +61,8 @@
     \begin{itemize}
     	\item Simulated Choice Probabilities
         \item Simulation-Based Estimators
+        \item Simulation Technicalities
+        \item SImulation Bias and Noise
     \end{itemize}
     \vspace{2ex}
     Upcoming
@@ -114,50 +116,6 @@
         \item Average over these R draws to get $\check{P}_{ni}$ for each alternative
         $$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)$$
     \end{enumerate}
-\end{frame}
-
-\begin{frame}\frametitle{Some Simulation Technicalities}
-    For a given set of coefficient density parameters, $\theta$, perform the steps on the previous slide for every alternative for each decision maker
-    \begin{itemize}
-        \item For a given decision maker, use the same set of $\beta^r$ draws to simulate the choice probability for every alternative
-        \begin{itemize}
-            \item That is, for each draw of $\beta^r$, calculate the full set of $J$ choice probabilities (one for each alternative), and then average each choice probability over the same $R$ draws of $\beta^r$
-        \end{itemize}
-        \item Use a different set of $\beta^r$ draws for each decision maker in order to maintain independence over decision makers
-        \begin{itemize}
-            \item That is, we need $N$ different sets of $R$ draws of $\beta^r$
-        \end{itemize}
-    \end{itemize}
-\end{frame}
-
-\begin{frame}\frametitle{Simulated Choice Probabilities and Numerical Optimization}
-    We use these simulated choice probabilities within a numerical optimization algorithm to find the set of parameters, $\hat{\theta}$, that are our estimators
-    \begin{itemize}
-        \item We want to use the same set of ``draws'' for a given decision maker throughout the numerical optimization algorithm
-        \item If we use different ``draws'' for each iteration of the algorithm, we introduce additional noise that impedes convergence
-    \end{itemize}
-    \vspace{3ex}
-     In order to avoid this noise
-    \begin{enumerate}
-        \item Draw many ($K \times N \times R$) random variables from a standard normal distribution before starting the optimization algorithm
-        \item Transform this same set of standard normal random variables in each iteration of the optimization algorithm to represent $f(\beta \mid \theta)$ for the set of parameters, $\theta$, of each iteration
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}\frametitle{Transforming a Standard Normal Random Variable}
-    We can transform a standard normal random variable (or a vector of standard normals) into many other distributions
-    \begin{enumerate}
-        \item Draw $K$ standard normal random variables, $\eta \sim N(0, 1)$, where $K$ is the number of random parameters
-        \item Transform these standard normals into the desired distributions
-        \begin{itemize}
-            \item Normal: $\varepsilon = b + s \eta$ gives $\varepsilon \sim N(b, s^2)$
-            \item Log-normal: $\varepsilon = e^{b + s \eta}$ gives $\ln \varepsilon \sim N(b, s^2)$
-            \item Multivariate normal: $\varepsilon = b + L \eta$ gives $\varepsilon \sim N(b, \Omega)$ where $\varepsilon$, $b$, and $\eta$ are each a vector of length equal to the number of multivariate normal random variables, $\Omega$ is the variance-covariance matrix of these variables, and $L$ is the Choleski factor of $\Omega$
-            \item Comparable transformations exist for most distributions
-        \end{itemize}
-    \end{enumerate}
-    \vspace{2ex}
-    See Chapter 9 in the Train textbook for more on drawing and transforming random variables
 \end{frame}
 
 \begin{frame}\frametitle{}
@@ -225,6 +183,61 @@
     \end{align*}
 \end{frame}
 
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation Technicalities
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Some Technicalities of Simulating Choice Probabilities}
+	$$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)$$ \\
+	\vspace{2ex}
+    For a given set of coefficient density parameters, $\theta$, perform simulate choice probabilities for every alternative for each decision maker
+    \begin{itemize}
+        \item For a given decision maker, use the same set of $\beta^r$ draws to simulate the choice probability for every alternative
+        \begin{itemize}
+            \item That is, for each draw of $\beta^r$, calculate the full set of $J$ choice probabilities (one for each alternative), and then average each choice probability over the same $R$ draws of $\beta^r$
+        \end{itemize}
+        \item Use a different set of $\beta^r$ draws for each decision maker in order to maintain independence over decision makers
+        \begin{itemize}
+            \item That is, we need $N$ different sets of $R$ draws of $\beta^r$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probabilities and Numerical Optimization}
+    We use these simulated choice probabilities within a numerical optimization algorithm to find the set of parameters, $\hat{\theta}$, that are our estimators
+    \begin{itemize}
+        \item We want to use the same set of ``draws'' for a given decision maker throughout the numerical optimization algorithm
+        \item If we use different ``draws'' for each iteration of the algorithm, we introduce additional noise that impedes convergence
+    \end{itemize}
+    \vspace{3ex}
+     In order to avoid this noise
+    \begin{enumerate}
+        \item Draw many ($K \times N \times R$) random variables from a standard normal distribution before starting the optimization algorithm
+        \item Transform this same set of standard normal random variables in each iteration of the optimization algorithm to represent $f(\beta \mid \theta)$ for the set of parameters, $\theta$, of each iteration
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Transforming a Standard Normal Random Variable}
+    We can transform a standard normal random variable (or a vector of standard normals) into many other distributions
+    \begin{enumerate}
+        \item Draw $K$ standard normal random variables, $\eta \sim N(0, 1)$, where $K$ is the number of random parameters
+        \item Transform these standard normals into the desired distributions
+        \begin{itemize}
+            \item Normal: $\varepsilon = b + s \eta$ gives $\varepsilon \sim N(b, s^2)$
+            \item Log-normal: $\varepsilon = e^{b + s \eta}$ gives $\ln \varepsilon \sim N(b, s^2)$
+            \item Multivariate normal: $\varepsilon = b + L \eta$ gives $\varepsilon \sim N(b, \Omega)$ where $\varepsilon$, $b$, and $\eta$ are each a vector of length equal to the number of multivariate normal random variables, $\Omega$ is the variance-covariance matrix of these variables, and $L$ is the Choleski factor of $\Omega$
+            \item Comparable transformations exist for most distributions
+        \end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    See Chapter 9 in the Train textbook for more on drawing and transforming random variables
+\end{frame}
+
 \begin{frame}\frametitle{Steps for Simulation-Based Estimation}
     \begin{enumerate}
         \item Draw $K \times N \times R$ standard normal random variables
@@ -247,6 +260,15 @@
             \item Repeat steps 2 and 3 until the algorithm converges to a set of parameters that is your simulation-based estimator
         \end{enumerate}
     \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulated Bias and Noise
+    \end{beamercolorbox}
+    \vfill
 \end{frame}
 
 \begin{frame}\frametitle{Traditional Estimators}
