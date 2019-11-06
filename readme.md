@@ -23,6 +23,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 15. [Mixed Logit Model I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_15/lecture_15.pdf)
 16. [Mixed Logit Model II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_16/lecture_16.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_16/lecture_16.R)
 17. [Simulation-Based Estimation I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_17/lecture_17.pdf)
+18. [Simulation-Based Estimation II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_18/lecture_18.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_18/lecture_18.R)
 
 ## Problem Sets
 

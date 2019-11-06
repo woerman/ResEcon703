@@ -1,0 +1,587 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 18:\ Simulation-Based Estimation II]{Lecture 18:\ Simulation-Based Estimation II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Simulation-Based Estimation
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Simulation-Based Estimation Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 11
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation}
+	To estimate a mixed logit model, we have to use maximum simulated likelihood estimation (MSLE), or another simulation-based estimator, because mixed logit choice probabilities do not have a closed-form solution 
+	\begin{align*}
+    	\hat{\theta} &= \argmax_\theta \sum_{n = 1}^N \sum_{j = 1}^J y_{nj} \ln \check{P}_{nj}(\theta) \\
+    	\intertext{where $\check{P}_{nj}(\theta)$ is the simulated choice probability}
+    	\check{P}_{ni} &= \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)
+    \end{align*}
+    To simulate this choice probability for a given set of parameters, $\theta$,
+    \begin{enumerate}
+        \item Draw a set of coefficients, $\beta^r$, from the density $f(\beta \mid \theta)$
+        \item Calculate the conditional probability, $L_{ni}(\beta^r)$, for each alternative
+        \item Repeat steps 1 and 2 for a total of R draws from $f(\beta \mid \theta)$
+        \item Average over these R draws to get $\check{P}_{ni}$ for each alternative
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimation Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GCC: gas central with AC
+		    	\item ECC: electric central with AC
+		    	\item ERC: electric room with AC
+		    	\item HPC: heat pump with AC
+		    	\item GC: gas central
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    \end{itemize}
+		    \vspace{2ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item ICH: installation cost for heat
+		    	\item ICCA: installation cost for AC
+		    	\item OCH: operating cost for heat
+		    	\item OCCA: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ### Load and look at dataset
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset from mlogit package
+    data('HC', package = 'mlogit')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    as_tibble(HC)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+    <<>>=
+    ### Format dataset
+    ## Gather into a long dataset
+    hvac_long <- HC %>% 
+      mutate(id = 1:n()) %>% 
+      gather(key, value, starts_with('ich.'), starts_with('och.')) %>% 
+      separate(key, c('cost', 'alt')) %>% 
+      spread(cost, value) %>% 
+      mutate(choice = (depvar == alt)) %>% 
+      select(-depvar)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+    <<>>=
+    ## Look at long dataset
+    as_tibble(hvac_long)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<>>=
+    ## Combine heating and cooling costs into one variable
+    hvac_clean <- hvac_long %>% 
+      mutate(cooling = (nchar(alt) == 3), 
+             ic = if_else(cooling, ich + icca, ich),
+             oc = if_else(cooling, och + occa, och)) %>% 
+      mutate(cooling = 1 * cooling,
+             ic = -ic,
+             oc = -oc) %>% 
+      select(id, alt, choice, cooling, ic, oc, income)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<>>=
+    ## Look at cleaned dataset
+    as_tibble(hvac_clean)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model to Estimate with MSLE}
+    The representative utility of each alternative is
+    $$V_{nj} = \alpha AC_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    with
+    \begin{align*}
+    	\ln \beta_1 &\sim N(\mu_1, \sigma_1^2) \\
+    	\ln \beta_2 &\sim N(\mu_2, \sigma_2^2)
+    \end{align*} \\
+    \vspace{2ex}
+    What are the MSLE parameters for this model? \\
+    \vspace{2ex}
+    What is the elasticity of each alternative with respect to the installation cost (IC) of a central gas system with AC (GCC)?
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulation-Based Estimation}
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the set of parameters that maximizes or minimizes the objective function of a simulation-based estimator
+        \begin{enumerate}
+            \item Start with some set of parameters, $\theta^0$
+            \item Simulate choice probabilities for this set of parameters, $\check{P}_{ni}(\theta^t)$
+            \begin{enumerate}
+                \item Transform each set of $K$ standard normals using $\theta^t$ to get a set of $\beta_n^r$
+                \item Calculate the choice probabilities for each individual and draw, $L_{ni}(\beta_n^r)$
+                \item Average over all R simulation draws to get $\check{P}_{ni}(\theta^t)$
+            \end{enumerate}
+            \item Use these simulated choice probabilities to calculate simulated log-likelihood, simulated moments, etc.
+            \item Step to a better set of parameters, $\theta^{t + 1}$
+            \item Repeat steps 2 and 3 until the algorithm converges to a set of parameters that is your simulation-based estimator
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{map()} Function in R}
+    We will use the \texttt{map()} function, and related functions, to help with our simulation
+    \begin{itemize}
+    	\item \texttt{map()} applies a function to each element of a vector or list
+    	\item \texttt{map2()} applies a function to elements from two vectors or lists
+    	\item \texttt{pmap()} is similar but allows for any number of vectors or lists
+    \end{itemize}
+    <<size = 'scriptsize'>>=
+    ### Map function in R
+    ## List to pass to the map function
+    list(1:5, 6:10)
+    ## Take mean of each list element
+    list(1:5, 6:10) %>% 
+      map(~ mean(.x))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 0: Set a Seed for Replication}
+	We first set a seed so we can replicate our random simulation draws
+	\vspace{1ex}
+    <<>>=
+    ### Set a seed for replication
+    ## Random draws without setting a seed
+    rnorm(5)
+    rnorm(5)
+    ## Random draws with the same seed
+    set.seed(703)
+    rnorm(5)
+    set.seed(703)
+    rnorm(5)
+    ## Set seed for replication
+    set.seed(703)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables}
+	Draw $K \times N \times R$ standard normal random variables and organize into a list with each element corresponding to one individual
+	\vspace{1ex}
+    <<size = 'scriptsize'>>=
+    ### Draw random variable for random coefficients
+    ## Draw standard normal random variables and split into list
+    draws_list <- 1:250 %>% 
+      map(., ~ tibble(ic_coef = rnorm(100),
+                      oc_coef = rnorm(100)))
+    draws_list[1]
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1.5: Organize Data}
+    Organize data into a list with each element corresponding to one individual to be compatible with random draws
+    \vspace{1ex}
+    <<>>=
+    ### Organize data for MSLE optimization
+    ## Split data into list by household
+    data_list <- hvac_clean %>% 
+      arrange(id, alt) %>% 
+      group_by(id) %>% 
+      group_split()
+    data_list[1]
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2: Find the MSLE}
+    <<eval = FALSE>>=
+    ### Optimization in R
+    ## Help file for the optimization function, optim
+    ?optim
+    ## Arguments for optim function
+    optim(par, fn, gr, ..., method, lower, upper, control, hessian)
+    @
+    \vspace{2ex}
+	\texttt{optim()} requires that you create a function, \texttt{fn}, that
+	\begin{enumerate}
+		\item Takes a set of parameters and data as inputs
+		\item Calculates your objective function given those parameters
+		\item Returns this value of the objective function
+	\end{enumerate}
+	\vspace{2ex}
+	Some \texttt{control} arguments may be useful when doing optimization that takes longer to converge
+	\begin{itemize}
+		\item \texttt{trace}: \texttt{1} will report progress of convergence
+		\item \texttt{REPORT}: How often (number of iterations) to report on convergence
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Step 2.2--2.3: Choice Probabilities and Log-Likelihood}
+    To estimate a multinomial logit model using MLE, we created a single function that calculated choice probabilities and then used them to calculate the log-likelihood \\
+    \vspace{2ex}
+    To estimate a mixed logit model using MSLE, we will create two separate functions
+    \begin{itemize}
+    	\item Function 1: Simulate choice probabilities for a single decision maker (household)
+    	\item Function 2: Use simulated choice probabilities to calculate simulated log-likelihood
+    \end{itemize}
+    \vspace{2ex}
+    We do not have to split this process into two functions, but it makes the code more transparent (and probably slower\ldots)
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Choice Probabilities for One Household}
+    <<size = 'tiny'>>=
+    ### Find MSLE estimator for mixed logit with random coefficients
+    ## Function to simulate choice probabilities for one household
+    simulate_probabilities <- function(parameters, draws, data){
+      ## Select relevant variables and convert into a matrix [J * K]
+      data_matrix <- data %>% 
+        select(cooling, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R * K]
+      coefficients <- draws %>% 
+        mutate(cooling_coef = parameters[1],
+               ic_coef = exp(parameters[2] + parameters[4] * ic_coef),
+               oc_coef = exp(parameters[3] + parameters[5] * oc_coef)) %>% 
+        select(cooling_coef, ic_coef, oc_coef)
+      ## Calculate utility for each alternative in each draw [R * J]
+      utility <- (as.matrix(coefficients) %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R * 1]
+      summed_utility <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative and draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Average conditional probabilities over all draws [1 * J]
+      simulated_probability <- colMeans(conditional_probability)
+      ## Add simulated probability to initial dataset
+      data_out <- data %>% 
+        mutate(probability = simulated_probability)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Calculate Simulated Log-Likelihood}
+    <<>>=
+    ## Function to calculate simulated log-likelihood
+    simulate_log_likelihood <- function(parameters, draws_list, data_list){
+      ## Simulate probabilities for each household
+      data <- map2(.x = draws_list, .y = data_list,
+                   .f = ~ simulate_probabilities(parameters = parameters, 
+                                                 draws = .x, 
+                                                 data = .y))
+      ## Combine individual datasets into one
+      data <- data %>% 
+        bind_rows()
+      ## Calcule the log of simulated probability for the chosen alternative
+      data <- data %>% 
+        filter(choice == TRUE) %>% 
+        mutate(log_probability = log(probability))
+      ## Calculate the simulated log-likelihood
+      simulated_log_likelihood <- sum(data$log_probability)
+      ## Return the negative of simulated log-likelihood
+      return(-simulated_log_likelihood)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximize Simulated Log-Likelihood}
+    <<>>=
+    ## Maximize the log-likelihood function
+    model <- optim(par = c(6.53, log(0.174), log(1.04), 0, 0), 
+                   fn = simulate_log_likelihood, 
+                   draws_list = draws_list, data_list = data_list, 
+                   method = 'BFGS', hessian = TRUE,
+                   control = list(trace = 1, REPORT = 5))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSLE Optimization Results}
+    <<size = 'scriptsize'>>=
+    ## Report model results
+    model
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSLE Parameters and Standard Errors}
+    <<>>=
+    ## Report parameter estimates and standard errors
+    model$par
+    model$hessian %>% 
+      solve() %>% 
+      diag() %>% 
+      sqrt()
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Elasticities}
+    The elasticity of alternative $i$ with respect to the $m$th attribute of alternative $j$ is
+    \begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    To simulate these elasticities at our MSLE, $\hat{\theta}$,
+    \begin{enumerate}
+        \item Draw a set of coefficients, $\beta^r$, from the density $f(\beta \mid \hat{\theta})$
+        \item Calculate the conditional probability, $L_{ni}(\beta^r)$, for each alternative
+        \item Calculate the term inside the integral for each elasticity
+        \item Repeat steps 1--3 for a total of R draws from $f(\beta \mid \theta)$
+        \item Average over these R draws to simulate the integral for each elasticity
+        \item Multiply each integral by the ratio in front
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ### Find elasticities with respect to the installation cost (ic) of
+    ### gas central with AC (gcc)
+    ## Function to simulate elasticities for one household
+    simulate_elasticities <- function(parameters, draws, data){
+      ## Select relevant variables and convert into a matrix [J * K]
+      data_matrix <- data %>% 
+        select(cooling, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R * K]
+      coefficients <- draws %>% 
+        mutate(cooling_coef = parameters[1],
+               ic_coef = exp(parameters[2] + parameters[4] * ic_coef),
+               oc_coef = exp(parameters[3] + parameters[5] * oc_coef)) %>% 
+        select(cooling_coef, ic_coef, oc_coef)
+      ## Calculate utility for each alternative in each draw [R * J]
+      utility <- (as.matrix(coefficients) %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R * 1]
+      summed_utility <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative and draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Average conditional probabilities over all draws [1 * J]
+      simulated_probability <- colMeans(conditional_probability)
+      ## Calculate integral term for own elasticity for each draw [R * 1]
+      own_elasticity_integral <- coefficients$ic_coef * 
+        conditional_probability[, 6] *
+        (1 - conditional_probability[, 6])
+      ## Calculate integral term for cross elasticities for each draw [R * (J - 1)]
+      cross_elasticity_integral <- coefficients$ic_coef * 
+        conditional_probability[, 6] *
+        conditional_probability[, -6]
+      ## Combine previous terms in correct order [R * J]
+      elasticity_integral <- cross_elasticity_integral[, 1:5] %>% 
+        cbind(own_elasticity_integral) %>% 
+        cbind(cross_elasticity_integral[, 6]) %>% 
+        unname()
+      ## Average elasticity integral terms to simulate integral [1 * J]
+      simulated_integral <- colMeans(elasticity_integral)
+      ## Calculate own-price and cross-price simulated elasticities [1 * J]
+      simulated_elasticity <- c(rep(-1, 5), 1, -1) * data$ic[6] / 
+        simulated_probability * simulated_integral
+      ## Add simulated elasticities to initial dataset
+      data_out <- data %>% 
+        mutate(elasticity = simulated_elasticity)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<size = 'tiny', eval = FALSE>>=
+      ## Calculate the conditional probability for each alternative and draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Average conditional probabilities over all draws [1 * J]
+      simulated_probability <- colMeans(conditional_probability)
+      ## Calculate integral term for own elasticity for each draw [R * 1]
+      own_elasticity_integral <- coefficients$ic_coef * 
+        conditional_probability[, 6] *
+        (1 - conditional_probability[, 6])
+      ## Calculate integral term for cross elasticities for each draw [R * (J - 1)]
+      cross_elasticity_integral <- coefficients$ic_coef * 
+        conditional_probability[, 6] *
+        conditional_probability[, -6]
+      ## Combine previous terms in correct order [R * J]
+      elasticity_integral <- cross_elasticity_integral[, 1:5] %>% 
+        cbind(own_elasticity_integral) %>% 
+        cbind(cross_elasticity_integral[, 6]) %>% 
+        unname()
+      ## Average elasticity integral terms to simulate integral [1 * J]
+      simulated_integral <- colMeans(elasticity_integral)
+      ## Calculate own-price and cross-price simulated elasticities [1 * J]
+      simulated_elasticity <- c(rep(-1, 5), 1, -1) * data$ic[6] / 
+        simulated_probability * simulated_integral
+      ## Add simulated elasticities to initial dataset
+      data_out <- data %>% 
+        mutate(elasticity = simulated_elasticity)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<size = 'tiny', eval = FALSE>>=
+    ## Add simulated elasticities to initial dataset
+      data_out <- data %>% 
+        mutate(elasticity = simulated_elasticity)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulated Elasticities}
+    <<size = 'scriptsize'>>=
+    ## Simulate elasticities for each household
+    data_list <- map2(.x = draws_list, .y = data_list,
+                      .f = ~ simulate_elasticities(parameters = model$par, 
+                                                   draws = .x, 
+                                                   data = .y))
+    ## Combine list of data into one tibble
+    data <- data_list %>% 
+      bind_rows()
+    ## Calculate average elasticity with respect to ic of gcc
+    data %>% 
+      group_by(alt) %>% 
+      summarize(elasticity = mean(elasticity)) %>% 
+      ungroup()
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 11
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}
