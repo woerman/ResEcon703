@@ -1,0 +1,259 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 19:\ Individual-Specific Parameters I]{Lecture 19:\ Individual-Specific Parameters I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Simulation-Based Estimation Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Individual-Specific Parameters
+    	\item Applications of Individual-Specific Parameters
+    	\item Error in Individual-Specific Parameters
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Optional: Fowlie (2010)
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model}
+    The mixed logit model allows for unobserved variation in coefficients throughout the population
+    \begin{itemize}
+        \item The distribution of these coefficients in the population is $f(\beta \mid \theta)$
+        \item We estimate the parameters, $\theta$, that define these population distributions
+        \item This population distribution and the parameters that define it tell us nothing about where any individual decision maker falls within that distribution of coefficients
+    \end{itemize}
+    \vspace{3ex}
+    What if we want a better idea of an individual's coefficients?
+    \begin{itemize}
+        \item We can combine the unconditional (or population) distribution of coefficients and the choices made by the individual to define a conditional distribution of coefficients
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Individual-Specific Parameters
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Example of Individual-Specific Parameters}
+    We are studying how commuters choose their travel mode
+    \begin{itemize}
+         \item $\beta_0$ tells us the relative utility of driving
+         \item We think there is heterogeneity in driving preferences, so we model $\beta_0$ as a random coefficient and find $\beta_0 \sim N(3, 4)$
+         \item But what are the conditional distributions for drivers and non-drivers?
+     \end{itemize} 
+     <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Distributions of Coefficients}
+    The unconditional distribution, $f(\beta \mid \theta)$ is the distribution of coefficients throughout the population (of which our sample is representative) \\
+    \vspace{3ex}
+    The conditional distribution, $h(\beta \mid y, x, \theta)$ is the distribution of coefficients in the subpopulation of individuals who would make decision(s) $y$ when faced with the choice(s) described by data $x$
+    \begin{itemize}
+    	\item We cannot recover the actual coefficients for a specific person
+    	\item But we can recover the distribution of coefficients for a specific person and others who would make the same decision(s) in the same choice situation(s)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Random Coefficients}
+    The utility that decision maker $n$ obtains from alternative $j$ in time $t$ is
+    $$U_{njt} = \beta_n' x_{njt} + \varepsilon_{njt}$$
+    \begin{itemize}
+    	\item $x_{njt}$: data for decision maker $n$ and alternative $j$ in time $t$
+    	\item $\beta_n'$: individual-specific coefficients $\sim f(\beta \mid \theta)$ in the population
+    	\item $\varepsilon_{njt}$: i.i.d.\ extreme value error term
+    \end{itemize}
+    \vspace{2ex}
+    To simplify notation
+    \begin{itemize}
+    	\item $x_n$: data collectively defined for all alternatives and times
+    	\item $y_n$: sequence of alternatives chosen by decision maker $n$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities with Random Coefficients}
+    If we knew an individual's coefficients, $\beta_n$, then the probability of choosing $y_n$ when faced with data $x_n$ would be
+    \begin{align*}
+    	P(y_n \mid x_n, \beta_n) &= \prod_{t = 1}^T L_{nt}(y_{nt} \mid \beta_n) \\
+    	\intertext{where}
+    	L_{nt}(y_{nt} \mid \beta_n) &= \frac{e^{\beta_n' x_{ny_{nt}t}}}{\sum_{j = 1}^J e^{\beta_n' x_{njt}}}
+    	\intertext{But we do not know each individual's coefficients, $\beta_n$, so we have to consider the unconditional distribution of parameters in the population and intergrate over this density}
+    	P(y_n \mid x_n, \theta) &= \int P(y_n \mid x_n, \beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Distribution of Random Coefficients}
+    Using Bayes' Rule, we can express the joint density of $\beta$ and $y_n$ as either side of the expression
+    $$h(\beta \mid y_n, x_n, \theta) \times P(y_n \mid x_n, \theta) = P(y_n \mid x_n, \beta) \times f(\beta \mid \theta)$$ \\
+    \vspace{1ex}
+    Rearranging terms gives us an expression for the conditional distribution
+    $$h(\beta \mid y_n, x_n, \theta) = \frac{P(y_n \mid x_n, \beta) \times f(\beta \mid \theta)}{P(y_n \mid x_n, \theta)}$$ \\
+    \vspace{1ex}
+    $h(\beta \mid y_n, x_n, \theta)$, or the density of $\beta$ among the subpopulation who would choose $y_n$ when facing choice(s) defined by $x_n$, is proportional to the product of
+    \begin{itemize}
+    	\item The density of $\beta$ in the population; and
+    	\item The probability that $y_n$ would be chosen if an individual's coefficients were $\beta$ (when facing choice(s) defined by $x_n$)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Applications of Individual-Specific Parameters
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Mean Coefficients}
+    Using the previous formula for the conditional distribution, we can calculate the mean coefficient for an individual (and similar individuals)
+    \begin{align*}
+    	\bar{\beta}_n &= \int \beta h(\beta \mid y_n, x_n, \theta) d \beta \\
+    	&= \frac{\int \beta P(y_n \mid x_n, \beta) f(\beta \mid \theta) d \beta}{\int P(y_n \mid x_n, \beta) f(\beta \mid \theta) d \beta}
+    \end{align*} \\
+    \vspace{2ex}
+    These integrals have to be simulated, yielding the simulated conditional mean coefficient
+    \begin{align*}
+    	\check{\beta}_n &= \sum_{r = 1}^R w^r \beta^r \\
+    	\intertext{where}
+    	w^r &= \frac{P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Future Choices}
+    If we observe a decision maker's past choice, we can refine future choice probabilities by conditioning on those past choices
+    \begin{align*}
+    	P(i \mid x_{nT+1}, y_n, x_n, \theta) &= \int L_{nT+1} (i \mid \beta) h(\beta \mid y_n, x_n, \theta) d \beta \\
+    	\intertext{where}
+    	L_{nT+1} (i \mid \beta) &= \frac{e^{\beta' x_{niT+1}}}{\sum_{j = 1}^J e^{\beta' x_{njT+1}}}
+    \end{align*} \\
+    \vspace{2ex}
+    We can simulate this probability analogously to the previous slide
+    \begin{align*}
+    	\check{P}_{niT+1}(y_n, x_n, \theta) &= \sum_{r = 1}^R L_{nT+1}(i \mid \beta^r)\\
+    	\intertext{where}
+    	w^r &= \frac{P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Error in Individual-Specific Parameters
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Error in Individual-Specific Parameters}
+    Individual-specific parameters (and their applications) depend on the population parameters, $\theta$
+    \begin{itemize}
+    	\item But we do not know the true values of $\theta$
+    	\item Instead, we have an estimate of $\theta$, given by $\hat{\theta}$, which has variance-covariance matrix $\hat{W}$
+    \end{itemize}
+    \vspace{2ex}
+    Our estimator, $\hat{\theta}$, is a consistent estimate of the true $\theta$, so we can use our estimated population parameters to get consistent estimates of individual-specific parameters, conditional distribution, mean conditional coefficients, etc. \\
+    \vspace{2ex}
+    When using individual-specific parameters (or condition distributions), you may want to represent the underlying uncertainty in the population parameters (or conditional distribution)
+    \begin{itemize}
+    	\item Bootstrap standard errors using the variance-covariance of your estimator (see the Train textbook for more)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Many Observed Choices}
+    As the number of observed choices ($T$) increases, the conditional mean coefficient for an individual (and similar individuals), $\bar{\beta}_n$, converges to the individual-specific coefficient, $\beta_n$
+    \begin{itemize}
+    	\item $\bar{\beta}_n$ is a consistent estimate of $\beta_n$
+    	$$\bar{\beta}_n \overset{p}{\rightarrow} \beta_n$$
+    \end{itemize}
+    \vspace{3ex}
+    You must observe (and model) many choices for this convergence to become close
+    \begin{itemize}
+    	\item Train conducts a Monte Carlo simulation exercise to find that even $T = 50$ yields a substantial difference between $\bar{\beta}_n$ and $\beta_n$
+    	\item See the Train textbook for more details on this point and the Monte Carlo simulation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Optional: Fowlie (2010)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: 2:00--3:00 on Tuesdays in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}
