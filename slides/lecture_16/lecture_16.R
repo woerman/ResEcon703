@@ -2,7 +2,7 @@
 ### Lecture 16: Mixed Logit Model II
 ### Matt Woerman, UMass Amherst
 
-### Generalized Extreme Value Model Example in R -------------------------------
+### Mixed Logit Model Example in R ---------------------------------------------
 
 ### Load and look at dataset
 ## Load tidyverse and mlogit
