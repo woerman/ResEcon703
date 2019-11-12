@@ -2,7 +2,7 @@
 ### Lecture 18: Simulation-Based Estimation II
 ### Matt Woerman, UMass Amherst
 
-### Generalized Extreme Value Model Example in R -------------------------------
+### Simulation-Based Estimation Example in R -----------------------------------
 
 ### Load and look at dataset
 ## Load tidyverse and mlogit
