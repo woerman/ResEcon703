@@ -25,7 +25,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 17. [Simulation-Based Estimation I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_17/lecture_17.pdf)
 18. [Simulation-Based Estimation II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_18/lecture_18.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_18/lecture_18.R)
 19. [Individual-Specific Parameters I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_19/lecture_19.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_19/lecture_19.R)
-
+20. [Individual-Specific Parameters II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_20/lecture_20.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_20/lecture_20.R)
 
 ## Problem Sets
 

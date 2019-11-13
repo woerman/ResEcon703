@@ -1,0 +1,790 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 20:\ Individual-Specific Parameters II]{Lecture 20:\ Individual-Specific Parameters II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Individual-Specific Parameters
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Individual-Specific Parameters Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 7.7
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Individual-Specific Parameters}
+    We can combine the unconditional (or population) distribution of coefficients, $f(\beta \mid \theta)$, and an individual's choices, $y_n$, and data, $x_n$, to generate the conditional distribution of coefficients, $h(\beta \mid y_n, x_n, \theta)$
+    $$h(\beta \mid y_n, x_n, \theta) = \frac{P(y_n \mid x_n, \beta) \times f(\beta \mid \theta)}{P(y_n \mid x_n, \theta)}$$ \\
+    \vspace{2ex}
+    If we only want the mean of this distribution, we can simulate the conditional mean coefficients as
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$ \\
+    \vspace{2ex}
+    With enough observed choices for an individual ($T > 50$?), these means converge to the individual's coefficients
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimation Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Individual-Specific Parameters Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GCC: gas central with AC
+		    	\item ECC: electric central with AC
+		    	\item ERC: electric room with AC
+		    	\item HPC: heat pump with AC
+		    	\item GC: gas central
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    \end{itemize}
+		    \vspace{2ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item ICH: installation cost for heat
+		    	\item ICCA: installation cost for AC
+		    	\item OCH: operating cost for heat
+		    	\item OCCA: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load and look at dataset}
+\hlcom{## Load tidyverse and mlogit}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\hlcom{## Load dataset from mlogit package}
+\hlkwd{data}\hlstd{(}\hlstr{'HC'}\hlstd{,} \hlkwc{package} \hlstd{=} \hlstr{'mlogit'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlkwd{as_tibble}\hlstd{(HC)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 250 x 18
+##    depvar ich.gcc ich.ecc ich.erc ich.hpc ich.gc ich.ec ich.er  icca
+##    <fct>    <dbl>   <dbl>   <dbl>   <dbl>  <dbl>  <dbl>  <dbl> <dbl>
+##  1 erc       9.7     7.86    8.79   11.4    24.1   24.5   7.37  27.3
+##  2 hpc       8.77    8.69    7.09    9.37   28     32.7   9.33  26.5
+##  3 gcc       7.43    8.86    6.94   11.7    25.7   31.7   8.14  22.6
+##  4 gcc       9.18    8.93    7.22   12.1    29.7   26.7   8.04  25.3
+##  5 gcc       8.05    7.02    8.44   10.5    23.9   28.4   7.15  25.4
+##  6 gcc       9.32    8.03    6.22   12.6    27.0   21.4   8.6   19.9
+##  7 gc        7.11    8.78    7.36   12.4    22.9   28.6   6.41  27.0
+##  8 hpc       9.38    7.48    6.72    8.93   26.2   27.9   7.3   18.1
+##  9 gcc       8.08    7.39    8.79   11.2    23.0   22.6   7.85  22.6
+## 10 gcc       6.24    4.88    7.46    8.28   19.8   27.5   6.88  25.8
+## # ... with 240 more rows, and 9 more variables: och.gcc <dbl>,
+## #   och.ecc <dbl>, och.erc <dbl>, och.hpc <dbl>, och.gc <dbl>,
+## #   och.ec <dbl>, och.er <dbl>, occa <dbl>, income <dbl>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Format dataset}
+\hlcom{## Gather into a long dataset}
+\hlstd{hvac_long} \hlkwb{<-} \hlstd{HC} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{id} \hlstd{=} \hlnum{1}\hlopt{:}\hlkwd{n}\hlstd{())} \hlopt{%>%}
+  \hlkwd{gather}\hlstd{(key, value,} \hlkwd{starts_with}\hlstd{(}\hlstr{'ich.'}\hlstd{),} \hlkwd{starts_with}\hlstd{(}\hlstr{'och.'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(key,} \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{spread}\hlstd{(cost, value)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{depvar)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at long dataset}
+\hlkwd{as_tibble}\hlstd{(hvac_long)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 8
+##     icca  occa income    id alt     ich   och choice
+##    <dbl> <dbl>  <dbl> <int> <chr> <dbl> <dbl>  <dbl>
+##  1  17    2.79     60   133 ec    20.3   4.52      0
+##  2  17    2.79     60   133 ecc    8.46  4.52      0
+##  3  17    2.79     60   133 er     7.7   4.32      0
+##  4  17    2.79     60   133 erc    8.16  4.32      0
+##  5  17    2.79     60   133 gc    25.3   2.26      0
+##  6  17    2.79     60   133 gcc    6.33  2.26      1
+##  7  17    2.79     60   133 hpc   11.1   1.63      0
+##  8  18.1  2.55     50    14 ec    25.6   5.21      0
+##  9  18.1  2.55     50    14 ecc   11.2   5.21      0
+## 10  18.1  2.55     50    14 er     9.3   3.8       0
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Combine heating and cooling costs into one variable}
+\hlstd{hvac_clean} \hlkwb{<-} \hlstd{hvac_long} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cooling} \hlstd{= (}\hlkwd{nchar}\hlstd{(alt)} \hlopt{==} \hlnum{3}\hlstd{),}
+         \hlkwc{ic} \hlstd{=} \hlkwd{if_else}\hlstd{(cooling, ich} \hlopt{+} \hlstd{icca, ich),}
+         \hlkwc{oc} \hlstd{=} \hlkwd{if_else}\hlstd{(cooling, och} \hlopt{+} \hlstd{occa, och))} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cooling} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{cooling)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(id, alt, choice, cooling, ic, oc, income)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(id, alt)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at cleaned dataset}
+\hlkwd{as_tibble}\hlstd{(hvac_clean)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 7
+##       id alt   choice cooling    ic    oc income
+##    <int> <chr>  <dbl>   <dbl> <dbl> <dbl>  <dbl>
+##  1     1 ec         0       0 24.5   4.09     20
+##  2     1 ecc        0       1 35.1   7.04     20
+##  3     1 er         0       0  7.37  3.85     20
+##  4     1 erc        1       1 36.1   6.8      20
+##  5     1 gc         0       0 24.1   2.26     20
+##  6     1 gcc        0       1 37.0   5.21     20
+##  7     1 hpc        0       1 38.6   4.68     20
+##  8     2 ec         0       0 32.7   2.69     50
+##  9     2 ecc        0       1 35.2   4.32     50
+## 10     2 er         0       0  9.33  3.45     50
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Convert cleaned dataset to mlogit format}
+\hlstd{hvac_mlogit} \hlkwb{<-} \hlkwd{mlogit.data}\hlstd{(hvac_clean,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                           \hlkwc{choice} \hlstd{=} \hlstr{'choice'}\hlstd{,} \hlkwc{alt.var} \hlstd{=} \hlstr{'alt'}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{mlogit} Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at data in mlogit format}
+\hlkwd{as_tibble}\hlstd{(hvac_mlogit)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1,750 x 7
+##       id alt   choice cooling    ic    oc income
+##    <int> <fct> <lgl>    <dbl> <dbl> <dbl>  <dbl>
+##  1     1 ec    FALSE        0 24.5   4.09     20
+##  2     1 ecc   FALSE        1 35.1   7.04     20
+##  3     1 er    FALSE        0  7.37  3.85     20
+##  4     1 erc   TRUE         1 36.1   6.8      20
+##  5     1 gc    FALSE        0 24.1   2.26     20
+##  6     1 gcc   FALSE        1 37.0   5.21     20
+##  7     1 hpc   FALSE        1 38.6   4.68     20
+##  8     2 ec    FALSE        0 32.7   2.69     50
+##  9     2 ecc   FALSE        1 35.2   4.32     50
+## 10     2 er    FALSE        0  9.33  3.45     50
+## # ... with 1,740 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Mean Coefficients to Simulate}
+    The representative utility of each alternative is
+    $$V_{nj} = \alpha AC_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    with
+    $$\ln \alpha \sim N(\mu, \sigma^2)$$
+    and $\beta_1$ and $\beta_2$ fixed (not random) \\
+    \vspace{3ex}
+    For each alternative, what is the mean $\alpha$ coefficient for the households with that HVAC system?
+    \begin{enumerate}
+        \item Estimate the mixed logit model
+        \item Simulate $\check{\alpha}_n$ for each household
+        \item Average $\check{\alpha}_n$ for the households with each HVAC system
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Simulating Conditional Mean Coefficients}
+    Two ways to simulate conditional mean coefficients for each household
+    \begin{itemize}
+        \item \texttt{mlogit} package
+        \item Code the simulation by hand
+    \end{itemize}
+    \vspace{2ex}
+    The \texttt{mlogit} function \texttt{fitted(model, type = `parameters')} simulates the conditional mean coefficients for every individual
+    \begin{itemize}
+        \item This function returns an $N \times K$ matrix of conditional mean coefficients
+    \end{itemize}
+    \vspace{2ex}
+    We can instead code the simulation by hand
+    \begin{itemize}
+        \item We may want to simulate additional objects that are not part of the \texttt{mlogit} functionality
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Using \texttt{mlogit}}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit using mlogit}
+\hlcom{## Model choice using cooling dummy with log-normal distribution and}
+\hlcom{## fixed coefficients for installation cost and operating cost}
+\hlstd{model_1} \hlkwb{<-} \hlstd{hvac_mlogit} \hlopt{%>%}
+  \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= choice} \hlopt{~} \hlstd{cooling} \hlopt{+} \hlstd{ic} \hlopt{+} \hlstd{oc} \hlopt{|} \hlnum{0} \hlopt{|} \hlnum{0}\hlstd{,} \hlkwc{data} \hlstd{= .,}
+         \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{cooling} \hlstd{=} \hlstr{'ln'}\hlstd{),} \hlkwc{R} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{703}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Results Using \texttt{mlogit}}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_1} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = choice ~ cooling + ic + oc | 0 | 0, data = ., 
+##     rpar = c(cooling = "ln"), R = 100, seed = 703)
+## 
+## Frequencies of alternatives:
+##    ec   ecc    er   erc    gc   gcc   hpc 
+## 0.004 0.016 0.032 0.004 0.096 0.744 0.104 
+## 
+## bfgs method
+## 14 iterations, 0h:0m:3s 
+## g'(-H)^-1g = 4.05E-08 
+## gradient close to zero 
+## 
+## Coefficients :
+##             Estimate Std. Error z-value  Pr(>|z|)    
+## cooling     2.561869   0.636702  4.0237 5.730e-05 ***
+## ic         -0.213818   0.035361 -6.0468 1.478e-09 ***
+## oc         -1.121642   0.186787 -6.0049 1.914e-09 ***
+## sd.cooling  0.766363   0.644710  1.1887    0.2346    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -327.57
+## 
+## random coefficients
+##         Min.  1st Qu.   Median     Mean  3rd Qu. Max.
+## cooling    0 7.728894 12.96002 17.38357 21.73173  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients Using \texttt{mlogit}}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Find the mean coefficient for each chosen alternative using mlogit}
+\hlcom{## Calculate mean coefficient for each household}
+\hlstd{coefficients_1} \hlkwb{<-} \hlstd{model_1} \hlopt{%>%}
+  \hlkwd{fitted}\hlstd{(}\hlkwc{type} \hlstd{=} \hlstr{'parameters'}\hlstd{)} \hlopt{%>%}
+  \hlkwd{as_tibble}\hlstd{()} \hlopt{%>%}
+  \hlkwd{rename}\hlstd{(}\hlkwc{cooling_coef} \hlstd{= cooling)}
+\hlstd{coefficients_1}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 250 x 1
+##    cooling_coef
+##           <dbl>
+##  1        19.5 
+##  2        18.3 
+##  3        19.3 
+##  4        18.7 
+##  5        20.3 
+##  6        18.9 
+##  7         4.91
+##  8        22.0 
+##  9        19.9 
+## 10        18.1 
+## # ... with 240 more rows
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Coefficients for Each Alternative Using \texttt{mlogit}}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Average coefficient over all households with each HVAC system}
+\hlstd{hvac_clean} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(choice} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{cbind}\hlstd{(coefficients_1)} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(alt)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{mean}\hlstd{(cooling_coef))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 7 x 2
+##   alt   cooling_coef
+##   <chr>        <dbl>
+## 1 ec            4.38
+## 2 ecc          19.5 
+## 3 er            4.45
+## 4 erc          19.5 
+## 5 gc            4.70
+## 6 gcc          19.5 
+## 7 hpc          19.9
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulating Conditional Mean Coefficients}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the MSLE parameters, $\hat{\theta}$
+        \begin{itemize}
+            \item See slides from last week on MSLE
+        \end{itemize}
+        \item Simulate conditional mean coefficients using the MSLE parameters, $\hat{\theta}$
+        \begin{enumerate}
+            \item Transform each set of $K$ standard normals using $\hat{\theta}$ to get a set of $\beta_n^r$
+            \item Calculate the choice probability of the chosen alternative for each individual and draw, $P(y_n \mid x_n, \beta_n^r)$
+            \item Take a weighted average of $\beta_n^r$, with weights equal to $P(y_n \mid x_n, \beta_n^r)$, to get $\check{\beta}_n$ for each individual
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables (and Organize Data)}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Model HVAC choice as a mixed logit coded by hand}
+\hlcom{## Set seed for replication}
+\hlkwd{set.seed}\hlstd{(}\hlnum{703}\hlstd{)}
+\hlcom{## Draw standard normal random variables and split into list}
+\hlstd{draws_2_list} \hlkwb{<-} \hlnum{1}\hlopt{:}\hlnum{250} \hlopt{%>%}
+  \hlkwd{map}\hlstd{(.,} \hlopt{~} \hlkwd{tibble}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{rnorm}\hlstd{(}\hlnum{100}\hlstd{)))}
+\hlcom{## Split data into list by household}
+\hlstd{data_2_list} \hlkwb{<-} \hlstd{hvac_clean} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(id)} \hlopt{%>%}
+  \hlkwd{group_split}\hlstd{()}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2a: Simulate Choice Probabilities for One Household}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to simulate choice probabilities for one household}
+\hlstd{simulate_probabilities} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{draws}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select relevant variables and convert into a matrix [J * K]}
+  \hlstd{data_matrix} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cooling, ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Transform random coefficients based on parameters [R * K]}
+  \hlstd{coefficients} \hlkwb{<-} \hlstd{draws} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{exp}\hlstd{(parameters[}\hlnum{1}\hlstd{]} \hlopt{+} \hlstd{parameters[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{cooling_coef),}
+           \hlkwc{ic_coef} \hlstd{= parameters[}\hlnum{2}\hlstd{],}
+           \hlkwc{oc_coef} \hlstd{= parameters[}\hlnum{3}\hlstd{])}
+  \hlcom{## Calculate utility for each alternative in each draw [R * J]}
+  \hlstd{utility} \hlkwb{<-} \hlstd{(}\hlkwd{as.matrix}\hlstd{(coefficients)} \hlopt{%*%} \hlkwd{t}\hlstd{(data_matrix))} \hlopt{%>%}
+    \hlkwd{pmin}\hlstd{(}\hlnum{700}\hlstd{)} \hlopt{%>%}
+    \hlkwd{pmax}\hlstd{(}\hlopt{-}\hlnum{700}\hlstd{)}
+  \hlcom{## Sum the exponential of utility over alternatives [R * 1]}
+  \hlstd{summed_utility} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{exp}\hlstd{()} \hlopt{%>%}
+    \hlkwd{rowSums}\hlstd{()}
+  \hlcom{## Calculate the conditional probability for each alternative in each draw [R * J]}
+  \hlstd{conditional_probability} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{summed_utility}
+  \hlcom{## Average conditional probabilities over all draws [1 * J]}
+  \hlstd{simulated_probability} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(conditional_probability)}
+  \hlcom{## Add simulated probability to initial dataset}
+  \hlstd{data_out} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{probability} \hlstd{= simulated_probability)}
+  \hlcom{## Return initial dataset with simulated probability variable}
+  \hlkwd{return}\hlstd{(data_out)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2b: Calculate Simulated Log-Likelihood}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate simulated log-likelihood}
+\hlstd{simulate_log_likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{draws_list}\hlstd{,} \hlkwc{data_list}\hlstd{)\{}
+  \hlcom{## Simulate probabilities for each household}
+  \hlstd{data} \hlkwb{<-} \hlkwd{map2}\hlstd{(}\hlkwc{.x} \hlstd{= draws_list,} \hlkwc{.y} \hlstd{= data_list,}
+               \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{simulate_probabilities}\hlstd{(}\hlkwc{parameters} \hlstd{= parameters,}
+                                             \hlkwc{draws} \hlstd{= .x,}
+                                             \hlkwc{data} \hlstd{= .y))}
+  \hlcom{## Combine individual datasets into one}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{bind_rows}\hlstd{()}
+  \hlcom{## Calcule the log of simulated probability for the chosen alternative}
+  \hlstd{data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{filter}\hlstd{(choice} \hlopt{==} \hlnum{TRUE}\hlstd{)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_probability} \hlstd{=} \hlkwd{log}\hlstd{(probability))}
+  \hlcom{## Calculate the simulated log-likelihood}
+  \hlstd{simulated_log_likelihood} \hlkwb{<-} \hlkwd{sum}\hlstd{(data}\hlopt{$}\hlstd{log_probability)}
+  \hlcom{## Return the negative of simulated log-likelihood}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{simulated_log_likelihood)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2c: Maximize Simulated Log-Likelihood}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_2} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{log}\hlstd{(}\hlnum{6.53}\hlstd{),} \hlopt{-}\hlnum{0.174}\hlstd{,} \hlopt{-}\hlnum{1.04}\hlstd{,} \hlnum{0}\hlstd{),}
+                 \hlkwc{fn} \hlstd{= simulate_log_likelihood,}
+                 \hlkwc{draws_list} \hlstd{= draws_2_list,} \hlkwc{data_list} \hlstd{= data_2_list,}
+                 \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{,}
+                 \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{trace} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{REPORT} \hlstd{=} \hlnum{5}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## initial  value 329.883895 
+## iter   5 value 329.769926
+## iter  10 value 327.822147
+## iter  15 value 327.606084
+## final  value 327.573807 
+## converged
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2d: Report MSLE Results}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Report parameter estimates and standard errors}
+\hlstd{model_2}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+## [1]  2.5617903 -0.2137397 -1.1215855  0.7667214
+\end{verbatim}
+\begin{alltt}
+\hlstd{model_2}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.6944200 0.0311569 0.1051514 0.6748593
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Find the mean coefficient for each chosen alternative coded by hand}
+\hlcom{## Function to simulate mean coefficient for one household}
+\hlstd{simulate_coefs} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{parameters}\hlstd{,} \hlkwc{draws}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select relevant variables and convert into a matrix [J * K]}
+  \hlstd{data_matrix} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cooling, ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Transform random coefficients based on parameters [R * K]}
+  \hlstd{coefficients} \hlkwb{<-} \hlstd{draws} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{exp}\hlstd{(parameters[}\hlnum{1}\hlstd{]} \hlopt{+} \hlstd{parameters[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{cooling_coef),}
+           \hlkwc{ic_coef} \hlstd{= parameters[}\hlnum{2}\hlstd{],}
+           \hlkwc{oc_coef} \hlstd{= parameters[}\hlnum{3}\hlstd{])}
+  \hlcom{## Calculate utility for each alternative in each draw [R * J]}
+  \hlstd{utility} \hlkwb{<-} \hlstd{(}\hlkwd{as.matrix}\hlstd{(coefficients)} \hlopt{%*%} \hlkwd{t}\hlstd{(data_matrix))} \hlopt{%>%}
+    \hlkwd{pmin}\hlstd{(}\hlnum{700}\hlstd{)} \hlopt{%>%}
+    \hlkwd{pmax}\hlstd{(}\hlopt{-}\hlnum{700}\hlstd{)}
+  \hlcom{## Sum the exponential of utility over alternatives [R * 1]}
+  \hlstd{summed_utility} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{exp}\hlstd{()} \hlopt{%>%}
+    \hlkwd{rowSums}\hlstd{()}
+  \hlcom{## Calculate the conditional probability for each alternative in each draw [R * J]}
+  \hlstd{conditional_probability} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{summed_utility}
+  \hlcom{## Extract conditional probabilities of chosen alternative for each draw [R * 1]}
+  \hlstd{probability_draw} \hlkwb{<-} \hlstd{conditional_probability} \hlopt{%*%} \hlstd{data}\hlopt{$}\hlstd{choice}
+  \hlcom{## Add draw probability to dataset of coefficients}
+  \hlstd{coefficients} \hlkwb{<-} \hlstd{coefficients} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{probability} \hlstd{=} \hlkwd{c}\hlstd{(probability_draw))}
+  \hlcom{## Calculate weighted average for each coefficient}
+  \hlstd{coefficients_weighted} \hlkwb{<-} \hlstd{coefficients} \hlopt{%>%}
+    \hlkwd{summarize}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{sum}\hlstd{(cooling_coef} \hlopt{*} \hlstd{probability),}
+              \hlkwc{probability} \hlstd{=} \hlkwd{sum}\hlstd{(probability))} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cooling_coef} \hlstd{= cooling_coef} \hlopt{/} \hlstd{probability)} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{probability)}
+  \hlcom{## Add individual coefficients to initial dataset}
+  \hlstd{data_out} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cooling_coef} \hlstd{= coefficients_weighted}\hlopt{$}\hlstd{cooling_coef)}
+  \hlcom{## Return initial dataset with simulated probability variable}
+  \hlkwd{return}\hlstd{(data_out)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{  ## Calculate the conditional probability for each alt in each draw [R * J]}
+  conditional_probability <- \hlkwd{exp}(utility) / summed_utility
+\hlcom{  ## Extract conditional probabilities of chosen alternative for each draw [R * 1]}
+  probability_draw <- conditional_probability %*% data$choice
+\hlcom{  ## Add draw probability to dataset of coefficients}
+  coefficients <- coefficients %>%
+    \hlkwd{mutate}(probability = \hlkwd{c}(probability_draw))
+\hlcom{  ## Calculate weighted average for each coefficient}
+  coefficients_weighted <- coefficients %>%
+    \hlkwd{summarize}(cooling_coef = \hlkwd{sum}(cooling_coef * probability),
+              probability = \hlkwd{sum}(probability)) %>% 
+    \hlkwd{mutate}(cooling_coef = cooling_coef / probability) %>% 
+    \hlkwd{select}(-probability)
+\hlcom{  ## Add individual coefficients to initial dataset}
+  data_out <- data %>% 
+    \hlkwd{mutate}(cooling_coef = coefficients_weighted$cooling_coef)
+\hlcom{  ## Return initial dataset with simulated probability variable}
+  \hlkwd{return}(data_out)
+\}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3b: Simulate Coefficients for All Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate individual coefficients for each household}
+\hlstd{data_2_list} \hlkwb{<-} \hlkwd{map2}\hlstd{(}\hlkwc{.x} \hlstd{= draws_2_list,} \hlkwc{.y} \hlstd{= data_2_list,}
+                    \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{simulate_coefs}\hlstd{(}\hlkwc{parameters} \hlstd{= model_2}\hlopt{$}\hlstd{par,}
+                                          \hlkwc{draws} \hlstd{= .x,}
+                                          \hlkwc{data} \hlstd{= .y))}
+\hlcom{## Combine list of data into one tibble}
+\hlstd{data_2} \hlkwb{<-} \hlstd{data_2_list} \hlopt{%>%}
+  \hlkwd{bind_rows}\hlstd{()}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients for Each HVAC System}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate average coefficients for Google phone consumers}
+\hlstd{data_2} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(choice} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(alt)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{cooling_coef} \hlstd{=} \hlkwd{mean}\hlstd{(cooling_coef))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 7 x 2
+##   alt   cooling_coef
+##   <chr>        <dbl>
+## 1 ec            4.37
+## 2 ecc          19.5 
+## 3 er            4.45
+## 4 erc          19.5 
+## 5 gc            4.69
+## 6 gcc          19.5 
+## 7 hpc          19.9
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 7.7
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}

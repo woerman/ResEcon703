@@ -1,0 +1,508 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Lecture 20:\ Individual-Specific Parameters II]{Lecture 20:\ Individual-Specific Parameters II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Individual-Specific Parameters
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Individual-Specific Parameters Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 7.7
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Individual-Specific Parameters}
+    We can combine the unconditional (or population) distribution of coefficients, $f(\beta \mid \theta)$, and an individual's choices, $y_n$, and data, $x_n$, to generate the conditional distribution of coefficients, $h(\beta \mid y_n, x_n, \theta)$
+    $$h(\beta \mid y_n, x_n, \theta) = \frac{P(y_n \mid x_n, \beta) \times f(\beta \mid \theta)}{P(y_n \mid x_n, \theta)}$$ \\
+    \vspace{2ex}
+    If we only want the mean of this distribution, we can simulate the conditional mean coefficients as
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$ \\
+    \vspace{2ex}
+    With enough observed choices for an individual ($T > 50$?), these means converge to the individual's coefficients
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimation Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Individual-Specific Parameters Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GCC: gas central with AC
+		    	\item ECC: electric central with AC
+		    	\item ERC: electric room with AC
+		    	\item HPC: heat pump with AC
+		    	\item GC: gas central
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    \end{itemize}
+		    \vspace{2ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item ICH: installation cost for heat
+		    	\item ICCA: installation cost for AC
+		    	\item OCH: operating cost for heat
+		    	\item OCCA: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ### Load and look at dataset
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset from mlogit package
+    data('HC', package = 'mlogit')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    as_tibble(HC)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+    <<>>=
+    ### Format dataset
+    ## Gather into a long dataset
+    hvac_long <- HC %>% 
+      mutate(id = 1:n()) %>% 
+      gather(key, value, starts_with('ich.'), starts_with('och.')) %>% 
+      separate(key, c('cost', 'alt')) %>% 
+      spread(cost, value) %>% 
+      mutate(choice = 1 * (depvar == alt)) %>% 
+      select(-depvar)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+    <<>>=
+    ## Look at long dataset
+    as_tibble(hvac_long)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<>>=
+    ## Combine heating and cooling costs into one variable
+    hvac_clean <- hvac_long %>% 
+      mutate(cooling = (nchar(alt) == 3), 
+             ic = if_else(cooling, ich + icca, ich),
+             oc = if_else(cooling, och + occa, och)) %>% 
+      mutate(cooling = 1 * cooling) %>% 
+      select(id, alt, choice, cooling, ic, oc, income) %>% 
+      arrange(id, alt)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<>>=
+    ## Look at cleaned dataset
+    as_tibble(hvac_clean)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{mlogit} Format}
+    <<>>=
+    ## Convert cleaned dataset to mlogit format
+    hvac_mlogit <- mlogit.data(hvac_clean, shape = 'long', 
+                               choice = 'choice', alt.var = 'alt')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{mlogit} Format}
+    <<>>=
+    ## Look at data in mlogit format
+    as_tibble(hvac_mlogit)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Mean Coefficients to Simulate}
+    The representative utility of each alternative is
+    $$V_{nj} = \alpha AC_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    with
+    $$\ln \alpha \sim N(\mu, \sigma^2)$$
+    and $\beta_1$ and $\beta_2$ fixed (not random) \\
+    \vspace{3ex}
+    For each alternative, what is the mean $\alpha$ coefficient for the households with that HVAC system?
+    \begin{enumerate}
+        \item Estimate the mixed logit model
+        \item Simulate $\check{\alpha}_n$ for each household
+        \item Average $\check{\alpha}_n$ for the households with each HVAC system
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Simulating Conditional Mean Coefficients}
+    Two ways to simulate conditional mean coefficients for each household
+    \begin{itemize}
+        \item \texttt{mlogit} package
+        \item Code the simulation by hand
+    \end{itemize}
+    \vspace{2ex}
+    The \texttt{mlogit} function \texttt{fitted(model, type = `parameters')} simulates the conditional mean coefficients for every individual
+    \begin{itemize}
+        \item This function returns an $N \times K$ matrix of conditional mean coefficients
+    \end{itemize}
+    \vspace{2ex}
+    We can instead code the simulation by hand
+    \begin{itemize}
+        \item We may want to simulate additional objects that are not part of the \texttt{mlogit} functionality
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Using \texttt{mlogit}}
+    <<>>=
+    ### Model HVAC choice as a mixed logit using mlogit
+    ## Model choice using cooling dummy with log-normal distribution and
+    ## fixed coefficients for installation cost and operating cost
+    model_1 <- hvac_mlogit %>% 
+      mlogit(formula = choice ~ cooling + ic + oc | 0 | 0, data = .,
+             rpar = c(cooling = 'ln'), R = 100, seed = 703)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Results Using \texttt{mlogit}}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    model_1 %>% 
+      summary()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients Using \texttt{mlogit}}
+    <<>>=
+    ### Find the mean coefficient for each chosen alternative using mlogit
+    ## Calculate mean coefficient for each household
+    coefficients_1 <- model_1 %>% 
+      fitted(type = 'parameters') %>% 
+      as_tibble() %>% 
+      rename(cooling_coef = cooling)
+    coefficients_1
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Coefficients for Each Alternative Using \texttt{mlogit}}
+    <<>>=
+    ## Average coefficient over all households with each HVAC system
+    hvac_clean %>% 
+      filter(choice == 1) %>% 
+      cbind(coefficients_1) %>% 
+      group_by(alt) %>% 
+      summarize(cooling_coef = mean(cooling_coef))
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulating Conditional Mean Coefficients}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the MSLE parameters, $\hat{\theta}$
+        \begin{itemize}
+            \item See slides from last week on MSLE
+        \end{itemize}
+        \item Simulate conditional mean coefficients using the MSLE parameters, $\hat{\theta}$
+        \begin{enumerate}
+            \item Transform each set of $K$ standard normals using $\hat{\theta}$ to get a set of $\beta_n^r$
+            \item Calculate the choice probability of the chosen alternative for each individual and draw, $P(y_n \mid x_n, \beta_n^r)$
+            \item Take a weighted average of $\beta_n^r$, with weights equal to $P(y_n \mid x_n, \beta_n^r)$, to get $\check{\beta}_n$ for each individual
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables (and Organize Data)}
+    <<>>=
+    ### Model HVAC choice as a mixed logit coded by hand
+    ## Set seed for replication
+    set.seed(703)
+    ## Draw standard normal random variables and split into list
+    draws_2_list <- 1:250 %>% 
+      map(., ~ tibble(cooling_coef = rnorm(100)))
+    ## Split data into list by household
+    data_2_list <- hvac_clean %>% 
+      group_by(id) %>% 
+      group_split()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2a: Simulate Choice Probabilities for One Household}
+    <<size = 'tiny'>>=
+    ## Function to simulate choice probabilities for one household
+    simulate_probabilities <- function(parameters, draws, data){
+      ## Select relevant variables and convert into a matrix [J * K]
+      data_matrix <- data %>% 
+        select(cooling, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R * K]
+      coefficients <- draws %>% 
+        mutate(cooling_coef = exp(parameters[1] + parameters[4] * cooling_coef),
+               ic_coef = parameters[2],
+               oc_coef = parameters[3])
+      ## Calculate utility for each alternative in each draw [R * J]
+      utility <- (as.matrix(coefficients) %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R * 1]
+      summed_utility <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative in each draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Average conditional probabilities over all draws [1 * J]
+      simulated_probability <- colMeans(conditional_probability)
+      ## Add simulated probability to initial dataset
+      data_out <- data %>% 
+        mutate(probability = simulated_probability)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2b: Calculate Simulated Log-Likelihood}
+    <<>>=
+    ## Function to calculate simulated log-likelihood
+    simulate_log_likelihood <- function(parameters, draws_list, data_list){
+      ## Simulate probabilities for each household
+      data <- map2(.x = draws_list, .y = data_list,
+                   .f = ~ simulate_probabilities(parameters = parameters, 
+                                                 draws = .x, 
+                                                 data = .y))
+      ## Combine individual datasets into one
+      data <- data %>% 
+        bind_rows()
+      ## Calcule the log of simulated probability for the chosen alternative
+      data <- data %>% 
+        filter(choice == TRUE) %>% 
+        mutate(log_probability = log(probability))
+      ## Calculate the simulated log-likelihood
+      simulated_log_likelihood <- sum(data$log_probability)
+      ## Return the negative of simulated log-likelihood
+      return(-simulated_log_likelihood)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2c: Maximize Simulated Log-Likelihood}
+    <<>>=
+    ## Maximize the log-likelihood function
+    model_2 <- optim(par = c(log(6.53), -0.174, -1.04, 0), 
+                     fn = simulate_log_likelihood, 
+                     draws_list = draws_2_list, data_list = data_2_list, 
+                     method = 'BFGS', hessian = TRUE,
+                     control = list(trace = 1, REPORT = 5))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2d: Report MSLE Results}
+    <<>>=
+    ## Report parameter estimates and standard errors
+    model_2$par
+    model_2$hessian %>% 
+      solve() %>% 
+      diag() %>% 
+      sqrt()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+    <<size = 'scriptsize'>>=
+    ### Find the mean coefficient for each chosen alternative coded by hand
+    ## Function to simulate mean coefficient for one household
+    simulate_coefs <- function(parameters, draws, data){
+      ## Select relevant variables and convert into a matrix [J * K]
+      data_matrix <- data %>% 
+        select(cooling, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R * K]
+      coefficients <- draws %>% 
+        mutate(cooling_coef = exp(parameters[1] + parameters[4] * cooling_coef),
+               ic_coef = parameters[2],
+               oc_coef = parameters[3])
+      ## Calculate utility for each alternative in each draw [R * J]
+      utility <- (as.matrix(coefficients) %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R * 1]
+      summed_utility <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative in each draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Extract conditional probabilities of chosen alternative for each draw [R * 1]
+      probability_draw <- conditional_probability %*% data$choice
+      ## Add draw probability to dataset of coefficients
+      coefficients <- coefficients %>%
+        mutate(probability = c(probability_draw))
+      ## Calculate weighted average for each coefficient
+      coefficients_weighted <- coefficients %>%
+        summarize(cooling_coef = sum(cooling_coef * probability),
+                  probability = sum(probability)) %>% 
+        mutate(cooling_coef = cooling_coef / probability) %>% 
+        select(-probability)
+      ## Add individual coefficients to initial dataset
+      data_out <- data %>% 
+        mutate(cooling_coef = coefficients_weighted$cooling_coef)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+    <<size = 'scriptsize', eval = FALSE>>=
+      ## Calculate the conditional probability for each alt in each draw [R * J]
+      conditional_probability <- exp(utility) / summed_utility
+      ## Extract conditional probabilities of chosen alternative for each draw [R * 1]
+      probability_draw <- conditional_probability %*% data$choice
+      ## Add draw probability to dataset of coefficients
+      coefficients <- coefficients %>%
+        mutate(probability = c(probability_draw))
+      ## Calculate weighted average for each coefficient
+      coefficients_weighted <- coefficients %>%
+        summarize(cooling_coef = sum(cooling_coef * probability),
+                  probability = sum(probability)) %>% 
+        mutate(cooling_coef = cooling_coef / probability) %>% 
+        select(-probability)
+      ## Add individual coefficients to initial dataset
+      data_out <- data %>% 
+        mutate(cooling_coef = coefficients_weighted$cooling_coef)
+      ## Return initial dataset with simulated probability variable
+      return(data_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3b: Simulate Coefficients for All Household}
+    $$\check{\beta}_n = \frac{\sum_{r = 1}^R \beta^r P(y_n \mid x_n, \beta^r)}{\sum_{r = 1}^R P(y_n \mid x_n, \beta^r)}$$
+    <<>>=
+    ## Calculate individual coefficients for each household
+    data_2_list <- map2(.x = draws_2_list, .y = data_2_list,
+                        .f = ~ simulate_coefs(parameters = model_2$par, 
+                                              draws = .x, 
+                                              data = .y))
+    ## Combine list of data into one tibble
+    data_2 <- data_2_list %>% 
+      bind_rows()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients for Each HVAC System}
+    <<>>=
+    ## Calculate average coefficients for Google phone consumers
+    data_2 %>%
+      filter(choice == 1) %>% 
+      group_by(alt) %>% 
+      summarize(cooling_coef = mean(cooling_coef))
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 7.7
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}
