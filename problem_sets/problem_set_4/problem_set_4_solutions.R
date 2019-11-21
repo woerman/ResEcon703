@@ -97,9 +97,9 @@ data_1 %>%
   rename(storage_data = storage) %>% 
   cbind(coefficients_1e) %>% 
   group_by(phone, storage_data) %>% 
-  summarize(apple = mean(apple) / -model_1c$coefficients[4], 
-            storage = mean(storage) / -model_1c$coefficients[4], 
-            screen = mean(screen) / -model_1c$coefficients[4] * 0.1) %>% 
+  summarize(apple = mean(apple), 
+            storage = mean(storage), 
+            screen = mean(screen)) %>% 
   ungroup() %>% 
   slice(1:4) %>% 
   rename(apple_coef = apple,
