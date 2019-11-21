@@ -1,0 +1,181 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc} 
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+\title{Problem Set 4}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three, and all group members can submit the same code and output; indicate in your writeup who you worked with. You must submit a unique writeup that answers the problems below. You can discuss answers with your fellow group members, but your writeup must be in your own words. Problem 1 allows you to use R's ``canned routines,'' while Problem 2 requires you to code your own estimators and write your own simulation code. Each problem will indicate which R function to use.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_4/ps4_dataset.zip}{\texttt{ps4\_dataset.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website (\texttt{github.com/woerman/ResEcon703})}. This zipped file contains the dataset, \texttt{phones.csv}, that you will use for this problem set. The dataset contains simulated data from 1000 customers on the purchases or pre-orders of highly-anticipated phone models recently released by Apple and Google: iPhone 11 and Pixel 4. See the file \texttt{data\_descriptions.txt} for descriptions of the variables in the dataset.
+
+<<R CODE HERE>>
+
+\section*{Problem 1: Mixed Logit Model}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item We are again interested in understanding how consumers value two phone characteristics: internal storage and screen size. As we saw in the last problem set, consumers appear to have brand preferences, which we are also interested in valuing. Model the purchase of a phone as a mixed logit model. Include an Apple brand dummy, the amount of storage, the screen size, and the price of each phone as explanatory variables with random coefficients. That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \beta_0 Apple_j + \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $Apple_j$ is a dummy variable if alternative $j$ is from Apple, $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Model all four random coefficients as having a normal distribution. Estimate this mixed logit model using the \texttt{mlogit()} function in R; use 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}).
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item For each coefficient, calculate the proportion of the population with negative coefficients and the proportion of the population with positive coefficients. Describe whether these coefficient distributions match economic intuition.
+	\end{enumerate}
+
+	<<R CODE HERE>>
+
+	Neither parameter for the $\beta_0$ distribution is significant, suggesting no brand preference in this model. Parameters for $\beta_1$ and $\beta_2$ are significant, indicating that preferences for internal storage and screen size vary throughout the population. The mean parameter for $\beta_3$ is significant but not the standard deviation, suggesting no variation in the marginal utility of income. The distributions of these coefficients is mostly intuitive. Coefficients $\beta_0$ and $\beta_2$ have substantial mass on both the positive and negative sides; some consumers prefer Apple phones and others prefer Google, and some consumers prefer a larger screen size and others prefer a more compact phone. Coefficient $\beta_1$ is positive for a large proportion of the population, but not for everyone, which is not intuitive because there is no clear reason to prefer less storage \emph{ceteris paribus}. Coefficient $\beta_3$ is technically negative for some consumers, but only a negligible amount, which is intuitive because we generally think everyone has a positive marginal utility of income. 
+
+	\item The mixed logit model of (a) is not be the best model for this setting if we think some coefficients should always be positive or some coefficient should always be negative. Again model this purchase as a mixed logit model with the same underlying utility model as in (a). That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \beta_0 Apple_j + \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $Apple_j$ is a dummy variable if alternative $j$ is from Apple, $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Model $\beta_0$ and $\beta_2$ as having a normal distribution and $\beta_1$ and $\beta_3$ as having a log-normal distribution. Estimate this mixed logit model using the \texttt{mlogit()} function in R; use 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}). 
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item For each coefficient, calculate the proportion of the population with negative coefficients and the proportion of the population with positive coefficients. Describe whether these coefficient distributions match economic intuition.
+	\end{enumerate}
+
+	<<R CODE HERE>>
+
+	The interpretation of the parameter estimates for this model is roughly the same as in (a). We now model $\beta_1$ and $\beta_3$ as log-normal distributions, however, so any significant variation in these coefficients occurs only on the positive side. Coefficients $\beta_0$ and $\beta_2$ still have substantial mass on both the positive and negative sides, which has intuitive appeal for the reasons described above. Since we model $\beta_1$ and $\beta_3$ using log-normal distributions, these coefficients are now positive for everyone, which is more intuitive and corrects the issues described above. Technically, however, we can interpret coefficient $\beta_3$ as negative for the entire population because we transformed the price data to be negative, making the positive coefficients effectively negative coefficients.
+
+	\item We could use the model in (b) to calculate how consumers value the Apple brand, storage, and screen size, but it would require taking a ratio of distributions. To make these calculations easier, we can model price as having a fixed coefficient. Again model this purchase as a mixed logit model with the same underlying utility model as in (a) and (b). That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \beta_0 Apple_j + \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $Apple_j$ is a dummy variable if alternative $j$ is from Apple, $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Model $\beta_0$ and $\beta_2$ as having a normal distribution, $\beta_1$ as having a log-normal distribution, and $\beta_3$ as a fixed coefficient. Estimate this mixed logit model using the \texttt{mlogit()} function in R; use 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}).
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. 
+		\item Calculate the value consumers place on the Apple brand, each gigabyte of internal storage, and each 0.1 inch of diagonal screen size. Because we have distributions for $\beta_0$, $\beta_1$, and $\beta_2$, these values will also be distributions. Report the parameters that define these distributions. That is, for the value of the Apple brand and the value of each 0.1 inch of diagonal screen size, report the mean and standard deviation of the value; for the value of each gigabyte of internal storage, report the mean and standard deviation of the underlying normal distribution from which the log-normal distribution is derived.
+	\end{enumerate}
+
+	<<R CODE HERE>>
+
+	The general interpretation of these parameter estimates is the same as in (b) because the standard deviation of $\beta_3$ was not previously significant and no other parameter estimates changed substantially. The value consumers place on an Apple phone, relative to a Google phone, is distributed normally with a mean of $-\$11$ and a standard deviation of $\$48$. The value consumers place on each gigabyte of internal storage is distributed log-normally such that its underlying normal distribution has a mean of $\$0.05$ and a standard deviation of $\$0.61$. The value consumers place on each 0.1 inch of diagonal screen size is distributed normally with a mean of $\$26$ and a standard deviation of $\$3.6$.
+
+	\item Conduct a likelihood ratio test to compare the models in (b) and (c). Write down the null hypothesis that you are testing and describe this hypothesis in words. Conduct this likelihood ratio test using the function \texttt{lrtest()} in R. Do you reject your null hypothesis? What is the p-value of the test?
+
+	<<R CODE HERE>>
+
+	The null hypothesis we are testing is
+	$$H_0 \text{: } \sigma_3 = 0$$
+	where $\sigma_3$ is the standard deviation of the underlying normal distribution for coefficient $\beta_3$. That is, we are testing if $\beta_3$ is a fixed coefficient or a random coefficient. We reject this null hypothesis; the likelihood ratio test has a p-value of 0.047. Thus, we conclude that, even though this parameter was not significant in (b), allowing $\beta_3$ to be log-normally distributed statistically improves the fit of the model.
+
+	\item Using the model in (c), calculate the mean coefficients for purchasers of each of the four Google phones. Use the function \texttt{fitted(type = `parameters')} in R to calculate mean coefficients for each consumer. Report these 12 mean coefficients (3 random coefficients $\times$ 4 Google phones). Describe and briefly interpret the patterns you observe in these coefficients.
+
+	<<R CODE HERE>>
+
+	These mean coefficients for consumers of Google phones have intuitive appeal. Consumers who purchase Google phones have a preference for Google phones; that is, the coefficient on the Apple brand variable, $\beta_0$, is negative. Consumers who purchase phones with 64 GB of internal storage place a lower value on internal storage than the consumers who purchase phones with 128 GB of internal storage. Consumers who purchase the Google Pixel 4, which has a smaller screen size, place a negative value on screen size; consumers who purchase the larger Google Pixel 4 XL place a positive value on screen size.
+\end{enumerate}
+
+\section*{Problem 2: Simulation-Based Estimation}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the purchase of a phone as in (c) of problem 1. That is, the representative utility for alternative $j$ is
+	$$V_{nj} = \beta_0 Apple_j + \beta_1 GB_j + \beta_2 SS_j + \beta_3 p_j$$
+	where $Apple_j$ is a dummy variable if alternative $j$ is from Apple, $GB_j$ is the internal storage of alternative $j$, $SS_j$ is the diagonal screen size of alternative $j$, and $p_j$ is the price of alternative $j$. Model $\beta_0$ and $\beta_2$ as having a normal distribution, $\beta_1$ as having a log-normal distribution, and $\beta_3$ as a fixed coefficient. Estimate the parameters of this model by maximum simulated likelihood estimation; use 100 draws for your simulation and set a seed of 703 for replication. The following steps can provide a rough guide to creating your own maximum simulated likelihood estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Set a seed of 703 for replication.
+		\item Draw 300,000 standard normal random variables (3 random coefficients $\times$ 100 draws $\times$ 1000 consumers).
+		\item Create a function to simulate choice probabilities for one consumer:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one consumer, and the data for one consumer as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for each alternative for each draw.
+			\item Calculate the conditional choice probability for each alternative for each draw.
+			\item Calculate the simulated choice probability for each alternative as the mean over all draws.
+		\end{enumerate}
+		\item Create a function to calculate simulated log-likelihood:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for all consumers, and the data for all consumers as inputs: \texttt{function(parameters, draws, data)}.
+			\item Simulate choice probabilities for each alternative for each consumer (call your previous function for each consumer).
+			\item Sum the log of the simulated choice probability for each consumer's chosen alternative.
+			\item Return the negative of the log of simulated likelihood.
+		\end{enumerate}
+		\item Maximize the simulated log-likelihood (or minimize its negative) using \texttt{optim()}. Use the parameters from (c) in problem 1 as your starting guesses to speed up convergence. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = c(model\_1c\$coefficients), fn = your\_second\_function,}} \\
+			& \qquad \quad \; \text{\texttt{data = your\_data, draws = your\_draws,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS', hessian = TRUE)}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results.
+
+	<<R CODE HERE>>
+
+	Coefficients $\beta_0$ and $\beta_2$ are normally distributed with positive means and large standard deviations, indicating high variability in these coefficients throughout the population; that is, the utility generated by the Apple brand and the marginal utility of screen size are positive on average but negative for many individuals. Coefficient $\beta_1$ is log-normally distributed, with the distribution defined by the parameters above, forcing everyone to have a positive marginal utility of internal storage. Coefficient $\beta_3$ is fixed and negative, indicating a positive marginal utility of income.
+
+	\item Using the model in (a), calculate the mean coefficients for purchasers of each of the four Google phones. Use the same simulation draws as in (a) to simulate the mean coefficients for each consumer, and then average over all purchasers for each Google phone. The following steps can provide a rough guide to simulating coefficients:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function to simulate mean coefficients for one consumer:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one consumer, and the data for one consumer as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for each alternative for each draw.
+			\item Calculate the conditional choice probability of the chosen alternative for each draw.
+			\item Calculate the weighted average for each coefficient with weights equal to the conditional choice probability of the chosen alternative for that simulation draw.
+		\end{enumerate}
+		\item Simulate mean coefficients for each consumer (call your previous function for each consumer).
+		\item For each of the four Google phones, average the simulated mean coefficients for all purchasers of that phone.
+	\end{enumerate}
+	Report these 12 mean coefficients (3 random coefficients $\times$ 4 Google phones). Describe and briefly interpret the patterns you observe in these coefficients.
+
+	<<R CODE HERE>>
+
+	These mean coefficients for consumers of Google phones differ from those calculated in part (e) of problem 1, but they again have intuitive appeal. Consumers who purchase Google phones have a preference for Google phones; that is, the coefficient on the Apple brand variable, $\beta_0$, is negative. Consumers who purchase phones with 64 GB of internal storage place a lower value on internal storage than the consumers who purchase phones with 128 GB of internal storage. Consumers who purchase the Google Pixel 4, which has a smaller screen size, place a negative value on screen size; consumers who purchase the larger Google Pixel 4 XL place a positive value on screen size.
+
+	\item As in the previous problem set, Apple is still interested in raising the price of the iPhone 11 with 256 GB. Using the model in (a), simulate the elasticity of each other phone with respect to the price of the iPhone 11 with 256 GB. The following steps can provide a rough guide to simulating elasticities:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function to simulate elasticities for one consumer:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one consumer, and the data for one consumer as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for each alternative for each draw.
+			\item Calculate the conditional choice probability for each alternative for each draw.
+			\item Calculate the simulated choice probability for each alternative as the mean over all draws.
+			\item Calculate the term inside the integral of the elasticity formula for each alternative for each draw by taking products of conditional choice probabilities and the price coefficient.
+			\item Simulate the integral in the elasticity formula by taking the mean of the previous values over all draws for each alternative.
+			\item Calculate the elasticities by multiplying these simulated integrals by the price of the iPhone 11 with 256 GB and dividing by the simulated choice probability of the respective alternative.
+		\end{enumerate}
+		\item Simulate elasticities for each consumer (call your previous function for each consumer).
+		\item Average each simulated elasticity over all consumers.
+	\end{enumerate}
+	Report these 10 elasticities. Briefly interpret these results.
+
+	<<R CODE HERE>>
+
+	The own-price elasticity of the iPhone 11 with 256 GB is nearly -10, indicating that consumers are highly price-responsive and many would substitute away from this phone if the price increases substantially. The cross-price elasticities of the Google phones with respect to the price of the iPhone 11 with 256 GB are all in the range of 1.08--1.34, suggesting few consumers would substitute across brands to the Google phones if Apple raises the price of the iPhone 11 with 256 GB. The largest cross-price elasticity is for the iPhone 11 with 64 GB, with an elasticity of 12.4, indicating many iPhone 11 consumers would substitute within model to less storage if Apple increases the price of the iPhone 11 with 256 GB. The remaining Apple phones have cross-price elasticities with respect to the price of the iPhone 11 with 256 GB of 1.55--5.44, larger than the Google phones but smaller than the iPhone 11 with 64 GB. These substitution patterns seem reasonable if consumers have strong brand and screen size preferences, as estimated by this model.
+\end{enumerate}
+
+\end{document}
