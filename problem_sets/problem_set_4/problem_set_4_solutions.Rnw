@@ -160,7 +160,7 @@ c(model_1c$coefficients[2] - log(-model_1c$coefficients[4]),
   setNames(c('storage', 'sd.storage'))
 ## Calculate distirbuiton of the value of screen size
 c(model_1c$coefficients[3] / -model_1c$coefficients[4] * 0.1,
-  abs(model_1c$coefficients[7]) / -model_1c$coefficients[4] * 0.01) %>% 
+  abs(model_1c$coefficients[7]) / -model_1c$coefficients[4] * 0.1) %>% 
   setNames(c('screen', 'sd.screen'))
 @
 
@@ -407,9 +407,9 @@ data_2b <- data_2b_list %>%
 data_2b %>% 
   filter(purchase == 1) %>% 
   group_by(phone, storage) %>% 
-  summarize(apple_coef = mean(apple_coef) / -model_2a$par[4], 
-            storage_coef = mean(storage_coef) / -model_2a$par[4], 
-            screen_coef = mean(screen_coef) / -model_2a$par[4] * 0.1) %>% 
+  summarize(apple_coef = mean(apple_coef), 
+            storage_coef = mean(storage_coef), 
+            screen_coef = mean(screen_coef)) %>% 
   ungroup() %>% 
   slice(1:4)
 @

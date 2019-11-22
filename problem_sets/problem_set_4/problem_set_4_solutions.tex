@@ -102,11 +102,11 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 \end{alltt}
 
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Attaching packages ------------------------------------------- tidyverse 1.2.1 --}}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Attaching packages ------------------------------------ tidyverse 1.2.1 --}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# v ggplot2 3.2.1\ \ \ \  v purrr\ \  0.3.3\\\#\# v tibble\ \ 2.1.3\ \ \ \  v dplyr\ \  0.8.3\\\#\# v tidyr\ \  1.0.0\ \ \ \  v stringr 1.4.0\\\#\# v readr\ \  1.3.1\ \ \ \  v forcats 0.4.0}}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# v ggplot2 3.2.1\ \ \ \  v purrr\ \  0.3.2\\\#\# v tibble\ \ 2.1.3\ \ \ \  v dplyr\ \  0.8.3\\\#\# v tidyr\ \  1.0.0\ \ \ \  v stringr 1.4.0\\\#\# v readr\ \  1.3.1\ \ \ \  v forcats 0.4.0}}
 
-{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Conflicts ---------------------------------------------- tidyverse\_conflicts() --\\\#\# x dplyr::filter() masks stats::filter()\\\#\# x dplyr::lag()\ \ \ \ masks stats::lag()}}\begin{alltt}
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Conflicts --------------------------------------- tidyverse\_conflicts() --\\\#\# x dplyr::filter() masks stats::filter()\\\#\# x dplyr::lag()\ \ \ \ masks stats::lag()}}\begin{alltt}
 \hlkwd{library}\hlstd{(mlogit)}
 \end{alltt}
 
@@ -174,7 +174,7 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 ## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
 ## 
 ## bfgs method
-## 34 iterations, 0h:0m:28s 
+## 34 iterations, 0h:0m:39s 
 ## g'(-H)^-1g = 2.33E-07 
 ## gradient close to zero 
 ## 
@@ -262,7 +262,7 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 ## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
 ## 
 ## bfgs method
-## 26 iterations, 0h:0m:20s 
+## 26 iterations, 0h:0m:27s 
 ## g'(-H)^-1g = 8.69E-08 
 ## gradient close to zero 
 ## 
@@ -358,7 +358,7 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 ## 0.073 0.008 0.078 0.005 0.208 0.355 0.009 0.081 0.014 0.169 
 ## 
 ## bfgs method
-## 24 iterations, 0h:0m:15s 
+## 24 iterations, 0h:0m:20s 
 ## g'(-H)^-1g = 8.38E-07 
 ## gradient close to zero 
 ## 
@@ -405,12 +405,12 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 \begin{alltt}
 \hlcom{## Calculate distirbuiton of the value of screen size}
 \hlkwd{c}\hlstd{(model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{3}\hlstd{]} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{]} \hlopt{*} \hlnum{0.1}\hlstd{,}
-  \hlkwd{abs}\hlstd{(model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{7}\hlstd{])} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{]} \hlopt{*} \hlnum{0.01}\hlstd{)} \hlopt{%>%}
+  \hlkwd{abs}\hlstd{(model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{7}\hlstd{])} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{]} \hlopt{*} \hlnum{0.1}\hlstd{)} \hlopt{%>%}
   \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'screen'}\hlstd{,} \hlstr{'sd.screen'}\hlstd{))}
 \end{alltt}
 \begin{verbatim}
 ##    screen sd.screen 
-## 25.979056  3.552643
+##  25.97906  35.52643
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -460,9 +460,9 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
   \hlkwd{rename}\hlstd{(}\hlkwc{storage_data} \hlstd{= storage)} \hlopt{%>%}
   \hlkwd{cbind}\hlstd{(coefficients_1e)} \hlopt{%>%}
   \hlkwd{group_by}\hlstd{(phone, storage_data)} \hlopt{%>%}
-  \hlkwd{summarize}\hlstd{(}\hlkwc{apple} \hlstd{=} \hlkwd{mean}\hlstd{(apple)} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{],}
-            \hlkwc{storage} \hlstd{=} \hlkwd{mean}\hlstd{(storage)} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{],}
-            \hlkwc{screen} \hlstd{=} \hlkwd{mean}\hlstd{(screen)} \hlopt{/ -}\hlstd{model_1c}\hlopt{$}\hlstd{coefficients[}\hlnum{4}\hlstd{]} \hlopt{*} \hlnum{0.1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{apple} \hlstd{=} \hlkwd{mean}\hlstd{(apple),}
+            \hlkwc{storage} \hlstd{=} \hlkwd{mean}\hlstd{(storage),}
+            \hlkwc{screen} \hlstd{=} \hlkwd{mean}\hlstd{(screen))} \hlopt{%>%}
   \hlkwd{ungroup}\hlstd{()} \hlopt{%>%}
   \hlkwd{slice}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{)} \hlopt{%>%}
   \hlkwd{rename}\hlstd{(}\hlkwc{apple_coef} \hlstd{= apple,}
@@ -617,25 +617,25 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 ## 
 ## $parameters
 ##        apple      storage       screen        price     sd.apple 
-##  17.72903267  -3.08390682  10.49278588  -0.04632926 -23.30665124 
+##  17.72907047  -3.08390631  10.49272675  -0.04632928 -23.30666552 
 ##   sd.storage    sd.screen 
-##   0.41970092 -31.48371729 
+##   0.41970114 -31.48374229 
 ## 
 ## $std_errors
 ##       apple     storage      screen       price    sd.apple  sd.storage 
-## 2.602787686 0.051008925 1.071222578 0.001999235 2.730125846 0.032545053 
+## 2.602764067 0.051008739 1.071194680 0.001999222 2.730096682 0.032545145 
 ##   sd.screen 
-## 0.510062042 
+## 0.510014775 
 ## 
 ## $z_stats
 ##      apple    storage     screen      price   sd.apple sd.storage  sd.screen 
-##   6.811555 -60.458181   9.795150 -23.173493  -8.536841  12.895998 -61.725270 
+##   6.811632 -60.458392   9.795350 -23.173651  -8.536938  12.895968 -61.731040 
 ## 
 ## $p_values
 ##         apple       storage        screen         price      sd.apple 
-##  9.654906e-12  0.000000e+00  1.181219e-22 8.428251e-119  1.379407e-17 
+##  9.649783e-12  0.000000e+00  1.178885e-22 8.397354e-119  1.378257e-17 
 ##    sd.storage     sd.screen 
-##  4.740884e-38  0.000000e+00
+##  4.742727e-38  0.000000e+00
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -719,9 +719,9 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 \hlstd{data_2b} \hlopt{%>%}
   \hlkwd{filter}\hlstd{(purchase} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
   \hlkwd{group_by}\hlstd{(phone, storage)} \hlopt{%>%}
-  \hlkwd{summarize}\hlstd{(}\hlkwc{apple_coef} \hlstd{=} \hlkwd{mean}\hlstd{(apple_coef)} \hlopt{/ -}\hlstd{model_2a}\hlopt{$}\hlstd{par[}\hlnum{4}\hlstd{],}
-            \hlkwc{storage_coef} \hlstd{=} \hlkwd{mean}\hlstd{(storage_coef)} \hlopt{/ -}\hlstd{model_2a}\hlopt{$}\hlstd{par[}\hlnum{4}\hlstd{],}
-            \hlkwc{screen_coef} \hlstd{=} \hlkwd{mean}\hlstd{(screen_coef)} \hlopt{/ -}\hlstd{model_2a}\hlopt{$}\hlstd{par[}\hlnum{4}\hlstd{]} \hlopt{*} \hlnum{0.1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{apple_coef} \hlstd{=} \hlkwd{mean}\hlstd{(apple_coef),}
+            \hlkwc{storage_coef} \hlstd{=} \hlkwd{mean}\hlstd{(storage_coef),}
+            \hlkwc{screen_coef} \hlstd{=} \hlkwd{mean}\hlstd{(screen_coef))} \hlopt{%>%}
   \hlkwd{ungroup}\hlstd{()} \hlopt{%>%}
   \hlkwd{slice}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{4}\hlstd{)}
 \end{alltt}
@@ -729,10 +729,10 @@ Download the file \href{https://github.com/woerman/ResEcon703/blob/master/proble
 ## # A tibble: 4 x 5
 ##   phone             storage apple_coef storage_coef screen_coef
 ##   <chr>               <dbl>      <dbl>        <dbl>       <dbl>
-## 1 Google Pixel 4         64      -272.        0.893       -49.8
-## 2 Google Pixel 4        128      -318.        1.17        -51.7
-## 3 Google Pixel 4 XL      64      -376.        0.862        73.0
-## 4 Google Pixel 4 XL     128      -469.        1.26         71.8
+## 1 Google Pixel 4         64      -12.6       0.0414       -23.1
+## 2 Google Pixel 4        128      -14.7       0.0540       -23.9
+## 3 Google Pixel 4 XL      64      -17.4       0.0399        33.8
+## 4 Google Pixel 4 XL     128      -21.7       0.0583        33.3
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
