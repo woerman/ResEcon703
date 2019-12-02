@@ -28,6 +28,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 20. [Individual-Specific Parameters II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_20/lecture_20.pdf) | [R code](https://github.com/woerman/ResEcon703/blob/master/slides/lecture_20/lecture_20.R)
 21. [Dynamic Discrete Choice I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_21/lecture_21.pdf)
 22. [Dynamic Discrete Choice II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_22/lecture_22.pdf)
+23. [Endongeneity I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_23/lecture_23.pdf)
 
 ## Problem Sets
 

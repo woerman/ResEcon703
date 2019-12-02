@@ -1,0 +1,478 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 23:\ Endogeneity I]{Lecture 23:\ Endogeneity I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Rust (1987)
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Endogeneity in Structural Models
+    	\item Research Design
+    	\item BLP Estimation
+    	\item Control Function
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Nevo (2000) or Berry et al. (1995)
+        \end{itemize}
+        \item Final exam
+        \begin{itemize}
+            \item Final exam is posted, due December 19
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Endogeneity in Structural Models
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in Structural Models}
+    So far, we have (mostly) assumed that all of our explanatory variables are exogenous
+    \begin{itemize}
+        \item When we talked about GMM estimation, we talked how we can use it to incorporate instruments, but I did not say much about why we would want to do so
+    \end{itemize}
+    \vspace{2ex}
+    Why is exogeneity/endogeneity so important?
+    \begin{itemize}
+        \item We need exogenous variation in our explanatory variables if we want to interpret our estimates as causal, rather than correlations
+        \item But in most cases, exogenous variation is difficult to come by
+    \end{itemize}
+    \vspace{2ex}
+    Then how do we estimate causal effects?
+\end{frame}
+
+\begin{frame}\frametitle{Examples of Endogeneity}
+    Housing choice and commute choice are correlated
+    \begin{itemize}
+        \item Example: people who like public transit tend to live closer to transit stations, making their transit travel time lower
+        \item The coefficient on transit travel time will be biased upward
+    \end{itemize}
+    \vspace{2ex}
+    Price and unobserved quality are correlated
+    \begin{itemize}
+        \item Example: products with higher unobserved quality cost more and are preferred by consumers
+        \item The coefficient on price will be biased downward and may even have the wrong sign
+    \end{itemize}
+    \vspace{2ex}
+    Price and unobserved marketing are correlated
+    \begin{itemize}
+        \item Example: large marketing campaigns may be accompanied by sales and/or increased prices
+        \item The coefficient on price will be biased, but the direction is uncertain
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Exogenous Variation and Causal Identification}
+    How do we estimate causal effects? \\
+    \vspace{2ex}
+    Research design
+    \begin{itemize}
+        \item Exploit random or quasi-random variation through (natural) experiments
+    \end{itemize}
+    \vspace{2ex}
+    BLP estimation
+    \begin{itemize}
+        \item Use instruments to isolate exogenous variation
+    \end{itemize}
+    \vspace{2ex}
+    Control function
+    \begin{itemize}
+        \item Use instruments to control for endogeneity
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Research Design
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Credibility Revolution}
+    The ``credibility revolution'' in applied microeconomics has focused on using experimental or quasi-experimental approaches to estimate causal effects
+    \begin{itemize}
+    	\item Randomized control trials with exogenous treatment assignment
+    	\item Difference-in-differences with an exogenous policy change
+    	\item Regression discontinuity with an exogenous threshold
+    	\item Instrumental variables with exogenous instruments
+    \end{itemize}
+    \vspace{2ex}
+    Use of these methods does not guarantee exogenous variation and causal identification
+    \begin{itemize}
+    	\item For example, if your policy change is endogenous, then the difference-in-difference estimator will be biased
+    \end{itemize}
+    \vspace{2ex}
+    But these methods can provide a framework for thinking about exogenous variation and looking for sources of (quasi-)exogenous variation to exploit
+\end{frame}
+
+\begin{frame}\frametitle{Credibility in Structural Estimation}
+    We can combine these ``treatment effect'' or ``reduced-form'' approaches with a structural model to credibly identify structural parameters
+    \begin{itemize}
+    	\item But the way to do so is not always obvious
+    	\item Example: How do we incorporate a regression discontinuity into a discrete choice model?
+    \end{itemize}
+    \vspace{2ex}
+    These research designs typically generate some exogenous variation, but they do not necessarily remove all of the endogeneity from our structural parameters of interest
+    \begin{itemize}
+    	\item Example: An exogenous policy change affects the joint decision of housing and commute choices, but it does not randomly assign people to locations, so we have some exogenous variation and some endogenous variation
+    \end{itemize}
+    \vspace{2ex}
+    We can use these source of exogenous variation as instruments in the methods that follow
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large BLP Estimation
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{BLP Estimation}
+    The context for the canonical BLP estimation approach is a random coefficients model of demand for a differentiated product using market-level data
+    \begin{itemize}
+        \item We want to estimate how the characteristics of products affect demand
+        \item Price is (one of) the most important characteristics to consider
+        \item But price is almost certainly correlated with unobserved characteristics of products
+    \end{itemize}
+    \vspace{2ex}
+    BLP (Berry et al. 1995) use instruments to isolate (supposedly) exogenous variation in price
+    \begin{itemize}
+        \item Including instruments in a nonlinear model using market-level data is difficult
+    \end{itemize}
+    \vspace{2ex}
+    A similar procedure can be used for endogenous variables other than price
+\end{frame}
+
+\begin{frame}\frametitle{BLP Demand Model}
+    We have data on $M$ markets with $J_m$ products in market $m$
+    \begin{itemize}
+        \item One of these products can be the ``outside good,'' or buying nothing
+    \end{itemize}
+    \vspace{2ex}
+    The utility that consumer $n$ in market $m$ obtains from product $j$ is
+    $$U_{njm} = V(p_{jm}, x_{jm}, s_n, \beta_n) + \xi_{jm} + \varepsilon_{njm}$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+        \item $p_{jm}$: price of product $j$ in market $m$
+        \item $x_{jm}$: vector of non-price attributes of product $j$ in market $m$
+        \item $s_n$: vector of demographic characteristics of consumer $n$
+        \item $\beta_n$: vector of coefficients for consumer $n$
+        \item $\xi_{jm}$: utility of unobserved attributes of product $j$ in market $m$
+        \item $\epsilon_{njm}$: idiosyncratic unobserved utility
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in the BLP Demand Model}
+    We would expect the price to depend on all attributes of a product, including those that are unobserved by the econometrician
+    \begin{itemize}
+        \item But if consumers also get utility from those unobserved attributes, then the price is correlated with the composite error term, $\xi_{jm} + \varepsilon_{njm}$
+    \end{itemize}
+    \vspace{2ex}
+    To solve this problem, BLP use a two-step procedure
+    \begin{enumerate}
+        \item Estimate the average utility for product $j$ in market $m$, including observable and unobservable attributes
+        \item Regress this average utility value on price and other observable attributes, instrumenting for price 
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Utility Decomposition}
+    Decompose the utility from observed attributes and characteristics, $V(\cdot)$, into two components (with $\bar{\beta}$ and $\tilde{\beta}_n$ similarly defined)
+    \begin{itemize}
+        \item $\bar{V}(p_{jm}, x_{jm}, \bar{\beta})$: component that varies over products and markets
+        \item $\tilde{V}(p_{jm}, x_{jm}, s_n, \tilde{\beta}_n)$: component that varies by consumer
+    \end{itemize}
+    \vspace{2ex}
+    Then the utility that consumer $n$ in market $m$ obtains from product $j$ is
+    \begin{align*}
+        U_{njm} &= \bar{V}(p_{jm}, x_{jm}, \bar{\beta}) + \tilde{V}(p_{jm}, x_{jm}, s_n, \tilde{\beta}_n) + \xi_{jm} + \varepsilon_{njm} \\
+        &= \left[ \bar{V}(p_{jm}, x_{jm}, \bar{\beta}) + \xi_{jm} \right] + \tilde{V}(p_{jm}, x_{jm}, s_n, \tilde{\beta}_n) + \varepsilon_{njm} \\
+        &= \delta_{jm} + \tilde{V}(p_{jm}, x_{jm}, s_n, \tilde{\beta}_n) + \varepsilon_{njm} \\
+        \intertext{where}
+        \delta_{jm} &= \bar{V}(p_{jm}, x_{jm}, \bar{\beta}) + \xi_{jm}
+    \end{align*} \\
+    This term, $\delta_{jm}$, effectively becomes a product-market constant term that represents the average utility obtained by product $j$ in market $m$
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities}
+    Two distributional assumptions
+    \begin{itemize}
+        \item $\varepsilon_{njm} \sim$ i.i.d.\ type I extreme value
+        \item $\tilde{\beta}_n$ has density $f(\tilde{\beta}_n \mid \theta)$
+        \begin{itemize}
+            \item The mean is already represented by $\bar{\beta}$, so $\theta$ will often be only a variance-covariance matrix
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Then the choice probabilities can be expressed as functions of $\delta_{jm}$ and $\tilde{V}$
+    $$P_{nim} = \int \left[ \frac{e^{\delta_{im} + \tilde{V}(p_{im}, x_{im}, s_n, \tilde{\beta}_n)}}{\sum_{j = 1}^{J_m} e^{\delta_{jm} + \tilde{V}(p_{jm}, x_{jm}, s_n, \tilde{\beta}_n)}} \right] f(\tilde{\beta}_n \mid \theta) d \tilde{\beta}_n$$ \\
+    \vspace{2ex}
+    We can use these choice probabilities to estimate the constant terms, $\delta_{jm}$, and the $\theta$ parameters
+    \begin{itemize}
+        \item But we cannot directly estimate the $\bar{\beta}$ parameters because they are subsumed into the constant terms
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Instrumenting for Price}
+    If we assume that $\bar{V}$ is linear in parameters
+    \begin{align*}
+        \bar{V}(p_{jm}, x_{jm}, \bar{\beta}) &= \bar{\beta}' (p_{jm}, x_{jm}) \\
+        \intertext{then we can express the constant terms as}
+        \delta_{jm} &= \bar{\beta}' (p_{jm}, x_{jm}) + \xi_{jm}
+    \end{align*} \\
+    \vspace{2ex}
+    Once we have estimated the constant terms, we can regress them on prices and other attributes to estimate $\bar{\beta}$
+    \begin{itemize}
+        \item But price depends on $\xi_{jm}$, so it is endogenous
+        \item We have to instrument for price in this regression
+        \item Instrumenting in a linear model in easy, if we have good instruments\ldots
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Contraction Mapping}
+    This estimation framework is theoretically feasible
+    \begin{itemize}
+        \item But we have to estimate $\delta_{jm}$ for each product and market, which can easily be 100s or 1000s (or more!) of terms to estimate
+    \end{itemize}
+    \vspace{2ex}
+    BLP developed an alternate approach that does not require estimating these $\delta_{jm}$ terms in the standard way \\
+    \vspace{2ex}
+    Their insight is that these $\delta_{jm}$ terms determine predicted market shares
+    \begin{itemize}
+        \item We want to find the set of constant terms that set predicted market shares equal to observed market shares
+    \end{itemize}
+    \vspace{2ex}
+    BLP show that
+    \begin{itemize}
+        \item For a given set of other parameters, a unique vector of $\delta_{jm}$ sets predicted market shares equal to observed market shares
+        \item There is an iterative ``contraction mapping'' algorithm that recovers this unique vector of $\delta_{jm}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Estimation}
+    The contraction mapping is an inner algorithm loop within the larger estimation loop \\
+    \vspace{2ex}
+    Two steps to estimate this model
+    \begin{enumerate}
+        \item Outer loop: search over $\theta$ to optimize the estimation objective function
+        \begin{enumerate}
+            \item Inner loop: use the contraction mapping to find the constant terms, $\delta_{jm}$, conditional on $\theta$
+            \item Use this $(\theta, \delta)$ to calculate choice probabilities and then the estimation objective function
+        \end{enumerate}
+        \item Estimate $\bar{\beta}$ by regressing $\delta_{jm}$ on $(p_{jm}, x_{jm})$ with price instruments
+    \end{enumerate}
+    \vspace{2ex}
+    We can estimate this model in two different
+    \begin{itemize}
+        \item MSLE for step 1, 2SLS for step 2
+        \item MSM for steps 1 and 2
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Control Function
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Control Function Approach}
+    The control function approach can be thought of as the opposite of the BLP approach
+    \begin{itemize}
+        \item The BLP approach isolates exogenous variation
+        \item The control function approach controls for the source of endogeneity
+    \end{itemize}
+    \vspace{2ex}
+    Why might the control function approach be better than the BLP approach?
+    \begin{itemize}
+        \item A control function can be used even if market shares are zero
+        \begin{itemize}
+            \item The constant terms in the BLP approach are not identified for zero market shares
+        \end{itemize}
+        \item A control function can control for individual-level endogeneity, rather than market-level endogeneity
+        \begin{itemize}
+            \item An individual-specific constant term is not identified in the BLP approach
+        \end{itemize}
+        \item The control function approach does not require the contraction mapping
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Control Function Model}
+    The utility that consumer $n$ obtains from product $j$ is
+    $$U_{nj} = V(y_{nj}, x_{nj}, \beta_n) + \varepsilon_{nj}$$
+    \vspace{-3ex}
+    \begin{itemize}
+        \item $y_{nj}$: endogenous explanatory variable for consumer $n$ and product $j$
+        \item $x_{jm}$: vector of non-price attributes for consumer $n$ and product $j$
+        \item $\beta_n$: vector of coefficients for consumer $n$
+        \item $\varepsilon_{nj}$: unobserved utility for consumer $n$ and product $j$
+    \end{itemize}
+    \vspace{2ex}
+    The endogenous explanatory variable can be expressed as
+    $$y_{nj} = W(z_{nj}, \gamma) + \mu_{nj}$$
+    \vspace{-3ex}
+    \begin{itemize}
+        \item $z_{nj}$: exogenous instruments for $y_{nj}$
+        \item $\gamma$: parameter(s) that relates $y_{nj}$ and $z_{nj}$
+        \item $\mu_{nj}$: unobserved factors that affect $y_{nj}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in the Control Function Model}
+    The utility that consumer $n$ obtains from product $j$ is
+    \begin{align*}
+        U_{nj} &= V(y_{nj}, x_{nj}, \beta_n) + \varepsilon_{nj} \\
+        \intertext{where the endogenous variable, $y_{nj}$, can be expressed as}
+        y_{nj} &= W(z_{nj}, \gamma) + \mu_{nj}
+    \end{align*} \\
+    \vspace{2ex}
+    Two assumptions
+    \begin{itemize}
+        \item $\varepsilon_{nj}$ and $\mu_{nj}$ are correlated
+        \begin{itemize}
+            \item $y_{nj}$ and $\varepsilon_{nj}$ are also correlated, so $y_{nj}$ is endogenous
+        \end{itemize}
+        \item $\varepsilon_{nj}$ and $\mu_{nj}$ are independent of $z_{nj}$
+        \begin{itemize}
+            \item $z_{nj}$ is an instrument for $y_{nj}$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Control Function}
+    Decompose the unobserved utility, $\varepsilon_{nj}$, into two components
+    $$\varepsilon_{nj} = E(\varepsilon_{nj} \mid \mu_{nj}) + \tilde{\varepsilon}_{nj}$$
+    \vspace{-3ex}
+    \begin{itemize}
+        \item $E(\varepsilon_{nj} \mid \mu_{nj})$: conditional mean of $\varepsilon_{nj}$ (conditional on $\mu_{nj}$)
+        \item $\tilde{\varepsilon}_{nj}$: deviations from the conditional mean
+    \end{itemize}
+    \vspace{2ex}
+    By construction, the deviations are not correlated with $\mu_{nj}$, so they are not correlated with $y_{nj}$
+    \begin{itemize}
+        \item If we can control for the conditional mean, then we control for the source of endogeneity
+    \end{itemize}
+    \vspace{2ex}
+    We create a ``control function'' to control for the conditional mean
+    $$CF(\mu_{nj}, \lambda) = E(\varepsilon_{nj} \mid \mu_{nj})$$
+    \vspace{-3ex}
+    \begin{itemize}
+        \item The control function is often linear, $CF(\mu_{nj}, \lambda) = \lambda \mu_{nj}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities}
+    Substituting in the control function, the utility becomes
+    $$U_{nj} = V(y_{nj}, x_{nj}, \beta_n) + CF(\mu_{nj}, \lambda) + \tilde{\varepsilon}_{nj}$$ \\
+    \vspace{2ex}
+    Two distributional assumptions 
+    \begin{itemize}
+        \item $\tilde{\varepsilon}_n$ has density $g(\tilde{\varepsilon}_n \mid \mu_n)$
+        \item $\beta_n$ has density $f(\beta_n \mid \theta)$
+    \end{itemize}
+    \vspace{2ex}
+    Then the choice probabilities are
+    \begin{align*}
+        P_{ni} &= \int \int I(V_{ni} + CF_{ni} + \tilde{\varepsilon}_{ni} > V_{nj} + CF_{nj} + \tilde{\varepsilon}_{nj} \; \forall j \neq i) \\
+        & \qquad \quad \times g(\tilde{\varepsilon}_n \mid \mu_{nj}) f(\beta_n \mid \theta) d \tilde{\varepsilon}_n d \beta_n
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Estimation}
+    Two steps to estimate this model
+    \begin{enumerate}
+        \item Estimate $\hat{\mu}_{nj}$ by regressing $y_{nj}$ on $z_{nj}$
+        \begin{itemize}
+            \item $\hat{\mu}_{nj}$ is the residual of this regression
+        \end{itemize}
+        \item Estimate $(\theta, \lambda)$ by MSLE using the choice probabilities
+    \end{enumerate}
+    \vspace{2ex}
+    An alternative approach is to estimate all parameters simultaneously
+    \begin{itemize}
+        \item This approach requires that we specify the joint distribution of $\varepsilon_n$ and $\mu_n$, whereas the sequential method requires only the conditional distribution of $\varepsilon_n$ given $\mu_n$
+        \item But if we can correctly specify this joint distribution, then the simultaneous approach is more efficient
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Nevo (2000) or Berry et al. (1995)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: 2:00--3:00 on Tuesdays in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Final exam is posted, due December 19
+    \end{itemize}
+\end{frame}
+
+\end{document}
