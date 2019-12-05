@@ -29,6 +29,7 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 21. [Dynamic Discrete Choice I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_21/lecture_21.pdf)
 22. [Dynamic Discrete Choice II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_22/lecture_22.pdf)
 23. [Endongeneity I](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_23/lecture_23.pdf)
+23. [Endongeneity II](https://raw.githack.com/woerman/ResEcon703/master/slides/lecture_24/lecture_24.pdf)
 
 ## Problem Sets
 
