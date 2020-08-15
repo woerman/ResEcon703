@@ -1,0 +1,341 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 17:\ Simulation-Based Estimation I]{Lecture 17:\ Simulation-Based Estimation I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Mixed Logit Model Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Simulated Choice Probabilities
+        \item Simulation-Based Estimators
+        \item Simulation Technicalities
+        \item Simulation Bias and Noise
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Optional: Handel (2013)
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model}
+    Mixed logit choice probability
+    $$P_{ni} = \int \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}} f(\beta \mid \theta) d \beta$$
+    \begin{itemize}
+        \item This integral does not have a closed-form expression
+        \item We cannot estimate a mixed logit model using MLE, as we did for logit and nested logit
+        \item Instead, we approximate choice probabilities through simulation and estimate the maximum simulated likelihood estimator (MSLE)
+    \end{itemize}
+    \vspace{2ex}
+    How do we simulate mixed logit choice probabilities? \\
+    \vspace{2ex}
+    What is maximum simulated likelihood estimation?
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulated Choice Probabilities
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probabilities}
+    The mixed logit choice probability is
+    \begin{align*}
+        P_{ni} &= \int L_{ni}(\beta) f(\beta \mid \theta) d \beta \\
+        \intertext{where $L_{ni}(\beta)$ is the logit choice probability at a given set of coefficients, $\beta$,}
+        L_{ni}(\beta) &= \frac{e^{\beta' x_{ni}}}{\sum_{j = 1}^J e^{\beta' x_{nj}}}
+    \end{align*}
+    To simulate this choice probability for a given set of parameters, $\theta$,
+    \begin{enumerate}
+        \item Draw a set of coefficients, $\beta^r$, from the density $f(\beta \mid \theta)$
+        \item Calculate the conditional probability, $L_{ni}(\beta^r)$, for each alternative
+        \item Repeat steps 1 and 2 for a total of R draws from $f(\beta \mid \theta)$
+        \item Average over these R draws to get $\check{P}_{ni}$ for each alternative
+        $$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulated-Based Estimators
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Simulation-Based Estimation}
+    Simulation-based estimators are roughly equivalent to their traditional analogs
+    \begin{itemize}
+        \item We replace terms that are difficult or impossible to calculate with their simulated counterparts
+        \begin{itemize}
+            \item Example: Mixed logit choice probabilities include an integral and do not have a closed-form expression, so we replace them with simulated choice probabilities
+        \end{itemize}
+        \item Simulation can potentially introduce bias or noise into the estimation, which we need to consider when using simulation-based estimators
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation}
+    Maximum simulated likelihood estimation (MSLE), or simulated maximum likelihood estimation (SMLE), is the simulation analog of maximum likelihood estimation (MLE) \\
+    \vspace{2ex}
+    MSLE is the estimator that maximizes the simulated log-likelihood
+    \begin{align*}
+        \hat{\theta} &= \argmax_\theta \ln \check{L}(\theta \mid y) \\
+        \intertext{where $\ln \check{L}(\theta \mid y)$ is the log of the simulated likelihood}
+        \ln \check{L}(\theta \mid y) &= \sum_{n = 1}^N \ln \check{f}(y_n \mid \theta)
+    \end{align*}
+    and $\check{f}(y_n \mid \theta)$ is a simulated density function
+\end{frame}
+
+\begin{frame}\frametitle{MSLE with Discrete Choice}
+    For discrete choice applications, the log of simulated likelihood is a function of simulated choice probabilities
+    \begin{align*}
+        \ln \check{L}(\theta \mid y) &= \sum_{n = 1}^N \sum_{j = 1}^J y_{nj} \ln \check{P}_{nj}(\theta) \\
+        \intertext{so the MSLE estimator is}
+        \hat{\theta} &= \argmax_\theta \sum_{n = 1}^N \sum_{j = 1}^J y_{nj} \ln \check{P}_{nj}(\theta) \\
+        \intertext{which yields the first-order condition}
+        0 &= \sum_{n = 1}^N \frac{\partial \ln \check{P}_n(\hat{\theta})}{\partial \theta}
+    \end{align*}
+    where $ \check{P}_n(\theta)$ is the simulated choice probability of the chosen alternative
+\end{frame}
+
+\begin{frame}\frametitle{Method of Simulated Moments}
+    Method of simulated moments (MSM), or simulated method of moments (SMM), is the simulation analog of generalized method of moments (GMM) \\
+    \vspace{2ex}
+    MSM is the estimator that ``solves'' simulated moments
+    \begin{align*}
+        \frac{1}{N} \sum_{n = 1}^N \check{m}(w_n, \hat{\theta}) &= 0
+        \intertext{where $\check{m}(w_n, \hat{\theta})$ are the simulated empirical analogs of population moments that satisfy}
+        E[m(w_n, \theta^*)] &= 0
+    \end{align*}
+    With more moments than parameters, we cannot actually solve the first equation, so we minimize a weighted function of the moments
+\end{frame}
+
+\begin{frame}\frametitle{MSM with Discrete Choice}
+    For discrete choice applications, the population moments result from the model residuals being uncorrelated with a set of exogenous instruments
+    \begin{align*}
+        E \left[ \sum_{j = 1}^J [y_{nj} - P_{nj}(\theta^*)] z_{nj} \right] &= 0 \\
+        \intertext{so the MSM estimator ``solves'' the simulated empirical analogs}
+        \frac{1}{N} \sum_{n = 1}^N \sum_{j = 1}^J [y_{nj} - \check{P}_{nj}(\hat{\theta})] z_{nj} &= 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation Technicalities
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Some Technicalities of Simulating Choice Probabilities}
+	$$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)$$ \\
+	\vspace{2ex}
+    For a given set of coefficient density parameters, $\theta$, perform simulate choice probabilities for every alternative for each decision maker
+    \begin{itemize}
+        \item For a given decision maker, use the same set of $\beta^r$ draws to simulate the choice probability for every alternative
+        \begin{itemize}
+            \item That is, for each draw of $\beta^r$, calculate the full set of $J$ choice probabilities (one for each alternative), and then average each choice probability over the same $R$ draws of $\beta^r$
+        \end{itemize}
+        \item Use a different set of $\beta^r$ draws for each decision maker in order to maintain independence over decision makers
+        \begin{itemize}
+            \item That is, we need $N$ different sets of $R$ draws of $\beta^r$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probabilities and Numerical Optimization}
+    We use these simulated choice probabilities within a numerical optimization algorithm to find the set of parameters, $\hat{\theta}$, that are our estimators
+    \begin{itemize}
+        \item We want to use the same set of ``draws'' for a given decision maker throughout the numerical optimization algorithm
+        \item If we use different ``draws'' for each iteration of the algorithm, we introduce additional noise that impedes convergence
+    \end{itemize}
+    \vspace{3ex}
+     In order to avoid this noise
+    \begin{enumerate}
+        \item Draw many ($K \times N \times R$) random variables from a standard normal distribution before starting the optimization algorithm
+        \item Transform this same set of standard normal random variables in each iteration of the optimization algorithm to represent $f(\beta \mid \theta)$ for the set of parameters, $\theta$, of each iteration
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Transforming a Standard Normal Random Variable}
+    We can transform a standard normal random variable (or a vector of standard normals) into many other distributions
+    \begin{enumerate}
+        \item Draw $K$ standard normal random variables, $\eta \sim N(0, 1)$, where $K$ is the number of random parameters
+        \item Transform these standard normals into the desired distributions
+        \begin{itemize}
+            \item Normal: $\varepsilon = b + s \eta$ gives $\varepsilon \sim N(b, s^2)$
+            \item Log-normal: $\varepsilon = e^{b + s \eta}$ gives $\ln \varepsilon \sim N(b, s^2)$
+            \item Multivariate normal: $\varepsilon = b + L \eta$ gives $\varepsilon \sim N(b, \Omega)$ where $\varepsilon$, $b$, and $\eta$ are each a vector of length equal to the number of multivariate normal random variables, $\Omega$ is the variance-covariance matrix of these variables, and $L$ is the Choleski factor of $\Omega$
+            \item Comparable transformations exist for most distributions
+        \end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    See Chapter 9 in the Train textbook for more on drawing and transforming random variables
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulation-Based Estimation}
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the set of parameters that maximizes or minimizes the objective function of a simulation-based estimator
+        \begin{enumerate}
+            \item Start with some set of parameters, $\theta^0$
+            \item Simulate choice probabilities for this set of parameters, $\check{P}_{ni}(\theta^t)$
+            \begin{enumerate}
+                \item Transform each set of $K$ standard normals using $\theta^t$ to get a set of $\beta_n^r$
+                \item Calculate the choice probabilities for each individual and draw, $L_{ni}(\beta_n^r)$
+                \item Average over all R simulation draws to get $\check{P}_{ni}(\theta^t)$
+            \end{enumerate}
+            \item Use these simulated choice probabilities to calculate simulated log-likelihood, simulated moments, etc.
+            \item Step to a better set of parameters, $\theta^{t + 1}$
+            \item Repeat steps 2 and 3 until the algorithm converges to a set of parameters that is your simulation-based estimator
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulated Bias and Noise
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Traditional Estimators}
+    Traditional estimators are the set of parameters that solve a specific function
+    \begin{align*}
+        g(\hat{\theta}) &= \frac{1}{N} \sum_{n = 1}^N g_n(\hat{\theta}) = 0 \\
+        \intertext{ Maximum likelihood estimation of a discrete choice model}
+        g_n(\theta) &= \frac{\partial \ln P_n(\theta)}{\partial \theta} \\
+        \intertext{Generalized method of moments estimation of a discrete choice model}
+        g_n(\theta) &= \sum_{j = 1}^J [y_{nj} - P_{nj}(\theta)] z_{nj}
+    \end{align*}
+    When the some assumptions are met, these estimators yield consistent estimates of the true set of parameters, $\theta^*$
+\end{frame}
+
+\begin{frame}\frametitle{Simulation-Based Estimators}
+     Simulation-based estimators are the set of parameters that solve a specific function
+     $$\check{g}(\hat{\theta}) = \frac{1}{N} \sum_{n = 1}^N \check{g}_n(\hat{\theta}) = 0$$
+     where $\check{g}_n(\theta)$ is the simulation-based analog of $g_n(\theta)$ \\
+     \vspace{2ex}
+     We can compare this function for the simulation-based and traditional estimators by writing
+     \begin{align*}
+        \check{g}(\theta) &= \check{g}(\theta) + \{ g(\theta) - g(\theta) \} + \{ E_r[\check{g}(\theta)] - E_r[\check{g}(\theta)] \} \\
+        &= g(\theta) + \{ E_r[\check{g}(\theta)] - g(\theta) \} + \{ \check{g}(\theta) - E_r[\check{g}(\theta)] \}
+     \end{align*} \\
+     \vspace{2ex}
+     A simulation-based estimator can differ from a traditional estimator for two reasons
+     \begin{itemize}
+         \item Simulation bias: $E_r[\check{g}(\theta)] - g(\theta)$
+         \item Simulation noise: $\check{g}(\theta) - E_r[\check{g}(\theta)]$
+     \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulation Bias and Noise}
+    How do we reduce the simulation bias and noise in a simulation-based estimator?
+    \begin{itemize}
+        \item Increase the sample size, $N$
+        \item Increase the number of simulation draws, $R$
+    \end{itemize}
+    \vspace{2ex}
+    With sufficient sample size and simulation draws, a simulation-based estimator is:
+    \begin{itemize}
+        \item Consistent
+        \item Asymptotically normal
+        \item Sometimes equivalent (or converging) to its traditional analog
+    \end{itemize}
+    \vspace{2ex}
+    The specifics depend on the estimator in question
+    \begin{itemize}
+        \item See Chapter 10 in the Train textbook for details
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Optional: Handel (2013)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: 2:00--3:00 on Tuesdays in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}

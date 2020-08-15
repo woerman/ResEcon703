@@ -1,0 +1,336 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 18:\ Simulation-Based Estimation II]{Lecture 18:\ Simulation-Based Estimation II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Simulation-Based Estimation
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Simulation-Based Estimation Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Train textbook, Chapter 11
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation}
+	To estimate a mixed logit model, we have to use maximum simulated likelihood estimation (MSLE), or another simulation-based estimator, because mixed logit choice probabilities do not have a closed-form solution 
+	\begin{align*}
+    	\hat{\theta} &= \argmax_\theta \sum_{n = 1}^N \sum_{j = 1}^J y_{nj} \ln \check{P}_{nj}(\theta) \\
+    	\intertext{where $\check{P}_{nj}(\theta)$ is the simulated choice probability}
+    	\check{P}_{ni} &= \frac{1}{R} \sum_{r = 1}^R L_{ni}(\beta^r)
+    \end{align*}
+    To simulate this choice probability for a given set of parameters, $\theta$,
+    \begin{enumerate}
+        \item Draw a set of coefficients, $\beta^r$, from the density $f(\beta \mid \theta)$
+        \item Calculate the conditional probability, $L_{ni}(\beta^r)$, for each alternative
+        \item Repeat steps 1 and 2 for a total of R draws from $f(\beta \mid \theta)$
+        \item Average over these R draws to get $\check{P}_{ni}$ for each alternative
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimation Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GCC: gas central with AC
+		    	\item ECC: electric central with AC
+		    	\item ERC: electric room with AC
+		    	\item HPC: heat pump with AC
+		    	\item GC: gas central
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    \end{itemize}
+		    \vspace{2ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item ICH: installation cost for heat
+		    	\item ICCA: installation cost for AC
+		    	\item OCH: operating cost for heat
+		    	\item OCCA: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model to Estimate with MSLE}
+    The representative utility of each alternative is
+    $$V_{nj} = \alpha AC_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    with
+    \begin{align*}
+    	\ln \beta_1 &\sim N(\mu_1, \sigma_1^2) \\
+    	\ln \beta_2 &\sim N(\mu_2, \sigma_2^2)
+    \end{align*} \\
+    \vspace{2ex}
+    What are the MSLE parameters for this model? \\
+    \vspace{2ex}
+    What is the elasticity of each alternative with respect to the installation cost (IC) of a central gas system with AC (GCC)?
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulation-Based Estimation}
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the set of parameters that maximizes or minimizes the objective function of a simulation-based estimator
+        \begin{enumerate}
+            \item Start with some set of parameters, $\theta^0$
+            \item Simulate choice probabilities for this set of parameters, $\check{P}_{ni}(\theta^t)$
+            \begin{enumerate}
+                \item Transform each set of $K$ standard normals using $\theta^t$ to get a set of $\beta_n^r$
+                \item Calculate the choice probabilities for each individual and draw, $L_{ni}(\beta_n^r)$
+                \item Average over all R simulation draws to get $\check{P}_{ni}(\theta^t)$
+            \end{enumerate}
+            \item Use these simulated choice probabilities to calculate simulated log-likelihood, simulated moments, etc.
+            \item Step to a better set of parameters, $\theta^{t + 1}$
+            \item Repeat steps 2 and 3 until the algorithm converges to a set of parameters that is your simulation-based estimator
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{map()} Function in R}
+    We will use the \texttt{map()} function, and related functions, to help with our simulation
+    \begin{itemize}
+    	\item \texttt{map()} applies a function to each element of a vector or list
+    	\item \texttt{map2()} applies a function to elements from two vectors or lists
+    	\item \texttt{pmap()} is similar but allows for any number of vectors or lists
+    \end{itemize}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 0: Set a Seed for Replication}
+	We first set a seed so we can replicate our random simulation draws 
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables}
+	Draw $K \times N \times R$ standard normal random variables and organize into a list with each element corresponding to one individual
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1.5: Organize Data}
+    Organize data into a list with each element corresponding to one individual to be compatible with random draws
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2: Find the MSLE}
+    <<R CODE HERE>>
+    \vspace{2ex}
+	\texttt{optim()} requires that you create a function, \texttt{fn}, that
+	\begin{enumerate}
+		\item Takes a set of parameters and data as inputs
+		\item Calculates your objective function given those parameters
+		\item Returns this value of the objective function
+	\end{enumerate}
+	\vspace{2ex}
+	Some \texttt{control} arguments may be useful when doing optimization that takes longer to converge
+	\begin{itemize}
+		\item \texttt{trace}: \texttt{1} will report progress of convergence
+		\item \texttt{REPORT}: How often (number of iterations) to report on convergence
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Step 2.2--2.3: Choice Probabilities and Log-Likelihood}
+    To estimate a multinomial logit model using MLE, we created a single function that calculated choice probabilities and then used them to calculate the log-likelihood \\
+    \vspace{2ex}
+    To estimate a mixed logit model using MSLE, we will create two separate functions
+    \begin{itemize}
+    	\item Function 1: Simulate choice probabilities for a single decision maker (household)
+    	\item Function 2: Use simulated choice probabilities to calculate simulated log-likelihood
+    \end{itemize}
+    \vspace{2ex}
+    We do not have to split this process into two functions, but it makes the code more transparent (and probably slower\ldots)
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Choice Probabilities for One Household}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Calculate Simulated Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximize Simulated Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSLE Optimization Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSLE Parameters and Standard Errors}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Elasticities}
+    The elasticity of alternative $i$ with respect to the $m$th attribute of alternative $j$ is
+    \begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    To simulate these elasticities at our MSLE, $\hat{\theta}$,
+    \begin{enumerate}
+        \item Draw a set of coefficients, $\beta^r$, from the density $f(\beta \mid \hat{\theta})$
+        \item Calculate the conditional probability, $L_{ni}(\beta^r)$, for each alternative
+        \item Calculate the term inside the integral for each elasticity
+        \item Repeat steps 1--3 for a total of R draws from $f(\beta \mid \theta)$
+        \item Average over these R draws to simulate the integral for each elasticity
+        \item Multiply each integral by the ratio in front
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\begin{align*}
+    	\text{Own: } E_{nix_{ni}^m} &= \frac{x_{ni}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) [1 - L_{ni}(\beta)] f(\beta \mid \theta) d \beta \\
+    	\text{Cross: } E_{nix_{nj}^m} &= - \frac{x_{nj}^m}{P_{ni}} \int \beta^m L_{ni}(\beta) L_{nj}(\beta) f(\beta \mid \theta) d \beta
+    \end{align*}
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulated Elasticities}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Train textbook, Chapter 11
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,412 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\plim}{plim}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 11:\ Generalized Method of Moments I]{Lecture 11:\ Generalized Method of Moments I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Nonlinear Least Squares Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Method of Moments
+    	\item Generalized Method of Moments
+    	\item Properties of the Generalized Method of Moments Estimator
+    	\item Optimal Generalized Method of Moments
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+    	\item No class on Tuesday! Monday schedule.
+        \item Reading for next time
+        \begin{itemize}
+            \item Optional: Crawford and Yurukoglu (2012)
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 2 is posted, due October 17
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{MLE and NLS Recap}
+    Maximum likelihood estimation
+    \begin{itemize}
+    	\item Requires a strong assumption about the density of our data
+    	\item Has many nice properties (lowest-variance consistent estimator)
+    \end{itemize}
+    \vspace{3ex}
+    Nonlinear least squares
+    \begin{itemize}
+    	\item Relies on weaker distributional assumptions
+    	\item Requires a single ``regression equation'' to be estimated
+    \end{itemize}
+    \vspace{3ex}
+    But what if we do not want to make a strong assumption about our data, and we want to jointly estimate multiple nonlinear equations at once?
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Method of Moments
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{(Generalized) Method of Moments}
+    Method of moments and generalized method of moments
+    \begin{itemize}
+    	\item Common in modern empirical economics
+    	\begin{itemize}
+    		\item Most common in industrial organization, macroeconomics, and finance
+    	\end{itemize}
+    	\item More flexible than MLE or NLS
+    	\begin{itemize}
+    		\item A few weak assumptions required! (Other than moment conditions\ldots)
+    	\end{itemize}
+    	\item (Almost?) All estimators you have learned so far are GMM estimators
+    	\begin{itemize}
+    		\item OLS, 2SLS, GLS, MLE, NLS, etc.
+    	\end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Overview of MM and GMM
+    \begin{itemize}
+    	\item MM and GMM use population moment conditions to estimate parameters
+    	\begin{itemize}
+    		\item Moments can come from economic models, model fitting criteria, etc.
+    	\end{itemize}
+    	\item MM and GMM estimators ``solve'' the sample moment conditions that are analogous to these population moment conditions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Moment Conditions}
+    Moment conditions are functions of parameters and data that equal zero in expectation when evaluated at the true parameter values
+    \begin{alignat*}{3}
+    	\text{Mean:} \; &\mu_y = E[y] \; &&\Rightarrow \; &&E[y - \mu_y] = 0 \\
+    	\text{Var:} \; &\sigma_y^2 = E[(y - \mu)^2] \; &&\Rightarrow \; &&E[ (y - \mu)^2 - \sigma_y^2] = 0 \\
+    	\text{Cov:} \; &\sigma_{xy} = E[(y - \mu_y) (x - \mu_x)] \; &&\Rightarrow \; &&E[ (y - \mu_y) (x - \mu_x) - \sigma_{xy}] = 0
+    \end{alignat*} \\
+    \vspace{2ex}
+    How do we normally generate moment conditions?
+    \begin{itemize}
+    	\item Economic models
+    	\begin{itemize}
+    		\item First-order conditions always set something equal to zero
+    	\end{itemize}
+    	\item Econometric or statistical model
+    	\begin{itemize}
+    		\item Example: Instruments must be uncorrelated with errors
+    	\end{itemize}
+    	\item Model fit
+    	\begin{itemize}
+    		\item Example: Predicted market shares must equal realized market shares
+    	\end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Estimator}
+    We have $K$ population moment conditions for $K$ parameters
+    \begin{align*}
+    	E[m(w_i, \theta)] &= 0 \\
+    	\intertext{where $m(\cdot)$ is a vector of $K$ functions, $\theta$ is a vector of $K$ parameters, and $w_i$ is observable data (outcome, explanatory variables, instruments, etc.)}
+    	\intertext{The method of moments estimator uses the sample analogs of these moment conditions }
+    	\frac{1}{n} \sum_{i = 1}^n m(w_i, \theta) & \\
+    	\intertext{The method of moments estimator is the set of parameters that solves}
+    	\frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) &= 0
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{MM Example: Population Mean}
+    Under the assumption that observations are i.i.d, sample means can be used to estimate population means \\
+    \vspace{2ex}
+	If $y$ is distributed i.i.d.\ with mean $\mu$, then a population moment condition is
+	\begin{align*}
+		E[y - \mu] &= 0 \\
+		\intertext{Replacing the expectation with the sample analog gives}
+		\frac{1}{n} \sum_{i = 1}^n (y_i - \hat{\mu}) &= 0
+		\intertext{Solving this one equation for the one parameter yields}
+		\hat{\mu} = \frac{1}{n} \sum_{i = 1}^n y_i &= \bar{y}
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{MM Example: Linear Regression}
+    Ordinary least squares is a special case of a MM estimator \\
+    \vspace{2ex}
+    Consider the most general linear regression model
+    $$y_i = \beta' x_i + \varepsilon_i$$
+    where $\beta$ is a vector of $K$ parameters and $E[\varepsilon_i \mid x_i] = 0$. Then $E[x_i \varepsilon_i] = 0$ (from last semester), which gives $K$ population moment conditions
+    \begin{align*}
+    	E[x_i (y_i - \beta' x_i)] &= 0 \\
+    	\intertext{Replacing the expectation with the sample analog gives}
+    	\frac{1}{n} \sum_{i = 1}^n x_i (y_i - \hat{\beta}' x_i) &= 0
+    \end{align*}
+    Solving these $K$ equations for the $K$ parameters yields
+    $$\hat{\beta} = \left(\sum_{i = 1}^n x_i x_i' \right)^{-1} \left(\sum_{i = 1}^n x_i y_i \right)$$
+\end{frame}
+
+\begin{frame}\frametitle{MM Example: Maximum Likelihood}
+    Maximum likelihood is another special case of a MM estimator \\
+    \vspace{2ex}
+    We want to maximize the log-likelihood function
+    $$\ln L(\theta \mid y_i, x_i) = \sum_{i = 1}^n \ln f(y_i  \mid x_i, \theta)$$
+    which gives $K$ first-order conditions (one for each parameter)
+    $$\frac{1}{n} \frac{\partial \ln L(\hat{\theta} \mid y_i, x_i)}{\partial \theta} = \frac{1}{n} \sum_{i = 1}^n \frac{\partial \ln f(y_i  \mid x_i, \hat{\theta})}{\partial \theta} = 0$$
+    These first-order conditions are the sample analogs of $K$ population moment conditions
+    $$E \left[ \frac{\partial \ln f(y_i  \mid x_i, \theta)}{\partial \theta} \right] = 0$$
+    so the MLE is also a MM estimator
+\end{frame}
+
+\begin{frame}\frametitle{Limitation of the Method of Moments}
+    In all of these examples, we have had $K$ moment conditions to estimate $K$ parameters. But what if we have more than $K$ moment conditions? \\
+    \vspace{3ex}
+    Examples
+    \begin{itemize}
+    	\item Economic model: Demand parameter appears in demand and supply first-order conditions
+    	\item Instruments: Multiple instruments for one endogenous variable
+    	\item Model fit: Predicted market shares equal realized market shares
+    	\item Statistical assumptions: Errors must be conditional mean-zero and symmetric
+    \end{itemize}
+    \vspace{3ex}
+    The generalized method of moments allows for more moment conditions than parameters
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Generalized Method of Moments
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments}
+    We have $L$ population moment conditions for $K$ parameters (with $L > K$)
+    $$E[m(w_i, \theta)] = 0$$
+    where $m(\cdot)$ is a vector of $L$ functions, $\theta$ is a vector of $K$ parameters, and $w_i$ is observable data (outcome, explanatory variables, instruments, etc.) \\
+    \vspace{2ex}
+    We cannot ensure all $L$ moment conditions are solved with only $K$ parameters. Instead, we seek to get as close as possible to solving all $L$ moment conditions by minimizing
+    \begin{align*}
+    	Q_N(\theta) &= \left[ \frac{1}{n} \sum_{i = 1}^n m(w_i, \theta) \right]' W_N \left[ \frac{1}{n} \sum_{i = 1}^n m(w_i, \theta) \right] \\
+    	\Rightarrow \; \hat{\theta} &= \argmin_{\theta} Q_N(\theta)
+    \end{align*}
+    where $W_N$ is a $L \times L$ positive definite weighting matrix 
+\end{frame}
+
+\begin{frame}\frametitle{GMM Example: Instrumental Variables}
+    Two-stage least squares is a special case of a GMM estimator \\
+    \vspace{2ex}
+    Consider the  linear regression model
+    $$y_i = \beta' x_i + \varepsilon_i$$
+    where $\beta$ is a vector of $K$ parameters. We have a vector of $L$ instruments, $z_i$, that are correlated with $x_i$ and must satisfy $E[\varepsilon_i \mid z_i] = 0$, which (with some math) gives $L$ population moment conditions
+    \begin{align*}
+    	E[z_i (y_i - \beta' x_i)] &= 0 \\
+    	\intertext{Replacing the expectation with the sample analog gives}
+    	\frac{1}{n} \sum_{i = 1}^n z_i (y_i - \beta' x_i) &= 0
+    \end{align*}
+    The GMM estimator, $\hat{\beta}$, is the set of parameters that minimizes
+    $$Q_N(\beta) = \left[ \frac{1}{n} \sum_{i = 1}^n z_i (y_i - \beta' x_i) \right]' W_N \left[ \frac{1}{n} \sum_{i = 1}^n z_i (y_i - \beta' x_i) \right]$$
+\end{frame}
+
+\begin{frame}\frametitle{Weighting Matrix}
+    From the previous example, the GMM estimator, $\hat{\beta}$, is the set of parameters that minimizes
+    $$Q_N(\beta) = \left[ \frac{1}{n} \sum_{i = 1}^n z_i (y_i - \beta' x_i) \right]' W_N \left[ \frac{1}{n} \sum_{i = 1}^n z_i (y_i - \beta' x_i) \right]$$
+    which depends on the choice of weighting matrix, $W_N$
+    \begin{itemize}
+    	\item $W_N$ must be a $L \times L$ positive definite matrix
+    \end{itemize}
+    \vspace{2ex}
+    The GMM estimator will be equivalent to the 2SLS estimator if we use
+    $$W_N = \sum_{i = 1}^n z_i z_i'$$ \\
+    \vspace{2ex}
+    But another weighting matrix might yield a ``better'' estimator
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Properties of the Generalized Method of Moments Estimator
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{GMM Assumptions}
+    \begin{enumerate}
+    	\item The empirical moments obey the law of large numbers
+    	$$\frac{1}{n} \sum_{i = 1}^n m_i(\theta_0) \overset{p}{\rightarrow} 0$$
+    	\item The empirical moments obey the central limit theorem
+    	$$\frac{\sqrt{n}}{n} \sum_{i = 1}^n m_i(\theta_0) \overset{d}{\rightarrow} N(0, S_0)$$
+    	where
+    	$$S_0 = \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n m_i(\theta_0) m_j(\theta_0)'$$
+    	\item The derivatives of the empirical moments converge
+    	$$\frac{1}{n} \sum_{i = 1}^n \left( \frac{\partial m(\theta)}{\partial \theta'} \right)_{\theta_0} \overset{p}{\rightarrow} G_0$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{GMM Assumptions}
+    \begin{enumerate}
+    	\setcounter{enumi}{3}
+    	\item The parameters are identified
+    	$$\theta_1 \neq \theta_2 \quad \Rightarrow \quad \frac{1}{n} \sum_{i = 1}^n m_i(\theta_1) \neq \frac{1}{n} \sum_{i = 1}^n m_i(\theta_2)$$
+    	\item The weighting matrix converges to a finite symmetric positive definite matrix
+    	$$W_N \overset{p}{\rightarrow} W_0$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Consistency of the GMM Estimator}
+    The GMM estimator, $\hat{\theta}$, is a consistent estimator of the true parameter values, $\theta_0$
+    $$\hat{\theta} \overset{p}{\rightarrow} \theta_0$$
+\end{frame}
+
+\begin{frame}\frametitle{Asymptotic Normality of the GMM Estimator}
+    The GMM estimator, $\hat{\theta}$, is asymptotically normal with mean $\theta_0$ and known variance
+    $$\hat{\theta} \overset{a}{\sim} N\left( \theta_0, \frac{1}{n} (G_0' W_0 G_0)^{-1} (G_0' W_0 S_0 W_0 G_0) (G_0' W_0 G_0)^{-1} \right)$$
+    where
+    \begin{align*}
+    	G_0 &= \plim \frac{1}{n} \sum_{i = 1}^n \left( \frac{\partial m(\theta)}{\partial \theta'} \right)_{\theta_0} \\
+    	W_0 &= \plim W_N \\
+    	S_0 &= \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n m_i(\theta_0) m_j(\theta_0)'
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Optimal Generalized Method of Moments
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Optimal Weighting Matrix}
+    If every weighting matrix yields a GMM estimator that is consistent, then we would ideally like to use the weighting matrix that minimizes the variance of the estimator
+    $$Var(\hat{\theta}) = \frac{1}{n} (G_0' W_0 G_0)^{-1} (G_0' W_0 S_0 W_0 G_0) (G_0' W_0 G_0)^{-1}$$
+    This variance is minimized when
+    \begin{align*}
+    	W_0 &= S_0^{-1} = \left[ \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n m_i(\theta_0) m_j(\theta_0)' \right]^{-1} \\
+    	& \quad \Rightarrow \quad Var(\hat{\theta}) = \frac{1}{n} (G_0' S_0^{-1} G_0)^{-1}
+    \end{align*}
+    $S_0$ is the variance-covariance matrix of the empirical moments, so weighting by its inverse minimizes the variance of the GMM estimator
+    \begin{itemize}
+    	\item This is a generalization of FGLS
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Optimal (or Two-Step) GMM Estimator}
+    To estimate the optimal (or two-step) GMM estimator, perform GMM twice
+    \begin{enumerate}
+    	\item Perform GMM with any arbitrary weighting matrix
+    	\begin{itemize}
+    		\item The identity matrix is a simple matrix to use
+    		\item Calculate $\widehat{S}$ evaluated at the first-step GMM estimator
+    	\end{itemize}
+    	\item Perform GMM with $W_N = \widehat{S}^{-1}$ from the first step
+    	\begin{itemize}
+    		\item Calculate $\widehat{S}$ and $\widehat{G}$ evaluated at the second-step GMM estimator
+    		\item Use $\widehat{S}$ and $\widehat{G}$ to estimate the variance covariance matrix
+    	\end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    \begin{align*}
+    	\widehat{Var}(\hat{\theta}) &= \frac{1}{n} \left( \widehat{G}' \widehat{S}^{-1} \widehat{G} \right)^{-1} \\
+    	\intertext{where (assuming independence between observations)}
+    	\widehat{G} &= \frac{1}{n} \sum_{i =1 }^n \left( \frac{\partial m_i(\theta)}{\partial \theta'} \right)_{\hat{\theta}} \\
+    	\widehat{S} &= \frac{1}{n} \sum_{i = 1}^n m_i(\hat{\theta}) m_i(\hat{\theta})'
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Test of Overidentifying Restrictions}
+    When we have more moment conditions than parameters, the model is ``overidentified,'' and we cannot ensure all moments equal zero simultaneously. But we can test if the moments are sufficiently close to zero.
+    $$H_0: E[m(w_i, \theta)] = 0$$ \\
+    \vspace{3ex}
+    When $\hat{\theta}$ is estimated by optimal GMM, the test statistic is
+    $$J = \left( \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) \right)' \widehat{S}^{-1} \left( \frac{1}{n} \sum_{i = 1}^n m(w_i, \hat{\theta}) \right)$$
+    which is asymptotically distributed $\chi^2$ with $L - K$ degrees of freedom
+\end{frame}
+
+\begin{frame}\frametitle{Hypothesis Tests}
+    We have seen two hypothesis tests so far
+    \begin{itemize}
+    	\item MLE: Likelihood ratio test
+    	\item NLS: Wald test
+    \end{itemize}
+    \vspace{2ex}
+    Both MLE and NLS are special cases of GMM, so there are generalized versions of each test to use with GMM estimators
+    \begin{itemize}
+    	\item See the Greene textbook for a description of these GMM hypothesis testing procedures
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+	No class on Tuesday! Monday schedule. \\
+	\vspace{3ex}
+    Reading for next time
+    \begin{itemize}
+        \item Optional: Crawford and Yurukoglu (2012)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item 10:00--11:15 am and 2:00--3:00 pm on Tuesday (9/15) in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 2 is posted, due October 17
+    \end{itemize}
+\end{frame}
+
+\end{document}

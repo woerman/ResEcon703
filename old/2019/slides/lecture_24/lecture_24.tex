@@ -1,0 +1,362 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 24:\ Endogeneity II]{Lecture 24:\ Endogeneity II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Endogeneity
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Berry, Levinsohn, and Pakes (1995)
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Final exam
+        \begin{itemize}
+        	\item Final exam is posted, due December 19
+        \end{itemize}
+        \item Course surveys
+        \begin{itemize}
+            \item Course surveys are open, due December 22
+            \item \href{http://owl.umass.edu/partners/courseEvalSurvey/uma/}{Click here (\texttt{owl.umass.edu/partners/courseEvalSurvey/uma})}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity}
+    In many empirical settings, our variable of interest is endogenous
+    \begin{itemize}
+    	\item The variable of interest is correlated with the error term
+        \item The coefficient on this variable will be biased and cannot be interpreted as causal
+        \begin{itemize}
+            \item Sometimes the direction of the bias can be predicted, in which case the estimated coefficient can be interpreted as a bound, but not always
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Example: price and unobserved quality
+    \begin{itemize}
+    	\item Products with better unobserved quality are likely to have a higher price, so price is an endogenous attribute of the product
+    	\item If we try to estimate a coefficient on price (marginal utility of price or income), our estimate will be biased downward and may even have the wrong sign
+    \end{itemize}
+    \vspace{2ex}
+    Correcting for this endogeneity in a nonlinear structural model is more difficult than in a linear model
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Berry, Levinsohn, and Pakes (1995)
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Automobile Prices in Market Equilibrium}
+    This paper develops a structural model of demand and supply in the automobile market
+    \begin{itemize}
+    	\item Random coefficient model of demand
+        \item Nash-Bertrand model of firm pricing
+    \end{itemize}
+    \vspace{2ex}
+    Why do we care about automobiles?
+    \begin{itemize}
+        \item They are important in their own right
+        \begin{itemize}
+            \item An automobile is one of the largest purchases a typical household makes
+            \item Automobiles are an important part of many policy debates, ranging from international trade to environmental regulation 
+        \end{itemize}
+        \item They are an example of an important kind of industry
+        \begin{itemize}
+            \item Differentiated product market with oligopolistic competition
+            \item This estimation technique can be used to estimate elasticities and cost parameters in other industries
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{BLP Innovation}
+    What is so innovative about the BLP approach?
+    \begin{itemize}
+        \item BLP estimate flexible substitution patterns (elasticities) from market-level data using a computationally efficient algorithm that corrects for price endogeneity
+    \end{itemize}
+    \vspace{1ex}
+    Flexible substitution patterns
+    \begin{itemize}
+        \item BLP model distributions of consumer preferences over attributes
+        \item Alternative: estimate $J (J - 1) / 2$ elasticity parameters
+    \end{itemize}
+    \vspace{1ex}
+    Market-level data
+    \begin{itemize}
+        \item Market-level data are more readily available than consumer-level data
+        \item Consumer-level data may not have sufficient power for all elasticities
+    \end{itemize}
+    \vspace{1ex}
+    Computationally efficient algorithm that corrects for price endogeneity
+    \begin{itemize}
+        \item BLP solve a nonlinear simultaneous equations problem
+        \item BLP develop a ``contraction mapping'' for efficient estimation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Utility Model}
+    There are $T$ markets ($t = 1, \ldots, T$), each with $J_t$ products ($j = 1, \ldots, J_t$)
+    \begin{itemize}
+        \item The ``outside good'' is indexed as $j = 0$
+    \end{itemize}
+    \vspace{2ex}
+    The utility that consumer $i$ in market $t$ obtains from product $j$ is
+    $$U(x_{jt}, \xi_{jt}, p_{jt}, \tau_i; \theta_1, \theta_2)$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+        \item $x_{jt}$: vector of non-price attributes of product $j$ in market $t$
+        \item $\xi_{jt}$: utility of unobserved attributes of product $j$ in market $t$
+        \item $p_{jt}$: price of product $j$ in market $t$
+        \item $\tau_i$: characteristics of individual $i$
+        \item $\theta_1$, $\theta_2$: vectors of unknown parameters
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Utility Functional Form}
+    A quasi linear utility function gives the utility expression
+    \begin{align*}
+    u_{ijt} &= \alpha_i (y_i - p_{jt}) + x_{jt} \beta_i + \xi_{jt} + \varepsilon_{ijt} \\
+    \intertext{BLP use a slightly different expression that comes from a Cobb-Douglas utility function}
+    u_{ijt} &= \alpha_i \ln(y_i - p_{jt}) + x_{jt} \beta_i + \xi_{jt} + \varepsilon_{ijt}
+    \end{align*}
+    but the first expression is easier to follow \\
+    \vspace{2ex}
+    Depending on the data and context, we could capture some components of $\xi_{jt}$ through brand and market dummy variables
+    $$\xi_{jt} = \xi_j + \xi_t + \Delta \xi_{jt}$$\\
+    \begin{itemize}
+        \item See Nevo (2000) for details on estimation with these dummy variables
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Individual Characteristics and Coefficients}
+    There are two types of individual characteristics
+    \begin{itemize}
+        \item $D_i \sim \hat{P}_D^*(D)$: ``observed'' demographic characteristics
+        \item $\nu_i \sim P_{\nu}^*(\nu)$: additional unobserved characteristics
+    \end{itemize}
+    BLP actually do not observe any individual-specific characteristics, but they do observe the distribution of demographic characteristics in the population, whereas $\nu_i$ represents characteristics that are fully unobserved \\
+    \vspace{2ex}
+    Individual coefficients are a function of these individual characteristics
+    $$\begin{pmatrix}
+        \alpha_i \\
+        \beta_i
+    \end{pmatrix} = \begin{pmatrix}
+        \alpha \\
+        \beta
+    \end{pmatrix} + \Pi D_i + \Sigma \nu_i$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+        \item $\Pi$ measures how individual coefficients vary with demographics
+        \item $\Sigma$ represents variation in individual coefficients for unobserved reasons
+    \end{itemize}
+    \vspace{2ex}
+    BLP have data on the income distribution, but no other demographics
+\end{frame}
+
+\begin{frame}\frametitle{Outside Good}
+    A consumer may choose not to purchase any good, which is denoted the ``outside good'' and indexed as $j = 0$ \\
+    \vspace{2ex}
+    The utility that consumer $i$ in market $t$ obtains from the outside good is
+    $$u_{i0t} = \alpha_i y_i + \xi_{0t} + \pi_0 D_i + \sigma_0 \nu_{i0} + \varepsilon_{i0t}$$ \\
+    \vspace{2ex}
+    The terms $\xi_{0t}$, $\pi_0$, and $\sigma_0$ are set equal to zero
+    \begin{itemize}
+        \item These terms are not identified without normalizing one $\xi_{jt}$ and components of $\Pi$ and $\Sigma$
+    \end{itemize}
+    \vspace{2ex}
+    Then the utility of the outside good is normalized to be zero (in expectation)
+    \begin{itemize}
+        \item The utility of income, $\alpha_i y_i$, is common to all products, so it effectively disappears
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Full Demand Model}
+    The utility that consumer $i$ in market $t$ obtains from product $j$ is
+    \begin{align*}
+        &u_{ijt} = \alpha_i y_i + \delta_{jt}(x_{jt}, p_{jt}, \xi_{jt}; \theta_1) + \mu_{ijt}(x_{jt}, p_{jt}, \nu_i, D_i; \theta_2) + \varepsilon_{ijt} \\
+        \intertext{where}
+        &\delta_{jt}(x_{jt}, p_{jt}, \xi_{jt}; \theta_1) = x_{jt} \beta - \alpha p_{jt} + \xi_{jt} \\
+        &\mu_{ijt}(x_{jt}, p_{jt}, \nu_i, D_i; \theta_2) = (-p_{jt}, x_{jt}) (\Pi D_i + \Sigma \nu_i)
+    \end{align*} \\
+    \vspace{-1ex}
+    \begin{itemize}
+        \item $\alpha_i y_i$: common to all products and effectively disappears
+        \item $\delta_{jt}$: mean utility of product $j$ in market $t$ that is common to all consumers
+        \item $\mu_{ijt} + \varepsilon_{ijt}$: mean-zero deviation from the common utility that captures the random coefficients and idiosyncratic utility
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Market Shares}
+    Consumer $i$ in market $t$ purchases product $j$ if and only if
+    $$u_{ijt} \geq u_{i \ell t} \; \forall \ell \in J_t$$ \\
+    \vspace{2ex}
+    Conditional on all product attributes and model parameters, the set of individual characteristics that lead to the choice of product $j$ in market $t$ is
+    $$A_{jt}(x_t, p_t, \delta_t; \theta_2) = \left\{ (D_i, \nu_i, \varepsilon_{i0t}, \ldots, \varepsilon_{iJ_tt}) \mid u_{ijt} \geq u_{i \ell t} \; \forall \ell \in J_t \right\}$$ \\
+    \vspace{2ex}
+    Then the market share of product $j$ in market $t$ is
+    \begin{align*}
+        s_{jt}(x_t, p_t, \delta_t; \theta_2) &= \int_{A_{jt}} dP^*(D, \nu, \varepsilon) \\
+        &= \int_{A_{jt}} dP_{\varepsilon}^*(\varepsilon) dP_{\nu}^*(\nu) d\hat{P}_D^*(D)
+    \end{align*}
+    if $\varepsilon$, $\nu$, and $D$ are assumed to be independent
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity of Price}
+    Product prices are not randomly assigned but set to maximize firm profits
+    \begin{itemize}
+        \item If firms know how consumers value the unobserved product attributes, $\xi_{jt}$, then they will consider these values when setting prices
+        \item But then prices are correlated with these unobserved product attributes, so estimates of the price coefficient will be biased
+        \item This problem is analogous to the classic simultaneity problem of demand and supply
+    \end{itemize}
+    \vspace{2ex}
+    BLP propose instrumenting for price
+    \begin{itemize}
+        \item But they cannot use instruments in a nonlinear model
+        \item BLP use an estimation method that transforms product attributes into a linear function of $\xi_{jt}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Cost Function}
+    BLP do not just discuss how profit-maximizing firms lead to price endogeneity, they also explicitly model supply and the pricing decision of firms \\
+    \vspace{2ex}
+    There are $F$ firms ($f = 1, \ldots, F$), each of which produces subset $\mathcal{J}_f$ of the products \\
+    \vspace{2ex}
+    The marginal cost of producing product $j$ for market $t$, $mc_{jt}$, is given by
+    $$\ln(mc_{jt}) = w_{jt} \gamma + \omega_{jt}$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+        \item $w_{jt}$: vector of cost characteristics for product $j$ in market $t$, which can overlap with product attributes, $x_{jt}$
+        \item $\gamma$: unknown parameters
+        \item $\omega_{jt}$: unobserved component of marginal costs, which can be correlated with $\xi_{jt}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Profit-Maximizing Firms}
+    The profits of firm $f$ in market $t$ is given by
+    $$Profits_{ft} = \sum_{j \in \mathcal{J}_f} (p_{jt} - mc_{jt}) M_t s_{jt}(x_t, p_t, \delta_t; \theta_2)$$
+    where $M_t$ is the number of consumers in market $t$ \\
+    \vspace{2ex}
+    BLP assume a Nash-Bertrand model of pricing, which yields the first-order condition for the price of product $j$ in market $t$
+    \begin{itemize}
+        \item Each firm sets prices to maximize its profits conditional on the attributes of all products and the prices of all other firms
+    \end{itemize}
+    \vspace{1ex}
+    $$s_{jt}(x_t, p_t, \delta_t; \theta_2) + \sum_{\ell \in \mathcal{J}_f} (p_{\ell t} - mc_{\ell t}) \frac{\partial s_{\ell t}(x_t, p_t, \delta_t; \theta_2)}{\partial p_{jt}} = 0$$
+\end{frame}
+
+\begin{frame}\frametitle{Markups}
+    The first-order condition can be expressed in vector notation as
+    $$s_t(x_t, p_t, \delta_t; \theta_2) - \Delta_t(x_t, p_t, \delta_t; \theta_2)(p_t - mc_t) = 0$$
+    where
+    $$\Delta_{j \ell} = \begin{cases}
+        \frac{- \partial s_{\ell t}}{\partial p_{jt}} & \text{if $j$ and $\ell$ are produced by the same firm} \\
+        0 & \text{otherwise}
+    \end{cases}$$ \\
+    \vspace{2ex}
+    Solving this first-order condition for prices gives an optimal markup rule
+    \begin{align*}
+        p_t &= mc + b_t(x_t, p_t, \delta_t; \theta_2) \\
+        \intertext{where $b_t$ is the vector of markups in market $t$ given by}
+        b_t(x_t, p_t, \delta_t; \theta_2) &= \Delta_t(x_t, p_t, \delta_t; \theta_2)^{-1} s_t(x_t, p_t, \delta_t; \theta_2)
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Full Supply Model}
+    Putting these pieces together yields an expression for prices in market $t$ as a function of data
+    $$\ln(p_{jt} - b_{jt}(x_t, p_t, \delta_t; \theta_2)) = w_{jt} \gamma + \omega_{jt}$$ \\
+    which BLP estimate to construct the marginal cost for every automobile model \\
+    \vspace{2ex}
+    As with the demand model, there is an endogeneity problem
+    \begin{itemize}
+        \item The price vector is a function of unobserved cost characteristics, $\omega$, and the markup, $b_t$, is a function of prices, so the markup is correlated with unobserved cost characteristics
+        \item The unobserved cost characteristics, $\omega$, are correlated with the utility of unobserved product attributes, $\xi$, which are correlated with price
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Summary of Theoretical Models}
+    BLP develop models of demand and supply
+    \begin{itemize}
+        \item Random coefficients model of demand for differentiated products
+        \item Nash-Bertrand pricing model with oligopolistic competition
+    \end{itemize}
+    \vspace{2ex}
+    Both of these models suffer from endogeneity
+    \begin{itemize}
+        \item BLP need instruments to recover unbiased parameter estimates
+    \end{itemize}
+    \vspace{2ex}
+    The endogeneity enters these models nonlinearly
+    \begin{itemize}
+        \item BLP develop a new estimation method to handle instruments in a nonlinear model
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Upcoming
+    \begin{itemize}
+        \item Final exam is posted, due December 19
+        \item Course surveys are open, due December 22
+        \begin{itemize}
+            \item \href{http://owl.umass.edu/partners/courseEvalSurvey/uma/}{Click here (\texttt{owl.umass.edu/partners/courseEvalSurvey/uma})}
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,328 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmin}{argmin}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 10:\ Nonlinear Least Squares II]{Lecture 10:\ Nonlinear Least Squares II}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Nonlinear Least Squares
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+        \item Nonlinear Least Squares Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Greene textbook, Chapters 13.1--13.5
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 2 is posted, due October 17
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nonlinear Least Squares}
+    $$y_i = h(x_i, \beta) + \varepsilon_i$$ \\
+    \vspace{2ex}
+    The nonlinear least squares estimator minimizes the sum of squared errors for this model
+    $$\hat{\beta} = \argmin_{\beta} \sum_{i = 1}^n [y_i - h(x_i, \beta)]^2$$ \\
+    \vspace{2ex}
+    This estimator does not require a distributional assumption about our data (unlike MLE), but it has fewer nice properties
+    \begin{itemize}
+        \item Consistent
+        \item Asymptotically normal
+        \item Does not achieve the Cramer-Rao lower bound
+        \item Does not have the ``invariance'' property
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Nonlinear Least Squares Example in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Logit Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes. We have data on 900 households in California and the type of heating system in their home. Each household has the following choice set, and we observe the following data \\
+    \vspace{3ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item GC: gas central
+		    	\item GR: gas room
+		    	\item EC: electric central
+		    	\item ER: electric room
+		    	\item HP: heat pump
+		    \end{itemize}
+		    \vspace{8ex}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item IC: installation cost
+		    	\item OC: annual operating cost
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item income: annual income
+		    	\item agehed: age of household head
+		    	\item rooms: number of rooms
+                \item region: home location
+		    \end{itemize}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Two Models to Estimate}
+    \vspace{-4ex}
+    \begin{align*}
+        \intertext{Base model}
+        U_{nj} &= \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj} \\
+        \vspace{3ex}
+        \intertext{Alternative-specific coefficients model}
+        U_{nj} &= \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n + \varepsilon_{nj}
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Optimization in R}
+    <<R CODE HERE>>
+    \vspace{2ex}
+    \texttt{optim()} requires that you create a function, \texttt{fn}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and data as inputs
+        \item Calculates your objective function given those parameters
+        \item Returns this value of the objective function
+    \end{enumerate}
+    \vspace{2ex}
+    You also have to give \texttt{optim()} arguments for
+    \begin{itemize}
+        \item \texttt{par}: starting parameter values
+        \item \texttt{\ldots}: dataset and other things needed by your function
+        \item \texttt{method}: optimization algorithm
+        \begin{itemize}
+            \item I recommend \texttt{method = `BFGS'} for our estimation
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Calculating the Sum of Squared Error in a Logit Model}
+    Steps to calculate the sum of squared errors for a given set of parameters in a logit model
+    \begin{enumerate}
+        \item Calculate the representative utility for each alternative and for each decision maker.
+        \item Calculate the choice probability for each alternative and for each decision maker.
+        \item Calculate the econometric residual, or the difference between the outcome and the probability, for each alternative and for each decision maker.
+        \item Sum the square of these residuals.
+        \item Return the sum of squares.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Base Model}
+    \begin{alignat*}{2}
+    &\text{Random utility model:} \quad &&U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj} \\
+    \intertext{}
+    &\text{NLS regression model:} \quad &&y_{ni} =  \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_{j = 1}^J e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}} + \omega_{ni}
+    \end{alignat*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Sum of Squares}
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate NLS Parameters}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{NLS Variance-Covariance Matrix Estimator}
+    $$\widehat{Var}(\hat{\beta}) = \hat{\sigma}^2 \left[ \sum_{i = 1}^n \left( \frac{\partial h(x_i, \beta)}{\partial \beta} \right)_{\hat{\beta}} \left( \frac{\partial h(x_i, \beta)}{\partial \beta'} \right)_{\hat{\beta}} \right]^{-1}$$
+    Steps to estimate this variance-covariance matrix
+    \begin{enumerate}
+        \item Write down the derivative of the nonlinear regression model with respect to each of the $K$ parameters.
+        \item Calculate this $K \times 1$ vector of derivatives, at the estimated parameters, for each decision maker.
+        \item Calculate the $K \times K$ matrix that is the product of the above vector and its transpose for each decision maker.
+        \item Sum these matrices for all decision makers.
+        \item Estimate the variance of the econometric error as the mean sum of squares at the estimated parameters.
+        \item Calculate the variance-covariance matrix, which is a function of the above $K \times K$ matrix and the estimated error variance.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Gradient of Logit Choice Probabilities}
+    \begin{align*}
+        \frac{\partial P_{ni}}{\partial \alpha_i} &= P_{ni} (1 - P_{ni}) \\
+        \frac{\partial P_{ni}}{\partial \alpha_{j \mid j \neq i}} &= -P_{ni} P_{nj} \\
+        \frac{\partial P_{ni}}{\partial \beta_1} &= P_{ni} (IC_{ni} - \sum_{j= 1}^J P_{nj} IC_{nj}) \\
+        \frac{\partial P_{ni}}{\partial \beta_2} &= P_{ni} (OC_{ni} - \sum_{j= 1}^J P_{nj} OC_{nj})
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimating the NLS Variance-Covariance Matrix}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimating the NLS Variance-Covariance Matrix}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Variance-Covariance Matrix}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Parameters and Standard Errors}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{NLS Hypothesis Test}
+    Test that the alternative-specific intercepts are jointly significant
+    $$H_0:
+    \begin{pmatrix}
+        \alpha_1 \\
+        \alpha_2 \\
+        \alpha_3 \\
+        \alpha_4
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{pmatrix}$$
+\end{frame}
+
+\begin{frame}\frametitle{NLS Wald Test}
+    \begin{alignat*}{2}
+        &\text{Hypothesis:} &&H_0 \text{: } r(\beta_0) = q \\
+        &\text{Test statistic:} &&W = [r(\hat{\beta}) - q]' [ R(\hat{\beta}) \widehat{Var}(\hat{\beta}) R'(\hat{\beta})]^{-1} [r(\hat{\beta}) - q] \\
+        &\text{Jacobian matrix:} \quad &&R(\hat{\beta}) = \left( \frac{\partial r(\beta)}{\partial \beta'} \right)_{\hat{\beta}}
+    \end{alignat*} \\
+    \vspace{2ex}
+    Steps to conduct a Wald Test using NLS estimators
+    \begin{enumerate}
+        \item Create a vector of $J$ parameter restrictions, $r(\beta_0) = q$.
+        \item Calculate the $J \times K$ Jacobian matrix by differentiating each restriction with respect to each of the $K$ parameters.
+        \item Calculate the Wald test statistic, which is a function of the vector of restrictions, the Jacobian matrix, and the variance-covariance matrix.
+        \item Conduct the Wald test using this test statistic, which is distributed $\chi^2$.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Calculating the NLS Wald Test Statistic}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{NLS Wald Test Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Alternative-Specific Coefficients Model}
+    \begin{alignat*}{2}
+    &\text{Random utility model:} \quad &&U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n + \varepsilon_{nj} \\
+    \intertext{}
+    &\text{NLS regression model:} \quad &&y_{ni} =  \frac{e^{ \alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni} + \beta_{3j} R_n}}{\sum_{j = 1}^J e^{ \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \beta_{3j} R_n}} + \omega_{ni}
+    \end{alignat*}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Estimation}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Estimation Data}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients Optimization}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Alternative-Specific Coefficients NLS Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Greene textbook, Chapters 13.1--13.5
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+        \item Reminder: Tuesdays at 2:00--3:00 in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 2 is posted, due October 17
+    \end{itemize}
+\end{frame}
+
+\end{document}

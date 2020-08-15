@@ -1,0 +1,413 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Lecture 21:\ Dynamic Discrete Choice I]{Lecture 21:\ Dynamic Discrete Choice I}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Individual-Specific Parameters Example in R
+    \end{itemize}
+    \vspace{2ex}
+    Today
+    \begin{itemize}
+    	\item Static Models with Panel Data
+    	\item Dynamic Discrete Choice Examples
+        \item Dynamic Discrete Choice 
+    \end{itemize}
+    \vspace{2ex}
+    Upcoming
+    \begin{itemize}
+        \item Reading for next time
+        \begin{itemize}
+            \item Rust (1987)
+        \end{itemize}
+        \item Problem sets
+        \begin{itemize}
+            \item Problem Set 4 is posted, due November 21
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Static Vs.\ Dynamic Models}
+    Static structural models
+    \begin{itemize}
+    	\item An agent maximizes their objective function within the current time period without considering the effect on future time periods
+    	\item Some simple ``dynamics'' can be incorporated by including
+    	\begin{itemize}
+    		\item Lagged or future explanatory variables
+    		\item State dependence through lagged outcome variables
+    	\end{itemize}
+    	\item All the models we have discussed have been static
+    	\item Panel data models can be (and usually are) static
+    \end{itemize}
+    \vspace{2ex}
+    Dynamic structural models
+    \begin{itemize}
+    	\item An agent maximizes their objective function while explicitly considering the effect on future time periods
+    	\begin{itemize}
+    		\item A choice in one period may change the choice set in future periods
+    		\item A choice in one period may change the utility of future choices
+    	\end{itemize}
+    	\item Modeling this dynamic behavior requires a more complex framework
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Static Models with Panel Data
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model with Panel Data}
+    We can use the logit model to model discrete choices with panel data
+    $$U_{njt} = \beta' x_{njt} + \varepsilon_{njt} \quad \Rightarrow \quad P_{nit} = \frac{e^{\beta' x_{nit}}}{\sum_j e^{\beta' x_{njt}}}$$ \\
+    \vspace{2ex}
+    The logit assumption has to hold
+    $$\varepsilon_{njt} \sim \text{i.i.d.\ type I extreme value (Gumbel) with } Var(\varepsilon_{njt}) = \frac{\pi^2}{6}$$ \\
+    \begin{itemize}
+        \item But the unobserved characteristics of a decision maker that affect choice are unlikely to be independent over time
+    \end{itemize}
+    \vspace{2ex}
+    The logit model with panel data is a sequence of static choices, not a fully dynamic model
+    \begin{itemize}
+        \item We assume the decision maker maximizes utility in each time period
+        \item But we do not represent how a decision can affect future choices
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model with Panel Data}
+    We can better represent a sequence of choices over time using the mixed logit model
+    $$U_{njt} = \beta_n' x_{njt} + \varepsilon_{njt} \quad \Rightarrow \quad P_{ni} = \int \prod_{t = 1}^T \frac{e^{\beta' x_{ni_{t}t}}}{\sum_{j = 1}^J e^{\beta' x_{nj_{t}t}}} f(\beta \mid \theta) d \beta$$ \\
+    \vspace{2ex}
+    The individual-specific coefficients represent unobserved preferences
+    \begin{itemize}
+        \item We model these coefficients as random coefficients and estimate their distributions
+        \item These individual coefficients yield unobserved correlations in choices over time periods
+    \end{itemize}
+    \vspace{2ex}
+    Although the mixed logit model better represents choices over multiple time periods, it is still inherently a sequence of static choices
+\end{frame}
+
+\begin{frame}\frametitle{Simple ``Dynamics'' in Static Models}
+    When using these static models, we can include lagged outcome variables to model
+    \begin{itemize}
+        \item Habit formation
+        \item Variety-seeking behavior
+        \item Switching costs
+        \item Brand loyalty
+    \end{itemize}
+    \vspace{2ex}
+    These are all examples of how past choices affect the decision maker's utility in the current time period \\
+    \vspace{2ex}
+    But if past choices affect utility in the current time period, then the current choice affects future utility
+    \begin{itemize}
+        \item A rational decision maker will consider these effects on future utility when making the current choice
+        \item To fully capture this discrete choice framework, we need to use a dynamic discrete choice model
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Dynamic Discrete Choice Examples
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Dynamic Discrete Choice Example}
+    Why do people attend college? (Or graduate school?)
+    \begin{itemize}
+        \item Because four years in college provides more utility than anything else the individual could have done in those four years?
+        \item Or because college opens up a new set of jobs and higher salaries compared to not attending college?
+    \end{itemize}
+    \vspace{2ex}
+    A static model implicitly assumes that the first answer is correct
+    \begin{itemize}
+        \item The static model has no way to represent that the future choice set and salaries will be different after attending to college
+    \end{itemize}
+    \vspace{2ex}
+    To consider the second answer, we need to use a dynamic discrete choice model
+    \begin{itemize}
+        \item This model will explicitly represent how the decision to attend college affects the future choice set and salaries
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Decision Maker with Two-Period Dynamics}
+    A decision maker thinking about college considers two time periods
+    \begin{enumerate}
+        \item College ($C$) or work ($W$) for four years
+        \begin{itemize}
+            \item $U_{1C}$: utility in period 1 from four years in college
+            \item $U_{1W}$: utility in period 1 from four years working
+        \end{itemize}
+        \item A set of $J$ possible jobs for a career over many future years
+        \begin{itemize}
+            \item $U_{2j}^C$: utility in period 2 from job $j$ after attending college
+            \item $U_{2j}^W$: utility in period 2 from job $j$ after working
+        \end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    The total utility obtained from attending college or working in period 1 is
+    \begin{align*}
+        TU_C &= U_{1C} + \lambda \max_j(U_{2j}^C) \\
+        TU_W &= U_{1W} + \lambda \max_j(U_{2j}^W)
+    \end{align*}
+    where $\lambda$ reflects the relative weighting of the two periods \\
+    \vspace{2ex}
+    The decision maker attends college if and only if $TU_C > TU_W$
+\end{frame}
+
+\begin{frame}\frametitle{Econometrician with Two-Period Dynamics}
+    We decompose the utility of each alternative into an observed and an unobserved component
+    \begin{alignat*}{3}
+        U_{1C} &= V_{1C} + \varepsilon_{1C} \qquad && U_{2j}^C &&= V_{2j}^C + \varepsilon_{2j}^C \\
+        U_{1W} &= V_{1W} + \varepsilon_{1W} \qquad && U_{2j}^W &&= V_{2j}^W + \varepsilon_{2j}^W
+    \end{alignat*}
+    and define $\varepsilon = \{\varepsilon_{1C},\varepsilon_{1W}, \varepsilon_{2j}^C, \varepsilon_{2j}^W\}$ with joint density $f(\varepsilon)$ \\
+    \vspace{2ex}
+    The probability that the decision maker chooses to attend college is
+    \begin{align*}
+        P_C &= \Pr(TU_C > TU_W) \\
+        &= \int I \left[ V_{1C} + \varepsilon_{1C} + \lambda \max_j(V_{2j}^C + \varepsilon_{2j}^C) \right. \\
+        &\left. \qquad \qquad > V_{1W} + \varepsilon_{1W} + \lambda \max_j(V_{2j}^W + \varepsilon_{2j}^W)\right] f(\varepsilon) d \varepsilon
+    \end{align*}
+    We have to approximate this integral using simulation
+\end{frame}
+
+\begin{frame}\frametitle{Simplifications for Two-Period Dynamics}
+    If we assume that unobserved utility in the first period, $\varepsilon_{1C}$ and $\varepsilon_{1W}$, is i.i.d.\ extreme value, the choice probability of attending college simplifies to
+    $$P_C = \int \frac{e^{V_{1C} + \lambda \max_j(V_{2j}^C + \varepsilon_{2j}^C)}}{e^{V_{1C} + \lambda \max_j(V_{2j}^C + \varepsilon_{2j}^C)} + e^{V_{1W} + \lambda \max_j(V_{2j}^W + \varepsilon_{2j}^W)}} g(\varepsilon_2) d \varepsilon_2$$
+    which is a simpler integral to simulate \\
+    \vspace{3ex}
+    If we also assume that unobserved utility in the second period, $\varepsilon_{2j}^C$ and $\varepsilon_{2j}^W$, is i.i.d.\ extreme value, we get the joint probability of attending college in period 1 and then taking job $i$ in period 2 as
+    $$P_{Ci} = P_C \times \frac{e^{V_{2i}^C}}{\sum_{j = 1}^J e^{{V_{2j}^C}}}$$
+    where $P_C$ is the probability of attending college given above
+\end{frame}
+
+\begin{frame}\frametitle{Example With Three Periods}
+    After many years working job $j$, the decision maker reaches retirement age and has a new choice to make
+    \begin{itemize}
+    	\item Continue working full time
+    	\item Work part time and spend retirement funds
+    	\item Retire and collect social security and/or pension funds
+    \end{itemize}
+    \vspace{2ex}
+    The retirement plan, social security payout, etc.\ differs for each of the possible jobs in period 2
+    \begin{itemize}
+    	\item In period 2, the decision maker will consider how their job will affect utility in period 3
+    	\item In period 1, the decision maker will consider how the decision to attend college will affect all periods
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Decision Maker with Three-Period Dynamics}
+    A decision maker thinking about college considers three time periods
+    \begin{enumerate}
+        \item College ($C$) or work ($W$) for four years
+        \item A set of $J$ possible jobs for a career over many future years
+        \item A set of $S$ possible retirement plans
+        \begin{itemize}
+        	\item $U_{3s}^{Cj}$: utility in period 3 from retirement plan $s$ after attending college in period 1 and working job $j$ in period 2
+            \item $U_{3s}^{Wj}$: utility in period 3 from retirement plan $s$ after working in period 1 and working job $j$ in period 2
+        \end{itemize}
+    \end{enumerate}
+    \vspace{1ex}
+    The total utility obtained from attending college or working in period 1 is
+    \begin{align*}
+        TU_C &= U_{1C} + \lambda \max_j \left[ U_{2j}^C + \theta \max_s (U_{3s}^{Cj}) \right] \\
+        TU_W &= U_{1W} + \lambda \max_j \left[ U_{2j}^W + \theta \max_s (U_{3s}^{Wj}) \right]
+    \end{align*}
+    where $\lambda$ and $\theta$ reflect the relative weighting of the three periods \\
+    \vspace{1ex}
+    The decision maker goes to college if and only if $TU_C > TU_W$
+\end{frame}
+
+\begin{frame}\frametitle{Econometrician with Three-Period Dynamics}
+    We decompose the utility of each alternative into an observed and an unobserved component
+    \begin{alignat*}{5}
+        U_{1C} &= V_{1C} + \varepsilon_{1C} \qquad && U_{2j}^C &&= V_{2j}^C + \varepsilon_{2j}^C \qquad && U_{3s}^{Cj} &&= V_{3s}^{Cj} + \varepsilon_{3s}^{Cj} \\
+        U_{1W} &= V_{1W} + \varepsilon_{1W} \qquad && U_{2j}^W &&= V_{2j}^W + \varepsilon_{2j}^W \qquad && U_{3s}^{Wj} &&= V_{3s}^{Wj} + \varepsilon_{3s}^{Wj} 
+    \end{alignat*}
+    and define $\varepsilon = \{\varepsilon_{1C},\varepsilon_{1W}, \varepsilon_{2j}^C, \varepsilon_{2j}^W, \varepsilon_{3s}^{Cj}, \varepsilon_{3s}^{Wj}\}$ with joint density $f(\varepsilon)$ \\
+    \vspace{3ex}
+    The probability that the decision maker chooses to attend college is
+    \begin{align*}
+        P_C &= \Pr(TU_C > TU_W) \\
+        &= \int I \left\{ V_{1C} + \varepsilon_{1C} + \lambda \max_j \left[ V_{2j}^C + \varepsilon_{2j}^C + \theta \max_s (V_{3s}^{Cj} + \varepsilon_{3s}^{Cj}) \right] \right. \\
+        & \left. \qquad \qquad > V_{1W} + \varepsilon_{1W} + \lambda \max_j \left[ V_{2j}^W + \varepsilon_{2j}^W + \theta \max_s (V_{3s}^{Wj} + \varepsilon_{3s}^{Wj}) \right] \right\} \\
+        & \qquad \times f(\varepsilon) d \varepsilon
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Dynamic Discrete Choice
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Dynamic Optimization Notation and Terminology}
+    Some common notation and terminology for dynamic structural models
+    \begin{itemize}
+        \item $\{i_1, i_2, \ldots, i_t\}$: sequence of choices up to and including period $t$
+        \item $U_{tj}(i_1, i_2, \ldots, i_{t-1})$: utility obtained in period $t$ from alternative $j$, which depends on all previous choices
+        \item $TU_{tj}(i_1, i_2, \ldots, i_{t-1})$: total utility (current and all future time periods) obtained from choosing alternative $j$ in period $t$
+        \begin{itemize}
+            \item Known as the ``conditional value function''
+        \end{itemize}
+        \item $TU_t(i_1, i_2, \ldots, i_{t-1})$: total utility obtained from the optimal choice in period $t$
+        \begin{itemize}
+            \item $TU_t(i_1, i_2, \ldots, i_{t-1}) = \max_j TU_{tj}(i_1, i_2, \ldots, i_{t-1})$
+            \item Known as the ``value function'' or ``valuation function'' at time $t$
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    We need to calculate all possible $TU_{tj}(i_1, \ldots, i_{t-1})$ in order to express the optimal choice in each time period
+\end{frame}
+
+\begin{frame}\frametitle{Bellman Equation for Dynamic Discrete Choice}
+    The decision maker chooses optimally (maximizes utility) in the current period knowing they will also choose optimally in every future period (and discounting the future with discount rate $\delta$), which yields an expression for the value function at time $t$
+    $$TU_t(i_1, \ldots, i_{t-1}) = \max_j \left[ U_{tj}(i_1, \ldots, i_{t-1}) + \delta TU_{t+1}(i_1, \ldots, i_t = j) \right]$$
+    This relation is the Bellman equation for dynamic discrete choice \\
+    \vspace{2ex}
+    We can also write down a Bellman equation for the conditional valuation function, $TU_{tj}(i_1, \ldots, i_{t-1})$
+    $$TU_{tj}(i_1, \ldots, i_{t-1}) = U_{tj}(i_1, \ldots, i_{t-1}) + \delta \max_k \left[ TU_{t+1,k}(i_1, \ldots, i_t = j) \right]$$
+\end{frame}
+
+\begin{frame}\frametitle{Applying the Bellman Equation}
+    If the number of time periods is finite, we can apply the Bellman equation through backward recursion to calculate all possible $TU_{tj}(i_1, \ldots, i_{t-1})$
+    \begin{enumerate}
+        \item Start in the last time period, $t = T$, with
+        $$TU_{Tj}(i_1, \ldots, i_{T-1}) = U_{Tj}(i_1, \ldots, i_{T-1})$$
+        \item Calculate total utility in period $T - 1$, $TU_{T-1,j}(i_1, \ldots, i_{T-2})$, as a function of the values of $TU_{Tj}(i_1, \ldots, i_{T-1})$ from step 1
+        \item Continue working backward until you reach period 1
+    \end{enumerate}
+    \vspace{2ex}
+    We have to calculate $U_{tj}(i_1, \ldots, i_{t-1})$ for each $t$, each $j$, and each $\{i_1, i_2, \ldots, i_{t-1}\}$
+    \begin{itemize}
+        \item If there are $J$ alternatives in each of $T$ time periods, we have to calculate $(J^T)T$ utilities
+        \item This computational burden is known as the ``curse of dimensionality''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities in Dynamic Discrete Choice}
+    We will ultimately use these conditional value functions, $TU_{tj}(i_1, \ldots, i_{t-1})$, to crate an expression for choice probabilities \\
+    \vspace{2ex}
+    For example, the probability of choosing alternative $i$ in period 1 is
+    \begin{align*}
+        P_{1i} &= \Pr(TU_{1i} > TU_{1j} \; \forall j \neq i) \\
+        &= \int I \left[ TU_{1i}(\varepsilon) > TU_{1j}(\varepsilon) \; \forall j \neq i \right] f(\varepsilon) d \varepsilon
+    \end{align*} \\
+    \vspace{2ex}
+    We have to simulate this choice probability by taking random draws from an assumed joint density of all unobserved utilities, $f(\varepsilon)$ \\
+    \vspace{2ex}
+    See Chapter 7.7.3 in the Train textbook for more details
+\end{frame}
+
+\begin{frame}\frametitle{Uncertainty in Dynamic Discrete Choice Models}
+    So far we have assumed that the decision maker has perfect information about the future
+    \begin{itemize}
+        \item Utility of each alternative in each future time period
+        \item How every possible sequence of choices affects this future utility
+        \item But this is unlikely to be true!
+    \end{itemize}
+    \vspace{2ex}
+    We can model utility as being a function factors that are unknown in previous periods
+    \begin{itemize}
+        \item The decision maker maximizes total expected utility with the expectation taken over the density of the unknown factors
+        \item This expectation adds another integral that has to be simulated, adding yet another layer of complexity and dimensionality to a problem that already suffers from the curse of dimensionality
+    \end{itemize}
+    \vspace{2ex}
+    See Chapter 7.7.3 in the Train textbook for more details
+\end{frame}
+
+\begin{frame}\frametitle{Simplifications for Dynamic Discrete Choice Models}
+    Two ways to simplify dynamic discrete choice models
+    \begin{enumerate}
+        \item Use as few time periods as possible
+        \begin{itemize}
+            \item We could model the college-job-retirement sequence of choices annually (or monthly, weekly, daily) instead of three broad time periods
+            \item Estimation is feasible with three time periods, but it becomes (at least) an order of magnitude more difficult with 60 individual year
+        \end{itemize}
+        \item Assume the factors that the decision maker does not observe are the same factors that the econometrician does not observe, and these factors are i.i.d.\ extreme value
+        \begin{itemize}
+            \item Choice probabilities have closed-form expressions that are easy to calculate
+            \item This assumption is unrealistic, but it may be the only way to make the model tractable
+        \end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    See Chapter 7.7.3 in the Train textbook for more details
+\end{frame}
+
+\begin{frame}\frametitle{Announcements}
+    Reading for next time
+    \begin{itemize}
+        \item Rust (1987)
+    \end{itemize}
+    \vspace{3ex}
+    Office hours
+    \begin{itemize}
+    	\item Reminder: 2:00--3:00 on Tuesdays in 218 Stockbridge
+    \end{itemize}
+    \vspace{3ex}
+    Upcoming
+    \begin{itemize}
+        \item Problem Set 4 is posted, due November 21
+    \end{itemize}
+\end{frame}
+
+\end{document}
