@@ -10,4 +10,4 @@ For detailed information on this course, please see the [syllabus](https://raw.g
 
 Week 1: **Structural Estimation**
 * Slides: [Course Overview](https://raw.githack.com/woerman/ResEcon703/master/slides/week_00/week_00.pdf) | [Structural Estimation](https://raw.githack.com/woerman/ResEcon703/master/slides/week_01/week_01.pdf)
-* Videos: [1](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG&index=1) | [2](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG&index=2) | [3](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG&index=3) | [4](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG&index=4)
+* Videos: [1](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [2](https://www.youtube.com/watch?v=-nsiFv30KNg&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [3](https://www.youtube.com/watch?v=5uO0frAGgl0&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [4](https://www.youtube.com/watch?v=AvbEOSqzd-s&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG)
