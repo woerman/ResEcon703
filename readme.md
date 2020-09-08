@@ -39,3 +39,7 @@ Week 11: **Individual-Specific Parameters**
 Week 12: **Dynamic Discrete Choice**
 
 Week 13: **Endogeneity**
+
+## Problem Sets
+
+[Problem Set 1](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/commute_datasets.zip)
