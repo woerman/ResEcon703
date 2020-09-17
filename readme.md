@@ -24,23 +24,24 @@ Week 4: **Logit Model**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/week_04.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/week_04.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/ac_renters.csv)
 * Videos: [1](https://www.youtube.com/watch?v=YNZsyOqnpXw&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [2](https://www.youtube.com/watch?v=kzA1IiutSEo&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [3](https://www.youtube.com/watch?v=9LJBhvnbeSM&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [4](https://www.youtube.com/watch?v=tIYjpmBtPq4&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [5](https://www.youtube.com/watch?v=U-hVuo-Tm6w&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [6](https://www.youtube.com/watch?v=vv6zLPkkxD4&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [7](https://www.youtube.com/watch?v=QudrDHALuBc&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [8](https://www.youtube.com/watch?v=QudrDHALuBc&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [9](https://www.youtube.com/watch?v=NZXLAndubbg&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf)
 
-Week 5: **Maximum Likelihood Estimation**
+Week 5: **Logit Model**
+* *No new materials*
 
-Week 6: **Logit Estimation**
+Week 6: **Maximum Likelihood Estimation**
 
-Week 7: **Generalized Method of Moments**
+Week 7: **Logit Estimation**
 
-Week 8: **Generalized Extreme Value Models**
+Week 8: **Generalized Method of Moments**
 
-Week 9: **Mixed Logit Model**
+Week 9: **Generalized Extreme Value Models**
 
-Week 10: **Simulation-Based Estimation**
+Week 10: **Mixed Logit Model**
 
-Week 11: **Individual-Specific Parameters**
+Week 11: **Simulation-Based Estimation**
 
-Week 12: **Dynamic Discrete Choice**
+Week 12: **Individual-Specific Parameters**
 
-Week 13: **Endogeneity**
+Week 13: **Dynamics and Endogeneity**
 
 ## Problem Sets
 
