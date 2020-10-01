@@ -1,0 +1,1295 @@
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 7:\ Logit Estimation]{Week 7:\ Logit Estimation}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last time
+    \begin{itemize}
+        \item Maximum likelihood estimation
+    \end{itemize}
+    \vspace{3ex}
+    Today
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{recap}}{Logit model recap}
+        \item \hyperlink{page.\getpagerefnumber{estim}}{Logit estimation}
+        \item \hyperlink{page.\getpagerefnumber{alt}}{Alternate logit estimation methods}
+        \item \hyperlink{page.\getpagerefnumber{example}}{Logit estimation R example}
+    \end{itemize}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Train textbook, chapters 3.7--3.8
+    \end{itemize}
+\end{frame}
+
+\section{Logit Model Recap}
+\label{recap}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Model Recap
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Course So Far}
+    So far we have covered
+    \begin{itemize}
+    	\item Structural econometric models
+    	\item Discrete choice framework
+    	\item Random utility model
+    	\item Logit model
+    	\item Maximum likelihood estimation
+    	\item Numerical optimization
+    \end{itemize}
+    \vspace{3ex}
+    We can finally put all these pieces together and estimate a structural econometric model ourselves! \\
+    \vspace{3ex}
+    But first, a recap of the random utility and logit models
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model Recap}
+    A decision maker chooses the alternative that maximizes utility
+    \begin{itemize}
+		\item A decision maker, $n$, faces a choice among $J$ discrete alternatives
+    	\item Alternative $j$ provides utility $U_{nj}$ (where $j = 1, \ldots, J$)
+    	\item $n$ chooses $i$ if and only if $U_{ni} > U_{nj} \; \forall j \neq i$
+   	\end{itemize}
+   	\vspace{2ex}
+   	We (the econometricians) do not observe utility $U_{nj}$, so we model it as being composed of
+   	\begin{itemize}
+		\item $V_{nj}$: Utility from observed attributes 
+		\item $\varepsilon_{nj}$: Utility from unobserved attributes, which we treat as random
+	\end{itemize}
+	$$U_{nj} = V_{nj} + \varepsilon_{nj}$$ \\
+	\vspace{2ex}
+	The probability that decision maker $n$ chooses alternative $i$ is
+    \begin{align*}
+    	P_{ni} & = \Pr(U_{ni} > U_{nj} \; \forall j \neq i) \\
+    	& = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model Recap}
+    The logit model makes a simple (but sometimes overly strong) assumption about the joint density of unobserved utility, $f(\bm{\varepsilon}_n)$
+    $$\varepsilon_{nj} \sim \text{i.i.d.\ type I extreme value (Gumbel) with } Var(\varepsilon_{nj}) = \frac{\pi^2}{6}$$ \\
+    \vspace{2ex}
+    This assumption yields a closed-form expression for choice probabilities
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$ \\
+    \vspace{2ex}
+    These choice probabilities make estimation relatively easy, but they imply rigid and often unrealistic substitution patterns
+    \begin{itemize}
+    	\item Independence of irrelevant alternatives (IIA)
+    	\item Proportional substitution
+    \end{itemize}
+\end{frame}
+
+\section{Logit Estimation}
+\label{estim}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Estimation
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Probability Mass Function of Logit Model}
+	We observe the following data about a discrete choice setting
+    \begin{itemize}
+    	\item $\bm{y}$: Vector of choices 
+    	\begin{itemize}
+    		\item $y_{ni} = 1$ if and only if decision maker $n$ chooses alternative $i$
+    	\end{itemize}
+    	\item $\bm{X}$: Matrix of data including attributes of alternatives and information on decision makers
+    \end{itemize}
+    \vspace{2ex}
+    Under the random utility model, $y_{ni}$ is a binary (Bernoulli) random variable with conditional probability mass function equal to the choice probability
+    \begin{align*}
+	    \Pr(y_{ni} = 1 \mid \bm{x}_n, \bm{\theta}) & = P_{ni}(\bm{x}_n, \bm{\theta})
+	    \intertext{Under the logit assumption, this PMF and choice probability are}
+	    \Pr(y_{ni} = 1 \mid \bm{x}_n, \bm{\theta}) & = P_{ni}(\bm{x}_n, \bm{\theta}) = \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}}
+	\end{align*}
+	We will use this distributional assumption to estimate the MLE, $\widehat{\bm{\theta}}$
+\end{frame}
+
+\begin{frame}\frametitle{Joint Probability Mass Function of Logit Model}
+	A decision maker chooses exactly one alternative, so the probability of observing the decision maker's vector of choices equals the choice probability of the observed choice
+	\begin{align*}
+		\Pr(\bm{y}_n \mid \bm{x}_n, \bm{\theta}) & = \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Assuming each decision maker is independent, the probability of observing the entire vector of choices is}
+		\Pr(\bm{y} \mid \bm{X}, \bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Under the logit assumption, this joint PMF is}
+		\Pr(\bm{y} \mid \bm{X}, \bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]^{y_{ni}}
+	\end{align*} \\
+	\vspace{-2ex}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Likelihood Function}
+	The joint PMF implies that we know $\bm{X}$ and $\bm{\theta}$ and want to know probabilities of $\bm{y}$, but we actually know $\bm{y}$ and $\bm{X}$ and want to estimate $\bm{\theta}$ \\
+	\vspace{3ex}
+	We simply switch the conditioning on this joint PMF to yield the likelihood function of the parameters, $\bm{\theta}$, conditional on the data, $\bm{y}$ and $\bm{X}$
+	\begin{align*}
+		L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Under the logit assumption, this likelihood function is}
+		L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]^{y_{ni}}
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Log-Likelihood Function}
+    Then the log-likelihood function of the parameters, $\bm{\theta}$, conditional on the data, $\bm{y}$ and $\bm{X}$, is
+    \begin{align*}
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}(\bm{x}_n, \bm{\theta})
+    	\intertext{Under the logit assumption, this likelihood function is}
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]
+    	\intertext{If we further assume that representative utility is liner, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then this log-likelihood function is}
+    	\ln L(\bm{\beta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_j e^{\bm{\beta}' \bm{x}_{nj}}} \right]
+    \end{align*} \\
+    \vspace{-2ex}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Maximum Likelihood Estimator}
+	The maximum likelihood estimator is the set of parameters that maximizes this log-likelihood function
+	$$\widehat{\bm{\theta}} = \argmax_{\bm{\theta}} \ln L(\bm{\theta} \mid \bm{y}, \bm{X})$$ \\
+	These parameters make it most likely to generate the choices that you observe, conditional on the data describing the choice setting
+	\begin{itemize}
+		\item The MLE makes the choice probability close to one for chosen alternatives and close to zero for alternatives that are not chosen
+	\end{itemize}
+	\vspace{2ex}
+    The first-order conditions for maximization are
+    $$\frac{\partial \ln L(\bm{\theta} \mid \bm{y}, \bm{X})}{\partial \bm{\theta}} = \bm{0}$$
+    These first-order conditions do not have a closed-form solution, so we will need to use numerical optimization to find the MLE
+\end{frame}
+
+\section{Alternate Logit Estimation Methods}
+\label{alt}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Alternate Logit Estimation Methods
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Logit Moment Conditions and GMM}
+    If we assume representative utility is linear, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then the logit MLE first-order conditions are equivalent to
+    $$\sum_{n = 1}^N \sum_{i = 1}^J \left[ y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right] \bm{x}_n = \bm{0}$$ \\
+    \vspace{2ex}
+    This expression implies the orthogonality of econometric residuals, $y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta})$, and the data, $\bm{x}_n$
+    \begin{itemize}
+    	\item Analogous to OLS finding the parameters that make the residuals orthogonal to the data
+    \end{itemize}
+    \vspace{2ex}
+    These equalities are sample moment conditions that we could use to estimate the logit parameters by GMM
+    \begin{itemize}
+    	\item More on GMM next week
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in the Logit Model}
+    The previous slides require that the data describing the choice settings, $\bm{X}$, are exogenous
+    \begin{itemize}
+    	\item If the data are endogenous to the choice, then coefficients may be inconsistent
+    	\begin{itemize}
+    		\item The institution is the same as endogeneity in an OLS regression
+    	\end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    If we have some exogenous instruments that generate variation in our data, we can use a kind of instrumental variables method to estimate consistent parameters
+    \begin{itemize}
+    	\item We will construct moment conditions using these instruments, rather than the data, and solve with GMM
+    	\item More on this topic next week
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Estimation Using a Subset of Alternatives}
+    In some settings, it is computationally infeasible to consider the full choice set for every decision maker
+    \begin{itemize}
+    	\item We can instead consider only a subset of the alternatives available to each decision maker
+    \end{itemize}
+    \vspace{2ex}
+    If we sample the alternatives for each decision maker in such a way that each alternative has an equal probability of being considered, we can use the standard ML method from the previous slides
+    \begin{itemize}
+    	\item In this case, the MLE is consistent but not efficient
+    \end{itemize}
+    \vspace{2ex}
+    If we sample with unequal probabilities, we need to make a small adjustment to estimation to account for this unequal sampling
+    \begin{itemize}
+    	\item We may want unequal probabilities when some alternatives have very low take-up
+    	\item See the Train textbook for details of this the estimation method
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice-Based Sampling of Decision Makers}
+    The previous slides require that the sampling of decision makers is random (or at least exogenous to the choice)
+    \begin{itemize}
+    	\item If the sample is endogenous to the choice, then coefficients may be inconsistent
+    	\begin{itemize}
+    		\item Example: What could go wrong if you take a survey of commute choices, but you take the survey at the bus stop?
+    	\end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    In some case, we may want to oversample some choices
+    \begin{itemize}
+    	\item If an important alternative has low take-up, we may want to oversample those decision makers to obtain more information about that choice
+    \end{itemize}
+    \vspace{2ex}
+    We can recover consistent estimates from a choice-based sample of decision makers, but estimation is more complex and depends on the specific sampling method used
+    \begin{itemize}
+    	\item See the Train textbook for more details and references
+    \end{itemize}
+\end{frame}
+
+\section{Logit Estimation R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Estimation R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Choice Example}
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes, but now with different data
+    \begin{itemize}
+        \item We have (real) data on 900 households in California and the type of heating system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Choice set
+            \begin{itemize}
+                \item \texttt{gc}: gas central
+                \item \texttt{gr}: gas room
+                \item \texttt{ec}: electric central
+                \item \texttt{er}: electric room
+                \item \texttt{hp}: heat pump
+            \end{itemize}
+            \vspace{8ex}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Alternative-specific data
+            \begin{itemize}
+                \item \texttt{ic}: installation cost
+                \item \texttt{oc}: annual operating cost
+            \end{itemize}
+            \vspace{1ex}
+            Household demographic data
+            \begin{itemize}
+                \item \texttt{income}: annual income
+                \item \texttt{agehed}: age of household head
+                \item \texttt{rooms}: number of rooms
+                \item \texttt{region}: home location
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    The \texttt{Heating} dataset is part of the \texttt{mlogit} package, so we can load it using the \texttt{data()} function \\
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load tidyverse and mlogit}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\hlcom{## Load dataset from mlogit package}
+\hlkwd{data}\hlstd{(}\hlstr{'Heating'}\hlstd{,} \hlkwc{package} \hlstd{=} \hlstr{'mlogit'}\hlstd{)}
+\hlcom{## Rename dataset to lowercase}
+\hlstd{heating} \hlkwb{<-} \hlstd{Heating}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at dataset}
+\hlkwd{tibble}\hlstd{(heating)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 900 x 16
+##    idcase depvar ic.gc ic.gr ic.ec ic.er ic.hp oc.gc oc.gr oc.ec oc.er
+##     <dbl> <fct>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+##  1      1 gc      866   963.  860.  996. 1136.  200.  152.  553.  506.
+##  2      2 gc      728.  759.  797.  895.  969.  169.  169.  520.  486.
+##  3      3 gc      599.  783.  720.  900. 1048.  166.  138.  439.  405.
+##  4      4 er      835.  793.  761.  831. 1049.  181.  147.  483   425.
+##  5      5 er      756.  846.  859.  986.  883.  175.  139.  404.  390.
+##  6      6 gc      666.  842.  694.  863.  859.  136.  141.  398.  371.
+##  7      7 gc      670.  941.  634.  952. 1087.  192.  148.  478.  446.
+##  8      8 gc      778. 1022.  813. 1012.  990.  188.  159.  502.  465.
+##  9      9 gc      928. 1212.  876. 1025. 1232.  169.  190.  553.  452.
+## 10     10 gc      683. 1045.  776.  874.  878.  176.  136.  532.  472.
+## # ... with 890 more rows, and 5 more variables: oc.hp <dbl>,
+## #   income <dbl>, agehed <dbl>, rooms <dbl>, region <fct>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model of Heating System Choice}
+    We model the utility to household $n$ of installing heating system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    The probability that household $n$ installs heating system $i$ is
+ 	$$P_{ni} = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n$$ \\
+ 	\vspace{2ex}
+  	Under the logit assumption, these choice probabilities simplify to
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of Heating System Choice}
+	What might affect the utility of the different heating systems?
+	\begin{itemize}
+		\item Installation cost
+		\item Annual operating cost
+		\item Heating system technology
+		\begin{itemize}
+			\item Gas systems might be preferred to electric systems
+			\item Central systems might be preferred to room systems
+		\end{itemize}
+		\item Anything else?
+	\end{itemize}
+    \vspace{3ex}
+    We model the representative utility of heating system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Logit Model of Heating System Choice}
+    Under the logit assumption, the choice probability that household $n$ installs heating system $i$ is
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$ \\
+    \vspace{1ex}
+    We model the representative utility of heating system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$ \\
+    \vspace{1ex}
+    Substituting this representative utility into the choice probabilities gives
+    $$P_{ni} = \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_j e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}}$$ \\
+    \vspace{1ex}
+    We have six parameters to estimate using maximum likelihood
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Likelihood Estimator of Logit Model}
+    The likelihood function of the parameters is
+    \begin{align*}
+        L(\bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J P_{ni}^{y_{ni}}
+        \intertext{and the log-likelihood function of the parameters is}
+        \ln L(\bm{\theta}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}
+        \intertext{The maximum likleihood estimator of these parameters is}
+        \widehat{\bm{\theta}} & = \argmax_{\bm{\theta}} \ln L(\bm{\theta})
+    \end{align*}
+    We will use numerical optimization to find the parameters values that maximize the log-likelihood function
+\end{frame}
+
+\begin{frame}\frametitle{Numerical Optimization for MLE}
+    We want to find the set of parameters, $\widehat{\bm{\theta}}$, that maximize the log-likelihood function, $\ln L(\bm{\theta})$
+    \begin{enumerate}
+        \item Begin with some initial parameter values, $\bm{\theta}^0$
+        \item Check if you can ``walk up'' to a higher value
+        \item If so, take a step in the right direction to $\bm{\theta}^1$
+        \item Repeat steps (2) and (3), stepping from $\bm{\theta}^s$ to $\bm{\theta}^{s + 1}$ until you reach the maximum
+    \end{enumerate}
+    \vspace{3ex}
+    The \texttt{optim()} function in R will perform this numerical optimization for us
+    \begin{itemize}
+        \item We just have to give the \texttt{optim()} function two things:
+        \begin{itemize}
+            \item Some initial parameter values, $\bm{\theta}^0$
+            \item A function that will take those parameters as an argument and calculate the log-likelihood, $\ln L(\bm{\theta})$
+            \item (And sometimes additional information to fine-tune the optimization procedure and output)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Optimization in R}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Optimization in R}
+\hlcom{## Help file for the optimization function, optim}
+\hlopt{?}\hlstd{optim}
+\hlcom{## Arguments for optim function}
+\hlkwd{optim}\hlstd{(par, fn, gr, ..., method, lower, upper, control, hessian)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+    \vspace{1ex}
+    \texttt{optim()} requires that you create a function, \texttt{fn}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and other arguments as inputs
+        \item Calculates your objective function given those parameters
+        \item Returns this value of the objective function
+    \end{enumerate}
+    \vspace{1ex}
+    You also have to give \texttt{optim()} arguments for
+    \begin{itemize}
+        \item \texttt{par}: starting parameter values
+        \item \texttt{\ldots}: dataset and other things needed by your function
+        \item \texttt{method}: optimization algorithm
+        \begin{itemize}
+            \item I recommend \texttt{method = `BFGS'} for our estimation
+        \end{itemize}
+    \end{itemize}
+    \vspace{1ex}
+    \texttt{optim()} will find the parameters that minimize the objective function
+    \begin{itemize}
+        \item To maximize, minimize the negative of the objective function
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Steps to Calculate the Logit Log-Likelihood}
+    The logit log-likelihood function is
+    $$\ln L(\bm{\theta}) = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}$$
+    where the choice probabilities for our model are
+    $$P_{ni} = \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_j e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}}$$ \\
+    \vspace{2ex}
+    Steps to calculate the logit log-likelihood conditional on $\bm{\theta}$
+    \begin{enumerate}
+        \item Calculate the representative utility of each alternative-household
+        \item Calculate the choice probability of each alternative-household
+        \item Calculate the log of the choice probability for each chosen alternative
+        \item Calculate the negative of the log-likelihood
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Log-Likelihood}
+    \vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_1} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract individual parameters with descriptive names}
+  \hlstd{alpha_ec} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]}
+  \hlstd{alpha_er} \hlkwb{<-} \hlstd{params[}\hlnum{2}\hlstd{]}
+  \hlstd{alpha_gc} \hlkwb{<-} \hlstd{params[}\hlnum{3}\hlstd{]}
+  \hlstd{alpha_gr} \hlkwb{<-} \hlstd{params[}\hlnum{4}\hlstd{]}
+  \hlstd{beta_1} \hlkwb{<-} \hlstd{params[}\hlnum{5}\hlstd{]}
+  \hlstd{beta_2} \hlkwb{<-} \hlstd{params[}\hlnum{6}\hlstd{]}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility_ec} \hlstd{= alpha_ec} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{ic.ec} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{oc.ec,}
+           \hlkwc{utility_er} \hlstd{= alpha_er} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{ic.er} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{oc.er,}
+           \hlkwc{utility_gc} \hlstd{= alpha_gc} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{ic.gc} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{oc.gc,}
+           \hlkwc{utility_gr} \hlstd{= alpha_gr} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{ic.gr} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{oc.gr,}
+           \hlkwc{utility_hp} \hlstd{= beta_1} \hlopt{*} \hlstd{ic.hp} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{oc.hp)}
+  \hlcom{## Calculate logit choice probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{exp}\hlstd{(utility_ec)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_er)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_gc)} \hlopt{+}
+             \hlkwd{exp}\hlstd{(utility_gr)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_hp))}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_ec} \hlstd{=} \hlkwd{exp}\hlstd{(utility_ec)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_er} \hlstd{=} \hlkwd{exp}\hlstd{(utility_er)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_gc} \hlstd{=} \hlkwd{exp}\hlstd{(utility_gc)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_gr} \hlstd{=} \hlkwd{exp}\hlstd{(utility_gr)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_hp} \hlstd{=} \hlkwd{exp}\hlstd{(utility_hp)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Calculate logit choice probability for chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_choice} \hlstd{= prob_ec} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstr{'ec'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_er} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstr{'er'}\hlstd{)} \hlopt{+} \hlstd{prob_gc} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstr{'gc'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_gr} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstr{'gr'}\hlstd{)} \hlopt{+} \hlstd{prob_hp} \hlopt{*} \hlstd{(depvar} \hlopt{==} \hlstr{'hp'}\hlstd{))}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob_choice))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Log-Likelihood}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  model_data <- model_data %>% 
+    \hlkwd{mutate}(log_prob = \hlkwd{log}(prob_choice))
+\hlcom{  ## Calculate the log-likelihood for these parameters}
+  ll <- \hlkwd{sum}(model_data$log_prob)
+  \hlkwd{return}(-ll)
+\}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Arguments for optim function}
+\hlkwd{optim}\hlstd{(par, fn, gr, ..., method, lower, upper, control, hessian)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+    \vspace{2ex}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{6}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_1,} \hlkwc{data} \hlstd{= heating,}
+                 \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    \vspace{1ex}
+    
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show optimization results}
+\hlstd{model_1}
+\end{alltt}
+\begin{verbatim}
+## $par
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+## 
+## $value
+## [1] 1008.337
+## 
+## $counts
+## function gradient 
+##       76       12 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+## 
+## $hessian
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show MLE parameters}
+\hlstd{model_1}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Show Hessian at the MLE}
+\hlstd{model_1}\hlopt{$}\hlstd{hessian}
+\end{alltt}
+\begin{verbatim}
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+    $$\widehat{Var}(\widehat{\bm{\theta}}) = \left\{ \left. -\frac{\partial^2 \ln L(\bm{\theta})}{\partial \bm{\theta} \partial \bm{\theta}'} \right\vert_{\bm{\theta} = \widehat{\bm{\theta}}} \right\}^{-1}$$
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE variance estimator}
+\hlstd{model_1}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##               [,1]          [,2]         [,3]          [,4]          [,5]          [,6]
+## [1,]  1.980437e-01  1.424109e-01 1.860571e-02 -5.521102e-03  9.512776e-05 -5.824413e-04
+## [2,]  1.424109e-01  1.284812e-01 7.940390e-03 -5.846949e-03  3.493597e-05 -4.723201e-04
+## [3,]  1.860571e-02  7.940390e-03 5.124370e-02  3.792083e-02  9.747095e-05  9.342135e-05
+## [4,] -5.521102e-03 -5.846949e-03 3.792083e-02  4.244292e-02  4.399295e-05  1.447288e-04
+## [5,]  9.512776e-05  3.493597e-05 9.747095e-05  4.399295e-05  3.843712e-07 -4.639197e-08
+## [6,] -5.824413e-04 -4.723201e-04 9.342135e-05  1.447288e-04 -4.639197e-08  2.356832e-06
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors}
+    
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE standard errors}
+\hlstd{model_1}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.4450210320 0.3584427563 0.2263707190 0.2060168046 0.0006199767
+## [6] 0.0015351975
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Another Way to Calculate Logit Log-Likelihood}
+	  We can make our function to calculate log-likelihood more efficient if we work with a long dataset \\
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Pivot heating dataset into a long dataset}
+\hlstd{heating_long} \hlkwb{<-} \hlstd{heating} \hlopt{%>%}
+  \hlkwd{pivot_longer}\hlstd{(}\hlkwd{contains}\hlstd{(}\hlstr{'.'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{separate}\hlstd{(name,} \hlkwd{c}\hlstd{(}\hlstr{'name'}\hlstd{,} \hlstr{'alt'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{pivot_wider}\hlstd{()} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{= (depvar} \hlopt{==} \hlstd{alt))} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlopt{-}\hlstd{depvar)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(idcase, alt)}
+\hlcom{## Add columns of ones to long dataset for alt-specific constant terms}
+\hlstd{heating_long} \hlkwb{<-} \hlstd{heating_long} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{constant_ec} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(alt} \hlopt{==} \hlstr{'ec'}\hlstd{),}
+         \hlkwc{constant_er} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(alt} \hlopt{==} \hlstr{'er'}\hlstd{),}
+         \hlkwc{constant_gc} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(alt} \hlopt{==} \hlstr{'gc'}\hlstd{),}
+         \hlkwc{constant_gr} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(alt} \hlopt{==} \hlstr{'gr'}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in Long Format}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at long dataset}
+\hlstd{heating_long} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(idcase, alt, choice, ic, oc,} \hlkwd{starts_with}\hlstd{(}\hlstr{'constant'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 4,500 x 9
+##    idcase alt   choice    ic    oc constant_ec constant_er constant_gc
+##     <dbl> <chr> <lgl>  <dbl> <dbl>       <dbl>       <dbl>       <dbl>
+##  1      1 ec    FALSE   860.  553.           1           0           0
+##  2      1 er    FALSE   996.  506.           0           1           0
+##  3      1 gc    TRUE    866   200.           0           0           1
+##  4      1 gr    FALSE   963.  152.           0           0           0
+##  5      1 hp    FALSE  1136.  238.           0           0           0
+##  6      2 ec    FALSE   797.  520.           1           0           0
+##  7      2 er    FALSE   895.  486.           0           1           0
+##  8      2 gc    TRUE    728.  169.           0           0           1
+##  9      2 gr    FALSE   759.  169.           0           0           0
+## 10      2 hp    FALSE   969.  199.           0           0           0
+## # ... with 4,490 more rows, and 1 more variable: constant_gr <dbl>
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{A Different Function to Calculate Logit Log-Likelihood}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_2} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select data for X and convert to a matrix}
+  \hlstd{X} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(}\hlkwd{starts_with}\hlstd{(}\hlstr{'constant'}\hlstd{), ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility} \hlstd{= X} \hlopt{%*%} \hlstd{params)}
+  \hlcom{## Calculate logit probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(utility)))} \hlopt{%>%}
+    \hlkwd{ungroup}\hlstd{()}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob} \hlstd{=} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Keep logit choice probability for only the chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{filter}\hlstd{(choice} \hlopt{==} \hlnum{TRUE}\hlstd{)}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_2} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{6}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_2,} \hlkwc{data} \hlstd{= heating_long,}
+                 \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    \vspace{1ex}
+    
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show optimization results}
+\hlstd{model_2}
+\end{alltt}
+\begin{verbatim}
+## $par
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+## 
+## $value
+## [1] 1008.337
+## 
+## $counts
+## function gradient 
+##       76       12 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+## 
+## $hessian
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show MLE parameters}
+\hlstd{model_2}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Show Hessian at the MLE}
+\hlstd{model_2}\hlopt{$}\hlstd{hessian}
+\end{alltt}
+\begin{verbatim}
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE variance estimator}
+\hlstd{model_2}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##               [,1]          [,2]         [,3]          [,4]          [,5]          [,6]
+## [1,]  1.980437e-01  1.424109e-01 1.860571e-02 -5.521103e-03  9.512776e-05 -5.824413e-04
+## [2,]  1.424109e-01  1.284812e-01 7.940390e-03 -5.846949e-03  3.493597e-05 -4.723201e-04
+## [3,]  1.860571e-02  7.940390e-03 5.124370e-02  3.792083e-02  9.747095e-05  9.342135e-05
+## [4,] -5.521103e-03 -5.846949e-03 3.792083e-02  4.244292e-02  4.399295e-05  1.447288e-04
+## [5,]  9.512776e-05  3.493597e-05 9.747095e-05  4.399295e-05  3.843712e-07 -4.639197e-08
+## [6,] -5.824413e-04 -4.723201e-04 9.342135e-05  1.447288e-04 -4.639197e-08  2.356832e-06
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors}
+    
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE standard errors}
+\hlstd{model_2}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.4450210322 0.3584427563 0.2263707192 0.2060168049 0.0006199767
+## [6] 0.0015351975
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Yet Another Function to Calculate Logit Log-Likelihood}
+	We can make our function to calculate log-likelihood even more efficient if we work with matrices \\
+	\vspace{1ex}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_3} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select data for X and convert to a matrix [(N * J) x K]}
+  \hlstd{X} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(}\hlkwd{starts_with}\hlstd{(}\hlstr{'constant'}\hlstd{), ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Calculate representative utility for each alternative [(N * J) x 1]}
+  \hlstd{utility} \hlkwb{<-} \hlstd{X} \hlopt{%*%} \hlstd{params}
+  \hlcom{## Convert utility to a wide matrix [N x J]}
+  \hlstd{utility} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwc{data} \hlstd{= utility,} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{byrow} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+  \hlcom{## Calculate logit probability denominator [N x 1]}
+  \hlstd{prob_denom} \hlkwb{<-} \hlkwd{rowSums}\hlstd{(}\hlkwd{exp}\hlstd{(utility))}
+  \hlcom{## Calculate logit choice probability for each alternative [N x J]}
+  \hlstd{prob} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom}
+  \hlcom{## Select data for y and convert to a wide matrix [N x J]}
+  \hlstd{y} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwc{data} \hlstd{= data}\hlopt{$}\hlstd{choice,} \hlkwc{ncol} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{byrow} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+  \hlcom{## Calculate logit choice probability for the chosen alternatives [N x 1]}
+  \hlstd{prob_choice} \hlkwb{<-} \hlkwd{rowSums}\hlstd{(y} \hlopt{*} \hlstd{prob)}
+  \hlcom{## Calculate log of logit choice probability for chosen alternatives [N x 1]}
+  \hlstd{log_prob} \hlkwb{<-} \hlkwd{log}\hlstd{(prob_choice)}
+  \hlcom{## Calculate the log-likelihood [1 x 1]}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_3} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{6}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_3,} \hlkwc{data} \hlstd{= heating_long,}
+                 \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    \vspace{1ex}
+    
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show optimization results}
+\hlstd{model_3}
+\end{alltt}
+\begin{verbatim}
+## $par
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+## 
+## $value
+## [1] 1008.337
+## 
+## $counts
+## function gradient 
+##       76       12 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+## 
+## $hessian
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show MLE parameters}
+\hlstd{model_3}\hlopt{$}\hlstd{par}
+\end{alltt}
+\begin{verbatim}
+## [1]  1.811460030  1.986682245  1.661661689  0.255606904 -0.001603602 -0.007689238
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Show Hessian at the MLE}
+\hlstd{model_3}\hlopt{$}\hlstd{hessian}
+\end{alltt}
+\begin{verbatim}
+##              [,1]         [,2]         [,3]         [,4]         [,5]        [,6]
+## [1,]    58.682876    -6.268791    -39.79257    -9.042317    -974.0483   15359.361
+## [2,]    -6.268791    74.971017    -52.12634   -11.874898   11305.5416   16493.310
+## [3,]   -39.792565   -52.126345    205.37492   -81.829543  -31025.7987  -24006.728
+## [4,]    -9.042317   -11.874898    -81.82954   109.932020   10530.5731   -7914.243
+## [5,]  -974.048313 11305.541577 -31025.79874 10530.573092 8813294.1157 2781602.803
+## [6,] 15359.360795 16493.309579 -24006.72752 -7914.243457 2781602.8033 9017721.751
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE variance estimator}
+\hlstd{model_3}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##               [,1]          [,2]         [,3]          [,4]          [,5]          [,6]
+## [1,]  1.980437e-01  1.424109e-01 1.860571e-02 -5.521103e-03  9.512776e-05 -5.824413e-04
+## [2,]  1.424109e-01  1.284812e-01 7.940390e-03 -5.846949e-03  3.493597e-05 -4.723201e-04
+## [3,]  1.860571e-02  7.940390e-03 5.124370e-02  3.792083e-02  9.747095e-05  9.342135e-05
+## [4,] -5.521103e-03 -5.846949e-03 3.792083e-02  4.244292e-02  4.399295e-05  1.447288e-04
+## [5,]  9.512776e-05  3.493597e-05 9.747095e-05  4.399295e-05  3.843712e-07 -4.639197e-08
+## [6,] -5.824413e-04 -4.723201e-04 9.342135e-05  1.447288e-04 -4.639197e-08  2.356832e-06
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors}
+    
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate MLE standard errors}
+\hlstd{model_3}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+  \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+  \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+  \hlkwd{sqrt}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.4450210322 0.3584427563 0.2263707192 0.2060168049 0.0006199767
+## [6] 0.0015351975
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}\frametitle{Likelihood Ratio Test}
+    We can test hypotheses about the model parameters using the likelihood ratio test \\
+    \vspace{3ex}
+    We will test if these households have heating technology preferences
+    \begin{itemize}
+    	\item Are all of the the alternative-specific intercepts equal zero?
+    \end{itemize}
+    \vspace{1ex}
+    $$H_0: \begin{pmatrix}
+    	\alpha_{ec} \\ 
+    	\alpha_{er} \\
+    	\alpha_{gc} \\
+    	\alpha_{gr}
+    \end{pmatrix} = \begin{pmatrix}
+    	0 \\
+    	0 \\
+    	0 \\
+    	0
+    \end{pmatrix}$$
+\end{frame}
+
+\begin{frame}\frametitle{Likelihood Ratio Test Statistic}
+    The likelihood ratio test statistic is
+    $$-2 \ln \lambda = 2 \left( \ln L(\widehat{\bm{\theta}}_U) - \ln L(\widehat{\bm{\theta}}_R) \right)$$
+    and is distributed $\chi^2$ with degrees of freedom equal to the number of model restrictions
+    $$-2 \ln \lambda \sim \chi^2(4)$$ \\
+    \vspace{2ex}
+    We need both the unrestricted MLE, $\widehat{\bm{\theta}}_U$, and the restricted MLE, $\widehat{\bm{\theta}}_R$, to calculate this test statistic
+    \begin{itemize}
+    	\item $\widehat{\bm{\theta}}_U$: MLE from the full model that we have already estimated
+    	\item $\widehat{\bm{\theta}}_R$: MLE from a model with no alternative-specific intercepts
+    \end{itemize}
+    \vspace{2ex}
+    We need to find the MLE of a model with representative utility
+    $$V_{nj} = \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Restricted Log-Likelihood}
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate restricted log-likelihood for heating choice}
+\hlstd{ll_fn_2_rest} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select data for X and convert to a matrix}
+  \hlstd{X} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(ic, oc)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility} \hlstd{= X} \hlopt{%*%} \hlstd{params)}
+  \hlcom{## Calculate logit probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{group_by}\hlstd{(idcase)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{sum}\hlstd{(}\hlkwd{exp}\hlstd{(utility)))} \hlopt{%>%}
+    \hlkwd{ungroup}\hlstd{()}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob} \hlstd{=} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Keep logit choice probability for only the chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{filter}\hlstd{(choice} \hlopt{==} \hlnum{TRUE}\hlstd{)}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_2_rest} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_2_rest,}
+                      \hlkwc{data} \hlstd{= heating_long,}
+                      \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    \vspace{1ex}
+\begin{knitrout}\scriptsize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Show optimization results}
+\hlstd{model_2_rest}
+\end{alltt}
+\begin{verbatim}
+## $par
+## [1] -0.006232787 -0.004580007
+## 
+## $value
+## [1] 1095.237
+## 
+## $counts
+## function gradient 
+##      112        9 
+## 
+## $convergence
+## [1] 0
+## 
+## $message
+## NULL
+## 
+## $hessian
+##           [,1]      [,2]
+## [1,] 8075639.7  473398.1
+## [2,]  473398.1 9730685.6
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test Statistic}
+	  The likelihood ratio test statistic is
+    $$-2 \ln \lambda = 2 \left( \ln L(\widehat{\bm{\theta}}_U) - \ln L(\widehat{\bm{\theta}}_R) \right)$$
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Look at negative of log-likelihood value for each model}
+\hlstd{model_2}\hlopt{$}\hlstd{value}
+\end{alltt}
+\begin{verbatim}
+## [1] 1008.337
+\end{verbatim}
+\begin{alltt}
+\hlstd{model_2_rest}\hlopt{$}\hlstd{value}
+\end{alltt}
+\begin{verbatim}
+## [1] 1095.237
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate likelihood ratio test statistic}
+\hlstd{lr_stat} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlstd{(}\hlopt{-}\hlstd{model_2}\hlopt{$}\hlstd{value} \hlopt{- -}\hlstd{model_2_rest}\hlopt{$}\hlstd{value)}
+\hlstd{lr_stat}
+\end{alltt}
+\begin{verbatim}
+## [1] 173.8003
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test}
+	  The likelihood ratio test statistic is distributed $\chi^2$ with degrees of freedom equal to the number of model restrictions
+    $$-2 \ln \lambda \sim \chi^2(4)$$
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Find chi-squared critical value for 4 degrees of freedom}
+\hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{,} \hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 9.487729
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Test if likelihood ratio test statistic is greater than critical value}
+\hlstd{lr_stat} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{,} \hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate p-value of test}
+\hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(lr_stat,} \hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\end{frame}
+
+\end{document}
