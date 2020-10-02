@@ -1,0 +1,202 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+\title{Problem Set 1}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{lm()}, \texttt{glm()}, and \texttt{mlogit()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_1/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options---assume the weather is too severe for even the heartiest graduate students to ride a bike or walk this distance. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+<<R CODE HERE>>
+
+\section*{Problem 1: Linear Probability Model}
+
+Use the \texttt{commute\_binary.csv} dataset for this question. (Reminder: the \texttt{read\_csv()} function from the \texttt{tidyverse} package reads a .csv file into memory.)
+
+<<R CODE HERE>>
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a linear probability model. Include the cost of driving and the time of each alternative as independent variables in your model:
+	$$Y_n = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb} + \varepsilon_{n}$$
+	where $Y_n$ is a binary indicator if student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{lm()} function estimates an OLS regression model.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and heteroskedastic-robust standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{coeftest()} function from the \texttt{lmtest} package tests the statistical significance of your coefficient estimates, and the \texttt{vcovHC()} function from the \texttt{sandwich} package estimates the heteroskedastic-robust covariance matrix of coefficient estimates.)
+
+		<<R CODE HERE>>
+
+		All three independent variables have statistically significant and economically meaningful effects on the choice to drive or take a bus to campus. An additional 10 cents of driving cost reduces the probability of driving by 4.4\%, an additional minute of driving reduces the probability of driving by 6.5\%, and an additional minute riding the bus increases the probability of driving by 2.8\%. Because there are only two alternatives, the marginal effects on the choice to ride the bus are the negatives of the driving marginal effects.
+
+		\item One potential problem with a linear probability model is that predicted probabilities can fall outside the $[0, 1]$ range. How many students have infeasible choice probabilities? Given these results, are you worried about using a linear probability model in this case? (Reminder: the \texttt{predict()} function calculates fitted values of an \texttt{lm} regression.)
+
+		<<R CODE HERE>>
+
+		Only 22 students, or 2.2\% of the sample, have estimated probabilities outside the $[0, 1]$ range. This result suggests that our estimated marginal effects are not likely to be inconsistent and our interpretation of the results is sound.
+
+		\item Test if the two time coefficients are equal in absolute value. Interpret the result of this test and briefly explain why it could make intuitive sense. If a delay were to increase equally the time to drive and the time to take the bus, would you expect the proportion of drivers to increase, decrease, or stay the same? (Hint: There are many ways to conduct this Wald test. I like the \texttt{linearHypothesis()} function from the \texttt{car} (companion to applied regression) package. You may need to use the help file or a Google search to learn how to use this function.) 
+
+		<<R CODE HERE>>
+
+		The result of Wald test indicates that the time coefficients are statistically different from one another. This result is intuitive because the experience of driving and riding a bus are different; for example, a student can read or catch up on email while riding the bus, but not while driving. So a minute of each mode might differently affect the decision to drive or ride the bus. The marginal effect of driving time is larger in absolute, so an equal increase in the time of both modes would decrease the utility of driving and cause some drivers to substitute to the bus.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Binary Logit Model}
+
+Use the \texttt{commute\_binary.csv} dataset for this question.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Include the cost of driving and the time of each alternative as independent variables in your model:
+	$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+	where $P_n$ is the probability that student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{glm()} function with argument \texttt{family = `binomial'} estimates a binary logit model.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{summary()} function summarize the results of a \texttt{glm} model.)
+
+		<<R CODE HERE>>
+
+		All three independent variables again have statistically significant and economically meaningful coefficients. Those coefficients, however, are now interpreted as marginal utilities rather than marginal effects. The cost of driving and the time spent driving both decrease the utility of driving, and the time spent riding the bus increases the utility of driving relative to riding the bus.
+
+		\item Calculate the marginal effect of each independent variable for each student; that is, 3 variables $\times$ 1000 students $=$ 3000 marginal effects. For each of these three variables, report the mean, minimum, maximum, and quartiles of its marginal effects. Compare these marginal effects to your estimates in problem 1. (Reminder: the \texttt{predict()} function calculates fitted values of a \texttt{glm} model, and the \texttt{summary()} function reports these summary statistics for a vector or data frame.)
+
+		<<R CODE HERE>>
+
+		The means of these marginal effects---reported above---are comparable to the estimated coefficients in problem 1, but there is heterogeneity around these means. For each marginal effect, there is a long tail that approaches zero, corresponding to students that have a probability of driving close to 0 or 1.
+
+		\item Use your coefficient estimates to calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus. (Hint: think about how to use your coefficient estimates to convert a student's time to money.)
+
+		<<R CODE HERE>>
+
+		Each hour of driving has a dollar value of \$9.60 and each hour of bus riding has a dollar value of \$3.83. In other words, a student would be willing to pay \$9.60 to spend one less hour commute by car but only \$3.83 to spend one less hour commuting by bus.
+	\end{enumerate}
+
+	\item Demographic information might affect a student's commute decision or underlying preferences. For example, students with different incomes might have different sensitivities to cost. Again model the choice to drive to campus during winter as a binary logit model, but now allow the parameter on cost to vary inversely with income:
+	$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \frac{\beta_1}{I_n} C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+	where $I_n$ is the income of student $n$. (Reminder: the \texttt{I()} function allows you to include math inside a \texttt{formula} object.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean?
+
+		<<R CODE HERE>>
+
+		All three independent variables again have statistically significant and economically meaningful coefficients. The time coefficients are comparable to those estimated in part (a). The cost coefficient now varies with income; a higher level of income yields a lower marginal utility of income. 
+
+		\item Use your coefficient estimates to calculate the marginal utility of income for a student at three different income levels: \$15,000, \$25,000, and \$35,000. For each of these three income levels, also calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus.
+
+		<<R CODE HERE>>
+
+		The marginal utility of income at each of these progressively higher incomes is 3.58, 2.15, and 1.53, respectively. At each of these incomes, each hour of driving has a dollar value of \$5.63, \$9.38, and \$13.13, respectively; and each hour of bus riding has a dollar value of \$2.28, \$3.80, and \$5.32, respectively.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 3: Multinomial Logit Model}
+
+Use the \texttt{commute\_multinomial.csv} dataset for this question.
+
+<<R CODE HERE>>
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the commute choice during spring as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost and time. Include an alternative-specific intercept, allow the common parameter on cost to vary inversely with income, and allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \frac{\beta_1}{I_n} C_{nj} + \beta_j T_{nj}$$
+	where $V_{nj}$ is the representative utility to student $n$ from alternative $j$, $I_n$ is the income of student $n$, $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$ and $\beta$ parameters are to be estimated. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a multinomial logit model, but the data must first be converted to an indexed data frame using the \texttt{dfidx()} function from the \texttt{dfidx} package. The \texttt{dfidx()} function sometimes does not work on a \texttt{tibble}, so you may need to use the \texttt{as.data.frame()} function to ensure your data are in a \texttt{data.frame} format. See the Week 4 slides or the \texttt{mlogit} vignettes at \href{https://cran.r-project.org/web/packages/mlogit/index.html}{\texttt{cran.r-project.org/web/packages/mlogit/index.html}} for information on specifying a \texttt{formula} for the \texttt{mlogit()} function.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameter and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		All independent variables again have statistically significant and economically meaningful parameters. The cost parameter again varies with income, yielding a greater marginal utility of income at lower incomes. The time parameter varies by alternative and is negative for all four alternatives, indicating that the marginal utility of commute time is consistently negative regardless of commute mode. The parameter values differ, however, providing evidence that time driving creates the greatest disutility and time riding the bus creates the least disutility.
+
+		\item Calculate the elasticity of each commute alternative with respect to the cost of driving for each student; that is, 4 alternatives $\times$ 1000 students $=$ 4000 elasticities. For each alternative, report the mean, minimum, maximum, and quartiles of its elasticity with respect to the cost of driving. Describe how these elasticities and substitution patterns relate to an important property of the logit model. (Reminder: the \texttt{fitted()} function with argument \texttt{type = `probabilities'} calculates the choice probabilities of each alternative for each decision maker.)
+
+		<<R CODE HERE>>
+
+		The summary statistics for own-elasticity and cross-elasticity of driving cost are reported above. Note that all three other alternatives---biking, riding the bus, and walking---have the same elasticity with respect to the cost of driving. This common cross-elasticity is an example of the independence of irrelevant alternatives (IIA), which implies proportional substitution to or from all other alternatives.
+	\end{enumerate}
+
+	\item A student's family status might also affect their commute decision or underlying preferences. Estimate the model from part (a) on two subsets of the data based on student marital status; that is, estimate one model using only single students, and estimate a second model using only married students.
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from both models. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		In both models, the marginal utility parameters are again statistically significant and economically meaningful. They have the same sign as in part (a), although the parameter values differ by approximately 50\% in these two models. But we should not directly compare these marginal utility values because they come from different models.
+
+		\item For each marital status, use the corresponding parameter estimates to calculate the marginal utility of income for a student with \$25,000 income. For each marital status, also calculate the dollar value that a student with \$25,000 income places on one hour of commute time for each of the four commute alternatives.
+
+		<<R CODE HERE>>
+
+		The marginal utility of income for a single student with \$25,000 income is 2.06, and the marginal utility of income for a married students with \$25,000 income is 3.17, but these values are not directly comparable because they come from different models. A single student with \$25,000 income has an hourly dollar value of \$7.49 for biking, \$3.19 for riding the bus, \$9.61 for driving, and \$7.69 for walking. A married student with \$25,000 income has an hourly dollar value of \$6.99 for biking, \$3.58 for riding the bus, \$12.27 for driving, and \$8.42 for walking. These hourly dollar values differ by only 10\% in most cases.
+
+		\item You should have found---when comparing these two models---that parameter estimates and marginal utilities differ by 50\% or more in most cases, but that the dollar values of commute times tend be much more similar. Give a potential econometric explanation for why these models yield such different parameters but also yields similar values of commute time. (Hint: think about what component of the random utility model could cause parameter estimates to differ, even for the same underlying preferences.)
+
+		The parameter of a logit model are estimated relative to the variance of the random utility component---greater variance of random utility yields lower parameter estimates. When taking the ratio of two parameters, however, the scale parameter drops out of the calculation. Thus, if single students and married students tend to have a different variance of random utility, these model would yield different parameter estimates, even for the same underlying preferences and valuations of commute time.
+	\end{enumerate}
+
+	\item The university has a strong commitment to environmental sustainability and would like to convince graduate students to take the bus rather than drive to campus. One proposal is to introduce more buses on the existing bus routes, which would reduce bus commute time by 20\%. Use your parameter estimates from part (a) to simulate this counterfactual.
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item How many additional students---of the 1000 students in this dataset---do you expect will commute by bus because of this reduction in bus commute time? How many fewer students do you expect will choose each of the three other commute alternatives?
+
+		<<R CODE HERE>>
+
+		This reduction in bus commute time is expected to yield an additional 73.5 students riding the bus, or an additional 7.35\% of the students in the dataset. Of these 73.5 additional bus riders, 16.7 previously biked, 51.3 previously drove, and 5.5 previously walked.
+
+		\item How much additional economic surplus do you expect this reduction in bus commute time will generate for the 1000 students in this dataset?
+
+		<<R CODE HERE>>
+
+		This reduction in bus commute time is expected to generate \$86.80 in economic surplus for these 1000 students each day.
+	\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
