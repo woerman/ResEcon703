@@ -584,21 +584,30 @@ options(width = 70)
     @
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Standard Errors}
-    <<include = FALSE>>=
-    options(width = 70)
-    @
-    <<>>=
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    $$\widehat{\bm{\theta}} \overset{a}{\sim} \mathcal{N} \left( \bm{\theta}_0, I(\bm{\theta}_0)^{-1} \right)$$ \\
+    \vspace{2ex}
+    <<size = 'tiny'>>=
     ## Calculate MLE standard errors
-    model_1$hessian %>% 
+    model_1_se <- model_1$hessian %>% 
       solve() %>% 
       diag() %>% 
       sqrt()
+    model_1_se
+    ## Calculate parameter z-stats
+    model_1_zstat <- model_1$par / model_1_se
+    model_1_zstat
+    ## Calculate parameter p-values
+    model_1_pvalue <- 2 * pnorm(q = -abs(model_1_zstat))
+    model_1_pvalue
     @
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Another Way to Calculate Logit Log-Likelihood}
 	  We can make our function to calculate log-likelihood more efficient if we work with a long dataset \\
+	  <<include = FALSE>>=
+    options(width = 70)
+    @
     <<>>=
     ## Pivot heating dataset into a long dataset
     heating_long <- heating %>% 
@@ -693,22 +702,28 @@ options(width = 70)
     @
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Standard Errors}
-    <<include = FALSE>>=
-    options(width = 70)
-    @
-    <<>>=
-    ## Calculate MLE standard errors
-    model_2$hessian %>% 
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    <<size = 'tiny'>>=
+    model_2_se <- model_2$hessian %>% 
       solve() %>% 
       diag() %>% 
       sqrt()
+    model_2_se
+    ## Calculate parameter z-stats
+    model_2_zstat <- model_2$par / model_2_se
+    model_2_zstat
+    ## Calculate parameter p-values
+    model_2_pvalue <- 2 * pnorm(q = -abs(model_2_zstat))
+    model_2_pvalue
     @
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Yet Another Function to Calculate Logit Log-Likelihood}
 	We can make our function to calculate log-likelihood even more efficient if we work with matrices \\
 	\vspace{1ex}
+	  <<include = FALSE>>=
+    options(width = 70)
+    @
     <<size = 'tiny'>>=
     ## Function to calculate log-likelihood for heating choice
     ll_fn_3 <- function(params, data){
@@ -773,16 +788,20 @@ options(width = 70)
     @
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Standard Errors}
-    <<include = FALSE>>=
-    options(width = 70)
-    @
-    <<>>=
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    <<size = 'tiny'>>=
     ## Calculate MLE standard errors
-    model_3$hessian %>% 
+    model_3_se <- model_3$hessian %>% 
       solve() %>% 
       diag() %>% 
       sqrt()
+    model_3_se
+    ## Calculate parameter z-stats
+    model_3_zstat <- model_3$par / model_3_se
+    model_3_zstat
+    ## Calculate parameter p-values
+    model_3_pvalue <- 2 * pnorm(q = -abs(model_3_zstat))
+    model_3_pvalue
     @
 \end{frame}
 
@@ -824,6 +843,9 @@ options(width = 70)
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Function to Calculate Restricted Log-Likelihood}
+    <<include = FALSE>>=
+    options(width = 70)
+    @
     <<size = 'tiny'>>=
     ## Function to calculate restricted log-likelihood for heating choice
     ll_fn_2_rest <- function(params, data){

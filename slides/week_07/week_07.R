@@ -78,10 +78,17 @@ model_1$hessian
 model_1$hessian %>% 
   solve()
 ## Calculate MLE standard errors
-model_1$hessian %>% 
+model_1_se <- model_1$hessian %>% 
   solve() %>% 
   diag() %>% 
   sqrt()
+model_1_se
+## Calculate parameter z-stats
+model_1_zstat <- model_1$par / model_1_se
+model_1_zstat
+## Calculate parameter p-values
+model_1_pvalue <- 2 * pnorm(q = -abs(model_1_zstat))
+model_1_pvalue
 
 ### Calculate MLE for multinomial logit heating choice another way
 ## Pivot heating dataset into a long dataset
@@ -141,10 +148,17 @@ model_2$hessian
 model_2$hessian %>% 
   solve()
 ## Calculate MLE standard errors
-model_2$hessian %>% 
+model_2_se <- model_2$hessian %>% 
   solve() %>% 
   diag() %>% 
   sqrt()
+model_2_se
+## Calculate parameter z-stats
+model_2_zstat <- model_2$par / model_2_se
+model_2_zstat
+## Calculate parameter p-values
+model_2_pvalue <- 2 * pnorm(q = -abs(model_2_zstat))
+model_2_pvalue
 
 ### Calculate MLE for multinomial logit heating choice yet another way
 ## Function to calculate log-likelihood for heating choice
@@ -184,10 +198,17 @@ model_3$hessian
 model_3$hessian %>% 
   solve()
 ## Calculate MLE standard errors
-model_3$hessian %>% 
+model_3_se <- model_3$hessian %>% 
   solve() %>% 
   diag() %>% 
   sqrt()
+model_3_se
+## Calculate parameter z-stats
+model_3_zstat <- model_3$par / model_3_se
+model_3_zstat
+## Calculate parameter p-values
+model_3_pvalue <- 2 * pnorm(q = -abs(model_3_zstat))
+model_3_pvalue
 
 ### Test that alternative-specific constants are jointly significant
 ## Function to calculate restricted log-likelihood for heating choice
