@@ -1,0 +1,1055 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\plim}{plim}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 8:\ Generalized Method of Moments]{Week 8:\ Generalized Method of Moments}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Logit estimation using maximum likelihood
+    \end{itemize}
+    \vspace{3ex}
+    Today
+    \begin{columns}
+        \begin{column}{0.48\textwidth}
+            \begin{itemize}
+                \item \hyperlink{page.\getpagerefnumber{overview}}{Method of moments overview}
+                \item \hyperlink{page.\getpagerefnumber{mm_est}}{Method of moments estimator}
+                \item \hyperlink{page.\getpagerefnumber{mm_ex}}{Method of moments examples}
+                \item \hyperlink{page.\getpagerefnumber{gmm_est}}{GMM estimator}
+                \item \hyperlink{page.\getpagerefnumber{gmm_ex}}{GMM example}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.52\textwidth}
+            \begin{itemize}
+                \item \hyperlink{page.\getpagerefnumber{properties}}{Properties of the GMM estimator}
+                \item \hyperlink{page.\getpagerefnumber{optimal}}{Optimal GMM estimator}
+                \item \hyperlink{page.\getpagerefnumber{tests}}{Specification and hypothesis tests}
+                \item \hyperlink{page.\getpagerefnumber{logit}}{Logit model with GMM}
+                \item \hyperlink{page.\getpagerefnumber{example}}{GMM R example}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Generalized method of moments supplement
+    \end{itemize}
+\end{frame}
+
+\section{Method of Moments Overview}
+\label{overview}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Method of Moments Overview
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{(Generalized) Method of Moments}
+    Method of moments (MM) estimation is a special case of generalized method of moments (GMM) estimation
+    \begin{itemize}
+    	\item Common in modern empirical economics
+    	\begin{itemize}
+    		\item Most common in industrial organization, macroeconomics, and finance
+    	\end{itemize}
+    	\item Less parametric than maximum likelihood
+    	\begin{itemize}
+    		\item Requires assumptions about moment conditions, not assumptions about the full distribution of data
+    	\end{itemize}
+    	\item Most of the estimators you have learned so far are (G)MM estimators
+    	\begin{itemize}
+    		\item OLS, 2SLS, GLS, MLE, etc.
+    	\end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Overview of (generalized) method of moments estimation
+    \begin{itemize}
+    	\item MM and GMM use population moment conditions to estimate parameters
+    	\begin{itemize}
+    		\item Moments can come from economic models, statistical assumptions, etc.
+    	\end{itemize}
+    	\item MM and GMM estimators ``solve'' the sample moment conditions that are analogous to these population moment conditions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Moment Conditions}
+    Moment conditions are functions of parameters and data that equal zero in expectation when evaluated at the true parameter values
+    \begin{alignat*}{3}
+        \text{Mean:} ~~ & \mu_y = E[y] ~ && \Rightarrow ~ & &E[y - \mu_y] = 0 \\
+        \text{Var:} ~~ & \sigma_y^2 = E[(y - \mu_y)^2] ~ && \Rightarrow ~ && E[ (y - \mu_y)^2 - \sigma_y^2] = 0 \\
+        \text{Cov:} ~~ & \sigma_{xy} = E[(y - \mu_y) (x - \mu_x)] ~ && \Rightarrow ~ && E[ (y - \mu_y) (x - \mu_x) - \sigma_{xy}] = 0
+    \end{alignat*} \\
+    \vspace{2ex}
+    How do we normally generate moment conditions?
+    \begin{itemize}
+    	\item Economic models
+    	\begin{itemize}
+    		\item Example: first-order conditions
+    	\end{itemize}
+    	\item Econometric or statistical model
+    	\begin{itemize}
+    		\item Example: instruments must be uncorrelated with errors
+    	\end{itemize}
+    	\item Model fit
+    	\begin{itemize}
+    		\item Example: predicted market shares must equal realized market shares
+    	\end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Intuition}
+    Suppose we have five random draws, but we do not know the distribution
+    $$\bm{y} = \{5, 10, 9, 14, 7\}$$
+    Suppose the mean of the unknown distribution is given by $\mu$, which gives us a population moment condition
+    $$E[y_i] = \mu ~~\Rightarrow~~ E[y_i - \mu] = 0$$
+    If this moment conditions holds in the population, then we should expect an analogous condition to hold in our sample
+    $$\frac{1}{n} \sum_{i = 1}^n \left(y_i - \mu \right) = 0$$
+    We can estimate the population parameter, $\widehat{\mu}$, by finding the value that makes this empirical expression true in our sample
+\end{frame}
+
+\section{Method of Moments Estimator}
+\label{mm_est}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Method of Moments Estimator
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Assumptions}
+    Data, $\{ y, \bm{x}, \bm{z} \}$, are drawn from a population with $K$ moment conditions that are functions of $K$ parameters, $\bm{\theta}$
+    $$E[\bm{m}(y, \bm{x}, \bm{z}, \bm{\theta})] = \bm{0}$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+    	\item $\bm{m}(\cdot)$: vector of $K$ functions
+    	\item $\bm{\theta}$: vector of $K$ parameters
+    	\item $y$: dependent variable
+    	\item $\bm{x}$: vector of independent variables
+    	\item $\bm{z}$: vector of exogenous instruments
+    \end{itemize}
+    \vspace{3ex}
+    We make assumptions about the moment conditions of the population from which the data are drawn, but we do not have to make an assumption about the full underlying distribution
+\end{frame}
+
+\begin{frame}\frametitle{Sample Moments}
+	These moment conditions hold for the population from which the data are drawn
+	$$E[\bm{m}(y, \bm{x}, \bm{z}, \bm{\theta})] = \bm{0}$$
+	But we do not observe the full population, only a sample \\
+	\vspace{3ex}
+	We replace the population expectation with its empirical analog---the sample mean---to generate the corresponding $K$ sample moments as a function of the $K$ parameters
+	$$\frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) = \bm{0}$$
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Estimator}
+	The method of moments estimators is the set of parameters, $\widehat{\bm{\theta}}$, that solves the system of equation given by the sample moments
+	$$\frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widehat{\bm{\theta}}) = \bm{0}$$ \\
+	\vspace{2ex}
+	In some case, $\widehat{\bm{\theta}}$ will have a closed-form expression, but in other cases we can reformulate $\widehat{\bm{\theta}}$ as the solution to a minimization problem and use numerical optimization
+	$$\widehat{\bm{\theta}} = \argmin_{\bm{\theta}} Q(\bm{\theta})$$
+	where $Q(\bm{\theta})$ is given by
+	$$Q(\bm{\theta}) = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]' \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]$$
+\end{frame}
+
+\section{Method of Moments Examples}
+\label{mm_ex}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Method of Moments Examples
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Population Mean Example}
+	We have five data points from a population, but what is the mean, $\mu$, of this population?
+	$$\bm{y} = \{5, 10, 9, 14, 7\}$$ \\
+    \vspace{2ex}
+	If $y$ is i.i.d.\ with mean $\mu$, then a population moment condition is
+	\begin{align*}
+		E[y - \mu] & = 0 \\
+		\intertext{Replacing the expectation with the sample analog gives}
+		\frac{1}{n} \sum_{i = 1}^n (y_i - \widehat{\mu}) & = 0
+		\intertext{Solving this one equation for the one parameter yields}
+		\widehat{\mu} = \frac{1}{n} \sum_{i = 1}^n y_i & = 9
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments OLS Regression Example}
+	The OLS regression estimator is a special case of a MM estimator \\
+	\vspace{3ex}
+    Consider the general OLS regression model
+    $$y_i = \bm{\beta}' \bm{x}_i + \varepsilon_i$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+    	\item $\bm{\beta}$: vector of $K$ parameters
+    	\item $\bm{x}_i$: vector of $K$ variables
+    \end{itemize}
+    \vspace{2ex}
+    We assume the error term, $\varepsilon_i$, is orthogonal to the data, $\bm{x}_i$
+    \begin{align*}
+    	E[\bm{x}_i \varepsilon_i] & = 0
+    	\intertext{Replacing $\varepsilon_i$ with $y_i - \bm{\beta}' \bm{x}_i$ gives $K$ population moment conditions}
+    	E[\bm{x}_i (y_i - \bm{\beta}' \bm{x}_i)] & = \bm{0}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments OLS Regression Example}
+	We have $K$ moments that are functions of the $K$ parameters, $\bm{\beta}$
+    \begin{align*}
+    	E[\bm{x}_i (y_i - \bm{\beta}' \bm{x}_i)] & = \bm{0} \\
+    	\intertext{We replace these $K$ expectations with the $K$ sample analogs}
+    	\frac{1}{n} \sum_{i = 1}^n \bm{x}_i (y_i - \widehat{\bm{\beta}}' \bm{x}_i) & = \bm{0}
+    \end{align*}
+    Solving these $K$ equations for the $K$ parameters yields the method of moments estimator 
+    $$\widehat{\bm{\beta}} = \left(\sum_{i = 1}^n \bm{x}_i \bm{x}_i' \right)^{-1} \left(\sum_{i = 1}^n \bm{x}_i y_i \right)$$
+    This method of moments estimator is equivalent to the traditional OLS estimator
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Maximum Likelihood Example}
+	The MLE can also be motivated as a special case of a MM estimator \\
+	\vspace{3ex}
+    Consider a random variable $y$ with conditional density
+    $$f(y_i \mid \bm{x}_i, \bm{\theta})$$
+    Then the log-likelihood function of $\bm{\theta}$ conditional on $\bm{y}$ and $\bm{X}$ is
+    \begin{align*}
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{i = 1}^n \ln f(y_i \mid \bm{x}_i, \bm{\theta})
+    	\intertext{Maximizing this log-likelihood function yields $K$ first-order conditions, one for each of the $K$ parameters}
+    	\bm{0} = \frac{\partial \ln L(\bm{\theta} \mid \bm{y}, \bm{X})}{\partial \bm{\theta}} & = \sum_{i = 1}^n \frac{\partial \ln f(y_i \mid \bm{x}_i, \bm{\theta})}{\partial \bm{\theta}}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Maximum Likelihood Example}
+	From these $K$ first-order conditions, we have that
+	\begin{align*}
+		\sum_{i = 1}^n \frac{\partial \ln f(y_i \mid \bm{x}_i, \bm{\theta})}{\partial \bm{\theta}} & = \bm{0}
+		\intertext{Dividing by $n$ yields an expression that looks like sample moments}
+		\frac{1}{n} \sum_{i = 1}^n \frac{\partial \ln f(y_i \mid \bm{x}_i, \bm{\theta})}{\partial \bm{\theta}} & = \bm{0}
+		\intertext{These $K$ sample moments can be viewed as the empirical analogs of $K$ population moment conditions}
+		E \left[ \frac{\partial \ln f(y \mid \bm{x}, \bm{\theta})}{\partial \bm{\theta}} \right] & = \bm{0}
+	\end{align*}
+    MLE can be motivated as a MM estimator with these population moments
+\end{frame}
+
+\section{GMM Estimator}
+\label{gmm_est}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large GMM Estimator
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments Assumptions}
+    Data, $\{ y, \bm{x}, \bm{z} \}$, are drawn from a population with $L$ moment conditions that are functions of $K$ parameters, $\bm{\theta}$, with $L \geq K$
+    $$E[\bm{m}(y, \bm{x}, \bm{z}, \bm{\theta})] = \bm{0}$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+    	\item $\bm{m}(\cdot)$: vector of $L$ functions
+    	\item $\bm{\theta}$: vector of $K$ parameters
+    	\item $y$: dependent variable
+    	\item $\bm{x}$: vector of independent variables
+    	\item $\bm{z}$: vector of exogenous instruments
+    \end{itemize}
+    \vspace{3ex}
+    We make assumptions about the moment conditions of the population from which the data are drawn, but we do not have to make an assumption about the full underlying distribution
+\end{frame}
+
+\begin{frame}\frametitle{Source of Moment Conditions}
+	Generalized method of moments allows for more moment conditions than the number of parameters
+	\begin{itemize}
+		\item Method of moments requires the number of moment conditions to equal the number of parameters
+	\end{itemize}
+	\vspace{3ex}
+    Additional moment conditions can come from many sources
+    \begin{itemize}
+    	\item Economic model: Demand parameter appears in demand and supply first-order conditions
+    	\item Instruments: Multiple instruments for one endogenous variable
+    	\item Model fit: Predicted market shares equal realized market shares
+    	\item Statistical assumptions: Errors are orthogonal to data
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Sample Moments}
+	These $L$ moment conditions hold for the population from which the data are drawn
+	$$E[\bm{m}(y, \bm{x}, \bm{z}, \bm{\theta})] = \bm{0}$$
+	But we do not observe the full population, only a sample \\
+	\vspace{3ex}
+	We replace the population expectation with is empirical analog---the sample mean---to generate the corresponding $L$ sample moments as a function of the $K$ parameters
+	$$\frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) = \bm{0}$$
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments Estimator}
+	With only $K$ parameters, we cannot solve for $L$ unique sample moments when $L > K$
+	\begin{itemize}
+		\item Instead, we will seek to simultaneously get as close as possible to solving all $L$ sample moments
+	\end{itemize}
+	\vspace{2ex}
+	The generalized method of moments estimators is the set of parameters, $\widehat{\bm{\theta}}$, that minimizes the weighted sum of squared sample moments
+	$$\widehat{\bm{\theta}} = \argmin_{\bm{\theta}} Q(\bm{\theta})$$
+	where $Q(\bm{\theta})$ is given by
+	$$Q(\bm{\theta}) = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]' \bm{W} \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]$$
+	and $\bm{W}$ is a $L \times L$ positive definite weighting matrix 
+\end{frame}
+
+\section{GMM Example}
+\label{gmm_ex}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large GMM Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments 2SLS Regression Example}
+	The 2SLS regression estimator is a special case of a GMM estimator \\
+	\vspace{2ex}
+    Consider the linear regression model
+    $$y_i = \bm{\beta}' \bm{x}_i + \varepsilon_i$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+    	\item $\bm{\beta}$: vector of $K$ parameters
+    	\item $\bm{x}_i$: vector of $K$ variables, but some are endogenous
+    \end{itemize}
+    \vspace{2ex}
+    We have a vector of $L$ instruments, $\bm{z}_i$, that are correlated with $\bm{x}_i$ but are orthogonal to the error term, $\varepsilon_i$
+    \begin{align*}
+    	E[\bm{z}_i \varepsilon_i] & = 0
+    	\intertext{Replacing $\varepsilon_i$ with $y_i - \bm{\beta}' \bm{x}_i$ gives $L$ population moment conditions}
+    	E[\bm{z}_i (y_i - \bm{\beta}' \bm{x}_i)] & = \bm{0}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments 2SLS Regression Example}
+	We have $L$ moments that are functions of the $K$ parameters, $\bm{\beta}$
+    \begin{align*}
+    	E[\bm{z}_i (y_i - \bm{\beta}' \bm{x}_i)] & = \bm{0} \\
+    	\intertext{We replace these $L$ expectations with the $L$ sample analogs}
+    	\frac{1}{n} \sum_{i = 1}^n \bm{z}_i (y_i - \bm{\beta}' \bm{x}_i) & = \bm{0}
+    \end{align*}
+    We cannot solve all $L$ sample moment conditions with only $K$ parameters (if $L > K$), so instead we find the set of parameters, $\widehat{\bm{\beta}}$, that minimizes the weighted sum of squared sample moments
+    $$Q(\bm{\beta}) = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{z}_i (y_i - \bm{\beta}' \bm{x}_i) \right]' \bm{W} \left[ \frac{1}{n} \sum_{i = 1}^n \bm{z}_i (y_i - \bm{\beta}' \bm{x}_i) \right]$$
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Method of Moments 2SLS Regression Example}
+	The GMM estimator for this instrumental variables regression, $\widehat{\bm{\beta}}$, is
+	$$\widehat{\bm{\beta}} = \argmin_{\bm{\beta}} Q(\bm{\beta})$$
+	where $Q(\bm{\beta})$ is given by
+	$$Q(\bm{\beta}) = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{z}_i (y_i - \widehat{\bm{\beta}}' \bm{x}_i) \right]' \bm{W} \left[ \frac{1}{n} \sum_{i = 1}^n \bm{z}_i (y_i - \widehat{\bm{\beta}}' \bm{x}_i) \right]$$ \\
+	\vspace{2ex}
+	The GMM estimator will be equivalent to the 2SLS estimator if we use a weighting matrix, $\bm{W}$, of
+    $$\bm{W} = \sum_{i = 1}^n \bm{z}_i \bm{z}_i'$$ \\
+    \vspace{2ex}
+    But another weighting matrix might yield a ``better'' estimator
+\end{frame}
+
+\section{Properties of the GMM Estimator}
+\label{properties}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Properties of the GMM Estimator
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Asymptotic Properties of GMM Estimator}
+    If some assumptions about the empirical moments and the weighting matrix hold, the generalized method of moments estimator has these properties
+    \begin{enumerate}
+        \item Consistency
+        \item Asymptotic normality
+    \end{enumerate}
+    \vspace{3ex}
+    Note that the GMM estimator is consistent and asymptotically normal, but it is not efficient, in contrast to the MLE
+    \begin{itemize}
+    	\item The distributional assumption of maximum likelihood provides additional information that makes the MLE efficient
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{GMM Empirical Moment Assumptions}
+	In these assumptions and properties, the $0$ subscript denotes an object evaluated at the true parameter values, $\bm{\theta}_0$ \\
+	\vspace{3ex}
+    \begin{enumerate}
+    	\item The empirical moments obey the law of large numbers
+    	$$\frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_0) \overset{p}{\rightarrow} \bm{0}$$
+    	\item The derivatives of the empirical moments converge
+    	$$\frac{1}{n} \sum_{i = 1}^n \left. \frac{\partial \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta})}{\partial \bm{\theta}'} \right\vert_{\bm{\theta} = \bm{\theta}_0} \overset{p}{\rightarrow} \bm{G}_0$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{GMM Empirical Moment Assumptions}
+    \begin{enumerate}
+    	\setcounter{enumi}{2}
+    	\item The empirical moments obey the central limit theorem
+    	$$\frac{\sqrt{n}}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_0) \overset{d}{\rightarrow} \mathcal{N}(0, \bm{S}_0)$$
+    	where
+    	$$\bm{S}_0 = \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_0) \bm{m}(y_j, \bm{x}_j, \bm{z}_j, \bm{\theta}_0)'$$
+    	\item The parameters are identified
+    	$$\frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_1) = \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_2) ~~\Leftrightarrow~~ \bm{\theta}_1 = \bm{\theta}_2$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{GMM Weighting Matrix Assumption}
+    \begin{enumerate}
+    	\setcounter{enumi}{4}
+    	\item The weighting matrix converges to a finite symmetric positive definite matrix
+    	$$\bm{W} \overset{p}{\rightarrow} \bm{W}_0$$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Consistency of the GMM Estimator}
+    The GMM estimator, $\widehat{\bm{\theta}}$, is a consistent estimator of the true parameter values, $\bm{\theta}_0$
+    $$\widehat{\bm{\theta}} \overset{p}{\rightarrow} \bm{\theta}_0$$ \\
+    \begin{itemize}
+        \item As our sample size grows (to infinity), the GMM estimator becomes vanishingly close to the true parameter value(s)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Asymptotic Normality of the GMM Estimator}
+    The GMM estimator, $\widehat{\bm{\theta}}$, is asymptotically normal with mean $\bm{\theta}_0$ and known variance
+    $$\widehat{\bm{\theta}} \overset{a}{\sim} \mathcal{N}\left( \bm{\theta}_0, \frac{1}{n} (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1} (\bm{G}_0' \bm{W}_0 \bm{S}_0 \bm{W}_0 \bm{G}_0) (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1} \right)$$
+    where
+    \begin{align*}
+    	\bm{G}_0 & = \plim \frac{1}{n} \sum_{i = 1}^n \left. \frac{\partial \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta})}{\partial \bm{\theta}'} \right\vert_{\bm{\theta} = \bm{\theta}_0} \\
+    	\bm{W}_0 & = \plim \bm{W} \\
+    	\bm{S}_0 & = \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_0) \bm{m}(y_j, \bm{x}_j, \bm{z}_j, \bm{\theta}_0)'
+    \end{align*}
+\end{frame}
+
+\section{Optimal GMM Estimator}
+\label{optimal}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Optimal GMM Estimator
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{GMM Variance-Covariance Matrix}
+	Every weighting matrix yields a GMM estimator that is consistent
+	\begin{itemize}
+		\item But the choice of weighting matrix, $\bm{W}$, will affect the variance of the GMM estimator, $\widehat{\bm{\theta}}$, because its probability limit, $\bm{W}_0$, enters the calculation of the variance-covariance matrix
+	\end{itemize}
+	\vspace{1ex}
+	$$Var(\widehat{\bm{\theta}}) = \frac{1}{n} (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1} (\bm{G}_0' \bm{W}_0 \bm{S}_0 \bm{W}_0 \bm{G}_0) (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1}$$ \\
+	\vspace{3ex}
+    If every weighting matrix yields a GMM estimator that is consistent, then we would ideally like to use the weighting matrix that minimizes the variance of the estimator
+\end{frame}
+
+\begin{frame}\frametitle{Optimal Weighting Matrix}
+	\vspace{-1ex}
+    $$Var(\widehat{\bm{\theta}}) = \frac{1}{n} (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1} (\bm{G}_0' \bm{W}_0 \bm{S}_0 \bm{W}_0 \bm{G}_0) (\bm{G}_0' \bm{W}_0 \bm{G}_0)^{-1}$$
+    The variance of the GMM estimator is minimized when
+   	$$\bm{W}_0 = \bm{S}_0^{-1} = \left[ \plim \frac{1}{n} \sum_{i = 1}^n \sum_{j = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}_0) \bm{m}(y_j, \bm{x}_j, \bm{z}_j, \bm{\theta}_0)' \right]^{-1}$$
+   	which gives a variance-covariance matrix of
+   	$$Var(\widehat{\bm{\theta}}) = \frac{1}{n} (\bm{G}_0' \bm{S}_0^{-1} \bm{G}_0)^{-1}$$
+    $\bm{S}_0$ is the variance-covariance matrix of the empirical moments
+    \begin{itemize}
+    	\item We minimize the variance of the GMM estimator by weighting each moment inversely to its variance
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Optimal (or Two-Step) GMM Estimator}
+	We want to use a weighting matrix, $\bm{W}$, that converges in probability to the variance of the empirical moments, $\bm{S}_0^{-1}$
+	\begin{itemize}
+		\item But we do not know $\bm{S}_0^{-1}$ because we do not know the true parameter values, $\bm{\theta}_0$
+	\end{itemize}
+	\vspace{3ex}
+	We can use a two-step procedure, performing GMM estimation twice, to obtain this optimal GMM estimator
+	\begin{enumerate}
+		\item Step 1: Perform GMM with any arbitrary weighting matrix and estimate the variance of the moments, $\widetilde{\bm{S}}$, using this GMM estimator
+		\item Step 2: Perform GMM again with $\bm{W} = \widetilde{\bm{S}}^{-1}$
+	\end{enumerate}
+	\vspace{3ex}
+	This procedure is a generalization of the FGLS regression \\
+	\vspace{2ex}
+	We will use the \texttt{gmm()} function from the \texttt{gmm} package in R to find this optimal GMM estimator
+\end{frame}
+
+\begin{frame}\frametitle{Optimal GMM Estimator: Step 1}
+	Step 1: Perform GMM with any arbitrary weighting matrix to obtain the first-step GMM estimator, $\widetilde{\bm{\theta}}$
+	\begin{itemize}
+		\item The GMM estimator is consistent for any weighting matrix, so we can use any arbitrary weighting matrix to obtain a consistent estimate of the true parameter values, $\bm{\theta}_0$
+		\item The identity matrix---equally weighting each moment---is a simple one to use
+	\end{itemize}
+	\vspace{2ex}
+	Use this first-step GMM estimator, $\widetilde{\bm{\theta}}$, to construct an estimator of $\bm{S}_0$
+	\begin{itemize}
+		\item Also assume observations are independent to simplify this estimator
+	\end{itemize}
+	$$\widetilde{\bm{S}} = \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widetilde{\bm{\theta}}) \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widetilde{\bm{\theta}})'$$ \\
+	\vspace{1ex}
+	Then use the inverse of this estimate, $\widetilde{\bm{S}}$, as the weighting matrix in the second step
+\end{frame}
+
+\begin{frame}\frametitle{Optimal GMM Estimator: Step 2}
+	Step 2: Perform GMM with weighting matrix $\bm{W} = \widetilde{\bm{S}}^{-1}$ \\
+	\vspace{2ex}
+	Find the GMM estimator, $\widehat{\bm{\theta}}$, that minimizes the objective function
+	$$Q(\bm{\theta}) = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]' \widetilde{\bm{S}}^{-1} \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta}) \right]$$ \\
+	\vspace{2ex}
+	This second-step GMM estimator, $\widehat{\bm{\theta}}$, also gives a consistent estimate of the true parameter values, $\bm{\theta}_0$, and it has the minimum variance among all GMM estimators
+	\begin{itemize}
+		\item It is not efficient (when compared to MLE), but it is efficient among GMM estimators
+	\end{itemize}
+	\vspace{2ex}
+	This optimal GMM estimator has the variance-covariance matrix
+	$$Var(\widehat{\bm{\theta}}) = \frac{1}{n} (\bm{G}_0' \bm{S}_0^{-1} \bm{G}_0)^{-1}$$
+\end{frame}
+
+\begin{frame}\frametitle{Optimal GMM Variance Estimator}
+	The variance-covariance matrix of the GMM estimator is evaluated at the true parameter values, $\bm{\theta}_0$, which we do not know
+	\begin{itemize}
+		\item We construct an estimator of this variance-covariance matrix by evaluating at the optimal GMM estimator, $\widehat{\bm{\theta}}$
+	\end{itemize}
+	\vspace{1ex}
+    $$\widehat{Var}(\widehat{\bm{\theta}}) = \frac{1}{n} \left( \widehat{\bm{G}}' \widehat{\bm{S}}^{-1} \widehat{\bm{G}} \right)^{-1}$$
+    where the components of this matrix are estimated by
+    \begin{align*}
+    	\widehat{\bm{G}} & = \frac{1}{n} \sum_{i = 1}^n \left. \frac{\partial \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \bm{\theta})}{\partial \bm{\theta}'} \right\vert_{\bm{\theta} = \widehat{\bm{\theta}}} \\
+    	\widehat{\bm{S}} & = \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widehat{\bm{\theta}}) \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widehat{\bm{\theta}})'
+    \end{align*}
+\end{frame}
+
+\section{Specification and Hypothesis Tests}
+\label{tests}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Specification and Hypothesis Tests
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Overidentifying Restrictions Test}
+    When we have more moment conditions than parameters, the model is ``overidentified'' and we cannot ensure all moments equal zero simultaneously, but we can test if all moment conditions are sufficiently close to zero
+    $$H_0: E[\bm{m}(y, \bm{x}, \bm{z}, \bm{\theta}_0)] = \bm{0}$$ \\
+    \vspace{3ex}
+    When $\widehat{\bm{\theta}}$ is estimated by optimal GMM, the overidentifying restrictions test statistic is equal to the objective function evaluated at the optimal GMM estimator, $Q(\widehat{\bm{\theta}})$
+    $$OIR = \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widehat{\bm{\theta}}) \right]' \widetilde{\bm{S}}^{-1} \left[ \frac{1}{n} \sum_{i = 1}^n \bm{m}(y_i, \bm{x}_i, \bm{z}_i, \widehat{\bm{\theta}}) \right]$$
+    which is asymptotically distributed $\chi^2$ with $L - K$ degrees of freedom
+    $$OIR \overset{a}{\sim} \chi^2(L - K)$$
+\end{frame}
+
+\begin{frame}\frametitle{Hypothesis Tests}
+    We discussed three hypothesis testing procedures for use with maximum likelihood estimation
+    \begin{itemize}
+    	\item Likelihood ratio test
+    	\item Wald test
+    	\item Lagrange multiplier test
+    \end{itemize}
+    \vspace{2ex}
+    Each of these test procedures has an analogous test using the results of GMM estimation
+    \begin{itemize}
+    	\item The intuition of each test is the same as its MLE counterpart, but using the GMM objective function is place of the likelihood or log-likelihood function
+    \end{itemize}
+    \vspace{2ex}
+    Refer to an econometrics textbook for the details of these hypothesis tests
+\end{frame}
+
+\section{Logit Model with GMM}
+\label{logit}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Model with GMM
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model First-Order Conditions}
+    When estimating the parameters of the logit model by maximum likelihood, the first-order conditions for the MLE are
+    $$\frac{\partial \ln L(\bm{\theta} \mid \bm{y}, \bm{X})}{\partial \bm{\theta}} = \bm{0}$$
+    where the log-likelihood function is given by
+    $$\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}(\bm{x}_n, \bm{\theta})$$ \\
+    \vspace{3ex}
+    We can alternatively express these first-order conditions as sample moments conditions
+    \begin{itemize}
+    	\item See the Train textbook for the proof of this equality
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model Moment Conditions}
+    If we assume representative utility is linear, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then the logit MLE first-order conditions are equivalent to
+    \begin{align*}
+    	\frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_{ni} & = \bm{0}
+    	\intertext{These sample moments can be viewed as the empirical analogs of the population moment conditions}
+    	E \left[ \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_{ni} \right] & = \bm{0}
+    \end{align*}
+    These population moment conditions state that the data, $\bm{x}_n$, are orthogonal to the model residuals, $y_{ni} - P_{ni}(\bm{x}_{ni}, \bm{\beta})$
+    \begin{itemize}
+    	\item Analogous to the data and errors being orthogonal in OLS regressions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model with Method of Moments}
+    If this assumption of exogeneity holds, then we can also estimate the parameters of the logit model by MM using the sample moments
+    $$\frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \widehat{\bm{\beta}}) \right) \bm{x}_{ni} = \bm{0}$$ \\
+    \vspace{-1ex}
+    \begin{itemize}
+    	\item MM because we have the same number of moments and parameters
+    \end{itemize}
+    \vspace{2ex}
+    Because logit choice probabilities are nonlinear, this MM estimator does not have a closed-form solution
+    \begin{itemize}
+    	\item Instead, we will use numerical optimization to find the set of parameters, $\widehat{\bm{\beta}}$, that minimizes the MM objective function
+    \end{itemize}
+    \vspace{1ex}
+    {\scriptsize $$Q(\bm{\beta}) = \left[ \frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_{ni} \right]' \left[ \frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_{ni} \right]$$}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model Moment Conditions with Instruments}
+    If the assumption of exogeneity does not hold, but we instead have some exogenous instruments, $\bm{Z}$, that are correlated with our data, $\bm{X}$, then we can create a different set of sample moment conditions that must hold \\
+    \vspace{2ex}
+    Our exogenous instruments, $\bm{Z}$, are orthogonal to the model residuals
+    \begin{align*}
+    	E \left[ \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_{ni} \right] & = \bm{0}
+    	\intertext{Replacing the expectation with the sample analog gives}
+    	\frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \widehat{\bm{\beta}}) \right) \bm{z}_{ni} & = \bm{0}
+    \end{align*} \\
+    \vspace{1ex}
+    Our instruments, $\bm{Z}$, can be any exogenous variables that are correlated with our data, $\bm{X}$, including the exogenous elements of $\bm{X}$
+    \begin{itemize}
+    	\item We must have at least as many instruments (and moments) as parameters in order to identify all parameters
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model with GMM}
+    We can estimate the parameters of the logit model with instruments by GMM using the instrument sample moments
+    $$\frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \widehat{\bm{\beta}}) \right) \bm{z}_{ni} = \bm{0}$$ \\
+    \vspace{2ex}
+    We will use the two-step procedure described earlier---based on this objective function---to find the optimal GMM estimator \\
+    \vspace{1ex}
+    {\scriptsize $$Q(\bm{\beta}) = \left[ \frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_{ni} \right]' \bm{W} \left[ \frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_{ni} \right]$$}
+    \begin{enumerate}
+    	\item Estimate $\widetilde{\beta}$ using any arbitrary weighting matrix in order to estimate $\widetilde{S}$ and find the optimal weighting matrix
+    	\item Use that weighting matrix to find the optimal GMM estimator, $\widehat{\bm{\beta}}$
+    \end{enumerate}
+\end{frame}
+
+\section{GMM R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large GMM R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Binary Choice Example}
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes.
+    \begin{itemize}
+        \item We have (simulated) data on 600 households that rent apartments without air conditioning. These households must choose whether or not to purchase a window air conditioning unit. (To simplify things, we assume there is only one ``representative'' air conditioner for each household and its price and operating cost are exogenous.)
+        \item We observe the following data about each household and its ``representative'' air conditioner
+        \begin{itemize}
+            \item An indicator if they purchase the air conditioner (TRUE/FALSE)
+            \item The purchase price of the air conditioner (\$)
+            \item The annual operating cost of the air conditioner (\$ per year)
+            \item The household's electricity price (cents per kWh)
+            \item The size of the household's apartment (square feet)
+            \item The household's annual income (\$1000s)
+            \item The number of residents in the household (people)
+            \item An indicator for the household's city (1, 2, or 3) 
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model for Air Conditioner Choice}
+    We model the utility to household $n$ of not purchasing an air conditioned ($j = 0$) or purchasing an air conditioner ($j = 1$) as
+    \begin{align*}
+        U_{n0} & = V_{n0} + \varepsilon_{n0} \\
+        U_{n1} & = V_{n1} + \varepsilon_{n1}
+    \end{align*}
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    The probability that household $n$ purchases an air conditioner is
+    $$P_{n1} = \Pr(\varepsilon_{n0} - \varepsilon_{n1} < V_{n1} - V_{n0})$$ \\
+    \begin{itemize}
+        \item Only differences in utility---not the actual values of utility---affect this probability
+        \item What is the difference in utility to household $n$ from purchasing an air conditioner vs.\ not purchasing an air conditioner?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    \texttt{read\_csv()} is a \texttt{tidyverse} function to read a .csv file into a tibble
+    <<message = FALSE>>=
+    ## Load tidyverse
+    library(tidyverse)
+    ## Load dataset
+    ac_data <- read_csv('ac_renters.csv')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    ac_data
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility for Air Conditioner Choice}
+    \vspace{-2ex}
+    $$P_{n1} = \Pr(\varepsilon_{n0} - \varepsilon_{n1} < V_{n1} - V_{n0})$$ \\
+    \vspace{1ex}
+    What is the difference in utility to household $n$ from purchasing an air conditioner vs.\ not purchasing an air conditioner?
+    \begin{itemize}
+        \item They gain utility from having air conditioning
+        \item They lose utility from paying the purchase price of the air conditioner
+        \item They lose utility from paying the annual operating cost of the air conditioner
+    \end{itemize}
+    \vspace{2ex}
+    We can model the difference in utility as
+    $$V_{n1} - V_{n0} = \beta_0 + \beta_1 P_n + \beta_2 C_n$$
+    where
+    \begin{itemize}
+        \item $P_n$ is the purchase price of the air conditioner
+        \item $C_n$ is the annual operating cost of the air conditioner
+        \item $\beta_0$, $\beta_1$, and $\beta_2$ are utility parameters to be estimated
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Binary Logit Model of Air Conditioner Choice}
+    Under the logit assumption, the choice probability of purchasing an air conditioner becomes
+    \begin{align*}
+        P_{n1} & = \frac{1}{1 + e^{-(V_{n1} - V_{n0})}} \\
+        & = \frac{1}{1 + e^{-(\beta_0 + \beta_1 P_n + \beta_2 C_n)}}
+    \end{align*}
+    When estimating the parameters of this model by maximum likelihood, the first-order conditions for the MLE are
+    $$\frac{\partial \ln L(\bm{\beta} \mid \bm{y}, \bm{X})}{\partial \bm{\theta}} = \bm{0}$$
+    where the log-likelihood function is given by
+    $$\ln L(\bm{\beta} \mid \bm{y}, \bm{X}) = \sum_{n = 1}^N \sum_{i = 0}^1 y_{ni} \ln P_{ni}(\bm{x}_n, \bm{\beta})$$
+\end{frame}
+
+\begin{frame}\frametitle{Moment Conditions for Air Conditioner Choice}
+	These MLE first-order conditions are equivalent to sample moments
+    $$\frac{1}{2N} \sum_{n = 1}^N \sum_{i = 0}^1 \left( y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_n = \bm{0}$$ \\
+    \vspace{2ex}
+    With a binary choice model, the model residuals for each alternative, $y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta})$, will always be the negative of one another
+    \begin{itemize}
+    	\item We can consider the moments for only one alternative because the second set of moments are redundant
+    \end{itemize}
+    \vspace{2ex}
+    We will estimate the parameters of the logit model using method of moments with the sample moment conditions
+    $$\frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_n = \bm{0}$$ \\
+    \vspace{-1ex}
+\end{frame}
+
+\begin{frame}\frametitle{Method of Moments Estimation for Air Conditioner Choice}
+    The method of moments estimator is the set of parameters, $\widehat{\bm{\beta}}$, that solves these sample moment conditions
+    $$\frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \widehat{\bm{\beta}}) \right) \bm{x}_n = \bm{0}$$
+    Because the logit choice probabilities are nonlinear, we will find $\widehat{\bm{\beta}}$ by minimizing the objective function 
+    $$Q(\bm{\beta}) = \left[ \frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_n \right]' \left[ \frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_n \right]$$ \\
+    \vspace{3ex}
+    We will use the \texttt{gmm()} function from the \texttt{gmm} package in R to find this method of moments estimator
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Generalized Method of Moments in R}
+    <<message = FALSE>>=
+    ## Load the gmm package
+    library(gmm)
+    @
+    <<eval = FALSE>>=
+    ## Help file for the gmm function
+    ?gmm
+    ## Arguments for gmm function
+    gmm(g, x, t0, ...)
+    @
+    \texttt{gmm()} requires that you create a function, \texttt{g}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and a data \emph{matrix} as inputs
+        \item Calculates the empirical moments for each observation
+        \item Returns a $N \times L$ matrix of empirical moments
+    \end{enumerate}
+    You also have to give \texttt{gmm()} arguments for
+    \begin{itemize}
+        \item \texttt{x}: your data \emph{matrix}
+        \item \texttt{t0}: parameter starting values
+        \item Many other optional arguments
+        \begin{itemize}
+            \item \texttt{gmm()} can be very finicky with the optimization arguments
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Steps to Calculate the Logit Moments}
+    The logit sample moments are
+    $$\frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{x}_n$$
+    where the choice probabilities for our model are
+    $$P_{n1} = \frac{1}{1 + e^{-(\beta_0 + \beta_1 P_n + \beta_2 C_n)}}$$ \\
+    \vspace{1ex}
+    Steps to calculate the logit moments conditional on $\bm{\beta}$
+    \begin{enumerate}
+        \item Calculate the representative utility of AC for each household
+        \item Calculate the choice probability of AC for each household
+        \item Calculate the econometric residual for each household
+        \item Calculate the vector of moments for each household
+        \item Return the resulting $N \times K$ matrix of empirical moments
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Organize Data Into a Matrix}
+    <<>>=
+    ## Create dataset for use in MM moment function
+    mm_data <- ac_data %>% 
+      mutate(air_conditioning = 1 * air_conditioning,
+             constant = 1) %>% 
+      select(air_conditioning, constant, cost_system, cost_operating) %>% 
+      as.matrix()
+    ## Look at data matrix
+    head(mm_data)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Moments}
+    <<>>=
+    ## Function to calculate moments for air conditioning choice
+    mm_fn <- function(params, data){
+      ## Select data for X [N x K]
+      X <- data[, -1]
+      ## Select data for y [N x 1]
+      y <- data[, 1]
+      ## Calculate representative utility of air conditioning [N x 1]
+      utility <- X %*% params
+      ## Calculate logit choice probability of air conditioning [N x 1]
+      prob <- 1 / (1 + exp(-utility))
+      ## Calculate econometric residuals [N x 1]
+      residuals <- y - prob
+      ## Create moment matrix [N x K]
+      moments <- c(residuals) * X
+      return(moments)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Binary Logit Model}
+    <<eval = FALSE>>=
+    ## Arguments for gmm function
+    gmm(g, x, t0, ...)
+    @
+    \vspace{2ex}
+    <<>>=
+    ## Find the MM estimator
+    model_1 <- gmm(g = mm_fn, x = mm_data, t0 = rep(0, 3), 
+                   vcov = 'iid', method = 'BFGS', 
+                   control = list(reltol = 1e-25, maxit = 10000))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Summary}
+    \texttt{summary()} summarizes the results of the model
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_1)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    \texttt{coef()} is the R function to display only the model parameters
+    <<>>=
+    ## Display model coefficients
+    coef(model_1)
+    @
+    \vspace{2ex}
+    How do we interpret these parameters?
+    \begin{itemize}
+        \item Air conditioning generates 4.44 ``utils'' of utility
+        \item An additional \$100 of purchase price reduces utility by 0.30
+        \item An additional \$100 of annual operating cost reduces utility by 1.54
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in Air Conditioner Choice}
+    This interpretation of the parameters is correct only if the data are exogenous
+    \begin{itemize}
+    	\item But if the data are correlated with the random utility term, then we cannot give the parameters this kind of ``causal'' interpretation
+    \end{itemize}
+    \vspace{3ex}
+    Is there any reason to worry about endogeneity in this setting?
+    \begin{itemize}
+    	\item Why might the price be endogenous?
+    	\item Why might the annual operating cost be endogenous?
+    \end{itemize}
+    \vspace{3ex}
+    When the data are endogenous, we need to use exogenous instruments to recover parameters with a ``causal'' interpretation
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Instruments for Air Conditioner Choice}
+    Could any of the other variables in the dataset be good instruments?
+    \begin{itemize}
+    	\item Relevant, or correlated with the data in the model
+    	\item Exogenous, or not correlated with the random utility term
+    \end{itemize}
+    <<>>=
+    ## Look at variable names to use as instruments
+    names(ac_data)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{GMM Estimation for Air Conditioner Choice}
+    The GMM estimator is the set of parameters, $\widehat{\bm{\beta}}$, that solves these sample moment conditions
+    $$\frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \widehat{\bm{\beta}}) \right) \bm{z}_n = \bm{0}$$
+    Because the logit choice probabilities are nonlinear, we will find $\widehat{\bm{\beta}}$ by minimizing the objective function 
+    $$Q(\bm{\beta}) = \left[ \frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_n \right]' \bm{W} \left[ \frac{1}{N} \sum_{n = 1}^N \left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_n \right]$$ \\
+    \vspace{3ex}
+    We will use the \texttt{gmm()} function from the \texttt{gmm} package in R to perform the two-step procedure to find the optimal GMM estimator
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Organize Data Into a Matrix}
+    <<>>=
+    ## Create dataset for use in GMM moment function
+    gmm_data <- ac_data %>% 
+      mutate(air_conditioning = 1 * air_conditioning,
+             constant = 1) %>% 
+      select(air_conditioning, constant, cost_system, cost_operating,
+             elec_price, square_feet, residents) %>% 
+      as.matrix()
+    @
+    \vspace{2ex}
+    <<include = FALSE>>=
+    options(width = 100)
+    @
+    <<size = 'tiny'>>=
+    ## Look at data matrix
+    head(gmm_data)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Moments with Instruments}
+    <<>>=
+    ## Function to calculate moments for AC choice with instruments
+    gmm_fn <- function(params, data){
+      ## Select data for X [N x K]
+      X <- data[, 2:4]
+      ## Select data for y [N x 1]
+      y <- data[, 1]
+      ## select data for Z [N x L]
+      Z <- data[, c(2, 5:7)]
+      ## Calculate representative utility of air conditioning [N x 1]
+      utility <- X %*% params
+      ## Calculate logit choice probability of air conditioning [N x 1]
+      prob <- 1 / (1 + exp(-utility))
+      ## Calculate econometric residuals [N x 1]
+      residuals <- y - prob
+      ## Create moment matrix [N x L]
+      moments <- c(residuals) * Z
+      return(moments)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Binary Logit Model with Instruments}
+    <<>>=
+    ## Find the GMM estimator
+    model_2 <- gmm(g = gmm_fn, x = gmm_data, t0 = rep(0, 3), 
+                   vcov = 'iid', method = 'BFGS', 
+                   control = list(reltol = 1e-25, maxit = 10000))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Model Summary}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_2)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    <<>>=
+    ## Display model coefficients
+    coef(model_2)
+    @
+    \vspace{2ex}
+    How do we interpret these parameters?
+    \begin{itemize}
+        \item Air conditioning generates 4.82 ``utils'' of utility
+        \item Purchase price does not affect utility
+        \item An additional \$100 of annual operating cost reduces utility by 3.05
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Test of Overidentifying Restrictions}
+  	\texttt{specTest()} is the \texttt{gmm} function to perform a test of overidentifying restrictions
+  	\begin{itemize}
+  		\item Test if all of our population moments equal zero
+  		$$H_0: E[\left( y_{n1} - P_{n1}(\bm{x}_n, \bm{\beta}) \right) \bm{z}_n] = \bm{0}$$
+  	\end{itemize}
+    <<>>=
+    ## Test overidentifying restrictions
+    specTest(model_2)
+    @
+    \vspace{2ex}
+    We can reject the null hypothesis and conclude that our model is overidentified and not correctly specified
+\end{frame}
+
+\end{document}
