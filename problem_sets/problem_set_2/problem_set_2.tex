@@ -122,7 +122,7 @@ Use the \texttt{commute\_binary.csv} dataset for this question.
 		\item Find the MM estimator using \texttt{gmm()}. Your call of the \texttt{gmm()} function may look something like:
 		\begin{align*}
 			&\text{\texttt{gmm(g = your\_function, x = your\_data\_matrix, t0 = your\_starting\_guesses, }} \\
-			&\qquad~ \text{\texttt{vcov = `iid', method = `BFGS',}} \\
+			&\qquad~ \text{\texttt{vcov = `iid', method = `Nelder-Mead'}} \\
 			&\qquad~ \text{\texttt{control = list(reltol = 1e-25, maxit = 10000))}}
 		\end{align*}
 	\end{enumerate}
