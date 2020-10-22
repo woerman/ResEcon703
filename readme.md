@@ -59,7 +59,7 @@ Week 13: **Dynamics and Endogeneity**
 * [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/commute_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.R)
 
 **Problem Set 2**
-* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/commute_datasets.zip)
+* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/commute_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.R)
 
 **Problem Set 3**
 * [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/camping_dataset.zip)

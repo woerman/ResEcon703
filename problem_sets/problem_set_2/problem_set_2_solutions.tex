@@ -1,0 +1,664 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 2}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. This problem set requires you to code your own estimators, rather than using R's ``canned'' routines (e.g., \texttt{glm()} and \texttt{mlogit()}).
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_2/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options---assume the weather is too severe for even the heartiest graduate students to ride a bike or walk this distance. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(gmm)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Problem 1: Maximum Likelihood Estimation}
+
+Use the \texttt{commute\_multinomial.csv} dataset for this question.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Create functions for use with maximum likelihood}
+\hlcom{## Function to summarize MLE model results}
+\hlstd{summarize_mle} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{model}\hlstd{,} \hlkwc{names}\hlstd{)\{}
+  \hlcom{## Extract model parameter estimates}
+  \hlstd{parameters} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{par}
+  \hlcom{## Calculate parameters standard errors}
+  \hlstd{std_errors} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+    \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+    \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+    \hlkwd{sqrt}\hlstd{()}
+  \hlcom{## Calculate parameter z-stats}
+  \hlstd{z_stats} \hlkwb{<-} \hlstd{parameters} \hlopt{/} \hlstd{std_errors}
+  \hlcom{## Calculate parameter p-values}
+  \hlstd{p_values} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlkwd{pnorm}\hlstd{(}\hlopt{-}\hlkwd{abs}\hlstd{(z_stats))}
+  \hlcom{## Summarize results in a list}
+  \hlstd{model_summary} \hlkwb{<-} \hlkwd{tibble}\hlstd{(}\hlkwc{names} \hlstd{= names,}
+                          \hlkwc{parameters} \hlstd{= parameters,}
+                          \hlkwc{std_errors} \hlstd{= std_errors,}
+                          \hlkwc{z_stats} \hlstd{= z_stats,}
+                          \hlkwc{p_values} \hlstd{= p_values)}
+  \hlcom{## Return model_summary object}
+  \hlkwd{return}\hlstd{(model_summary)}
+\hlstd{\}}
+\hlcom{## Function to conduct likelihood ratio test}
+\hlstd{test_likelihood_ratio} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{model_rest}\hlstd{,} \hlkwc{model_unrest}\hlstd{)\{}
+  \hlcom{## Calculate likelihood ratio test statistic}
+  \hlstd{test_stat} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlstd{(model_rest}\hlopt{$}\hlstd{value} \hlopt{-} \hlstd{model_unrest}\hlopt{$}\hlstd{value)}
+  \hlcom{## Calculate the number of restrictions}
+  \hlstd{df} \hlkwb{<-} \hlkwd{length}\hlstd{(model_unrest}\hlopt{$}\hlstd{par)} \hlopt{-} \hlkwd{length}\hlstd{(model_rest}\hlopt{$}\hlstd{par)}
+  \hlcom{## Test if likelihood ratio test statistic is greater than critical value}
+  \hlstd{test} \hlkwb{<-} \hlstd{test_stat} \hlopt{>} \hlkwd{qchisq}\hlstd{(}\hlnum{0.95}\hlstd{, df)}
+  \hlcom{## Calculate p-value of test}
+  \hlstd{p_value} \hlkwb{<-} \hlnum{1} \hlopt{-} \hlkwd{pchisq}\hlstd{(test_stat, df)}
+  \hlcom{## Return test result and p-value}
+  \hlkwd{return}\hlstd{(}\hlkwd{list}\hlstd{(}\hlkwc{reject} \hlstd{= test,} \hlkwc{p_value} \hlstd{= p_value))}
+\hlstd{\}}
+
+\hlcom{## Load dataset}
+\hlstd{data_multi} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'commute_multinomial.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  id = col\_double(),\\\#\#\ \  mode = col\_character(),\\\#\#\ \  time.car = col\_double(),\\\#\#\ \  cost.car = col\_double(),\\\#\#\ \  time.bus = col\_double(),\\\#\#\ \  cost.bus = col\_double(),\\\#\#\ \  time.bike = col\_double(),\\\#\#\ \  cost.bike = col\_double(),\\\#\#\ \  time.walk = col\_double(),\\\#\#\ \  cost.walk = col\_double(),\\\#\#\ \  age = col\_double(),\\\#\#\ \  income = col\_double(),\\\#\#\ \  marital\_status = col\_character()\\\#\# )}}\end{kframe}
+\end{knitrout}
+
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the commute choice during spring as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost and time with common parameters on these variables. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \beta C_{nj} + \gamma T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\beta$ and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The following steps can provide a rough guide to creating your own maximum likelihood estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function that takes a set of parameters and data as inputs: \texttt{function(parameters, data)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the representative utility of every alternative for each decision maker.
+			\item Calculate the choice probability of the chosen alternative for each decision maker.
+			\item Sum the log of these choice probabilities to get the log-likelihood.
+			\item Return the negative of the log-likelihood.
+		\end{enumerate}
+		\item Maximize the log-likelihood (by minimizing its negative) using \texttt{optim()}. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = your\_starting\_guesses, fn = your\_function, data = your\_data,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS', hessian = TRUE)}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_1a} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract individual parameters with descriptive names}
+  \hlstd{beta_1} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]}
+  \hlstd{beta_2} \hlkwb{<-} \hlstd{params[}\hlnum{2}\hlstd{]}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility_bike} \hlstd{= beta_1} \hlopt{*} \hlstd{cost.bike} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.bike,}
+           \hlkwc{utility_bus} \hlstd{= beta_1} \hlopt{*} \hlstd{cost.bus} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.bus,}
+           \hlkwc{utility_car} \hlstd{= beta_1} \hlopt{*} \hlstd{cost.car} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.car,}
+           \hlkwc{utility_walk} \hlstd{= beta_1} \hlopt{*} \hlstd{cost.walk} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.walk)}
+  \hlcom{## Calculate logit choice probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{+}
+             \hlkwd{exp}\hlstd{(utility_car)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_walk))}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_bike} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_bus} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_car} \hlstd{=} \hlkwd{exp}\hlstd{(utility_car)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_walk} \hlstd{=} \hlkwd{exp}\hlstd{(utility_walk)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Calculate logit choice probability for chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_choice} \hlstd{= prob_bike} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bike'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_bus} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bus'}\hlstd{)} \hlopt{+} \hlstd{prob_car} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_walk} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'walk'}\hlstd{))}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob_choice))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1a} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_1a,} \hlkwc{data} \hlstd{= data_multi,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlcom{## Summarize model results}
+\hlstd{model_1a} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 2 x 5
+##   names parameters std_errors z_stats p_values
+##   <chr>      <dbl>      <dbl>   <dbl>    <dbl>
+## 1 cost      -1.00      0.175    -5.72 1.07e- 8
+## 2 time      -0.126     0.0100  -12.6  3.31e-36
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	Both parameters are statistically significant and are interpreted as marginal utilities. The cost of driving decreases the utility of driving, and the time spent commuting by a particular travel mode decreases the utility of taking that mode. This result is intuitive since people like both money and leisure time.
+
+	\item Again model the commute choice during spring as a multinomial logit model, but now add alternative-specific intercepts for all but one alternative. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta C_{nj} + \gamma T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The steps to creating your own maximum likelihood estimator are the same as in part (a), but some of the calculations will be different. 
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_1b} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract individual parameters with descriptive names}
+  \hlstd{alpha_bus} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]}
+  \hlstd{alpha_car} \hlkwb{<-} \hlstd{params[}\hlnum{2}\hlstd{]}
+  \hlstd{alpha_walk} \hlkwb{<-} \hlstd{params[}\hlnum{3}\hlstd{]}
+  \hlstd{beta_1} \hlkwb{<-} \hlstd{params[}\hlnum{4}\hlstd{]}
+  \hlstd{beta_2} \hlkwb{<-} \hlstd{params[}\hlnum{5}\hlstd{]}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility_bike} \hlstd{= beta_1} \hlopt{*} \hlstd{cost.bike} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.bike,}
+           \hlkwc{utility_bus} \hlstd{= alpha_bus} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{cost.bus} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.bus,}
+           \hlkwc{utility_car} \hlstd{= alpha_car} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{cost.car} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.car,}
+           \hlkwc{utility_walk} \hlstd{= alpha_walk} \hlopt{+} \hlstd{beta_1} \hlopt{*} \hlstd{cost.walk} \hlopt{+} \hlstd{beta_2} \hlopt{*} \hlstd{time.walk)}
+  \hlcom{## Calculate logit choice probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{+}
+             \hlkwd{exp}\hlstd{(utility_car)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_walk))}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_bike} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_bus} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_car} \hlstd{=} \hlkwd{exp}\hlstd{(utility_car)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_walk} \hlstd{=} \hlkwd{exp}\hlstd{(utility_walk)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Calculate logit choice probability for chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_choice} \hlstd{= prob_bike} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bike'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_bus} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bus'}\hlstd{)} \hlopt{+} \hlstd{prob_car} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_walk} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'walk'}\hlstd{))}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob_choice))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1b} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_1b,} \hlkwc{data} \hlstd{= data_multi,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_1b} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'bus_int'}\hlstd{,} \hlstr{'car_int'}\hlstd{,} \hlstr{'walk_int'}\hlstd{,} \hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 5
+##   names    parameters std_errors z_stats p_values
+##   <chr>         <dbl>      <dbl>   <dbl>    <dbl>
+## 1 bus_int       1.76      0.113     15.6 4.69e-55
+## 2 car_int       2.92      0.200     14.6 2.39e-48
+## 3 walk_int      3.17      0.306     10.4 3.46e-25
+## 4 cost         -6.05      0.511    -11.9 2.11e-32
+## 5 time         -0.296     0.0246   -12.0 2.08e-33
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		As in the previous model, the cost parameter and the time parameter are both negative, indicating that the cost and the time spent commuting by a particular travel mode decrease the utility of taking that mode. Additionally, all three alternative-specific intercepts are positive and significant, suggesting that, \emph{ceteris paribus}, all other modes would be preferred to biking.
+
+		\item Conduct a likelihood ratio test on this model to test the joint significance of the alternative-specific intercepts. That is, test the null hypothesis:
+		$$H_0 \text{: } \alpha_{bus} = \alpha_{car} = \alpha_{walk} = 0$$
+		Your null hypothesis may be slightly different, depending on what you consider your ``reference alternative.'' Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test. (Reminder: to conduct this likelihood ratio test, you need the log-likelihood value of the model in part (b) and the log-likelihood value of the restricted model that is obtained when the hypothesized restrictions are imposed.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct likelihood ratio test of models 1a and 1b}
+\hlstd{test_1b} \hlkwb{<-} \hlkwd{test_likelihood_ratio}\hlstd{(model_1a, model_1b)}
+\hlcom{## Display test results}
+\hlstd{test_1b}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] TRUE
+## 
+## $p_value
+## [1] 0
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		We reject this null hypothesis and conclude that the alternative-specific intercepts are jointly significant. That is, this model provides a better fit than the model in part (a), which restricted these parameters to all be zero.
+	\end{enumerate}
+	
+	\item Again model the commute choice during spring as a multinomial logit model, but now allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta C_{nj} + \gamma_j T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The steps to creating your own maximum likelihood estimator are the same as in part (a), but some of the calculations will be different.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to calculate log-likelihood for heating choice}
+\hlstd{ll_fn_1c} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Extract individual parameters with descriptive names}
+  \hlstd{alpha_bus} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]}
+  \hlstd{alpha_car} \hlkwb{<-} \hlstd{params[}\hlnum{2}\hlstd{]}
+  \hlstd{alpha_walk} \hlkwb{<-} \hlstd{params[}\hlnum{3}\hlstd{]}
+  \hlstd{beta} \hlkwb{<-} \hlstd{params[}\hlnum{4}\hlstd{]}
+  \hlstd{gamma_bike} \hlkwb{<-} \hlstd{params[}\hlnum{5}\hlstd{]}
+  \hlstd{gamma_bus} \hlkwb{<-} \hlstd{params[}\hlnum{6}\hlstd{]}
+  \hlstd{gamma_car} \hlkwb{<-} \hlstd{params[}\hlnum{7}\hlstd{]}
+  \hlstd{gamma_walk} \hlkwb{<-} \hlstd{params[}\hlnum{8}\hlstd{]}
+  \hlcom{## Calculate representative utility for each alternative given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{utility_bike} \hlstd{= beta} \hlopt{*} \hlstd{cost.bike} \hlopt{+} \hlstd{gamma_bike} \hlopt{*} \hlstd{time.bike,}
+           \hlkwc{utility_bus} \hlstd{= alpha_bus} \hlopt{+} \hlstd{beta} \hlopt{*} \hlstd{cost.bus} \hlopt{+} \hlstd{gamma_bus} \hlopt{*} \hlstd{time.bus,}
+           \hlkwc{utility_car} \hlstd{= alpha_car} \hlopt{+} \hlstd{beta} \hlopt{*} \hlstd{cost.car} \hlopt{+} \hlstd{gamma_car} \hlopt{*} \hlstd{time.car,}
+           \hlkwc{utility_walk} \hlstd{= alpha_walk} \hlopt{+} \hlstd{beta} \hlopt{*} \hlstd{cost.walk} \hlopt{+}
+             \hlstd{gamma_walk} \hlopt{*} \hlstd{time.walk)}
+  \hlcom{## Calculate logit choice probability denominator given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_denom} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{+}
+             \hlkwd{exp}\hlstd{(utility_car)} \hlopt{+} \hlkwd{exp}\hlstd{(utility_walk))}
+  \hlcom{## Calculate logit choice probability for each alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_bike} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bike)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_bus} \hlstd{=} \hlkwd{exp}\hlstd{(utility_bus)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_car} \hlstd{=} \hlkwd{exp}\hlstd{(utility_car)} \hlopt{/} \hlstd{prob_denom,}
+           \hlkwc{prob_walk} \hlstd{=} \hlkwd{exp}\hlstd{(utility_walk)} \hlopt{/} \hlstd{prob_denom)}
+  \hlcom{## Calculate logit choice probability for chosen alt given the parameters}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob_choice} \hlstd{= prob_bike} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bike'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_bus} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'bus'}\hlstd{)} \hlopt{+} \hlstd{prob_car} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{)} \hlopt{+}
+             \hlstd{prob_walk} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'walk'}\hlstd{))}
+  \hlcom{## Calculate log of logit choice probability for chosen alt given the params}
+  \hlstd{model_data} \hlkwb{<-} \hlstd{model_data} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob_choice))}
+  \hlcom{## Calculate the log-likelihood for these parameters}
+  \hlstd{ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(model_data}\hlopt{$}\hlstd{log_prob)}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{ll)}
+\hlstd{\}}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1c} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{8}\hlstd{),} \hlkwc{fn} \hlstd{= ll_fn_1c,} \hlkwc{data} \hlstd{= data_multi,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlstd{model_1c} \hlopt{%>%}
+  \hlkwd{summarize_mle}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'bus_int'}\hlstd{,} \hlstr{'car_int'}\hlstd{,} \hlstr{'walk_int'}\hlstd{,} \hlstr{'cost'}\hlstd{,}
+                  \hlstr{'time_bike'}\hlstd{,} \hlstr{'time_bus'}\hlstd{,} \hlstr{'time_car'}\hlstd{,} \hlstr{'time_walk'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 8 x 5
+##   names     parameters std_errors z_stats p_values
+##   <chr>          <dbl>      <dbl>   <dbl>    <dbl>
+## 1 bus_int       -0.219     0.386   -0.568 5.70e- 1
+## 2 car_int        2.75      0.443    6.20  5.52e-10
+## 3 walk_int       2.98      0.783    3.80  1.44e- 4
+## 4 cost          -2.60      0.824   -3.16  1.56e- 3
+## 5 time_bike     -0.289     0.0386  -7.51  6.12e-14
+## 6 time_bus      -0.143     0.0351  -4.08  4.53e- 5
+## 7 time_car      -0.405     0.0464  -8.73  2.63e-18
+## 8 time_walk     -0.297     0.0384  -7.72  1.14e-14
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		As in the previous models, the cost parameter is negative, indicating that the cost of driving decreases the utility of driving. The alternative-specific parameters on time are all negative but tend to be different from one another---the bike and walk parameters are not statistically different from one another, but all other pairwise combinations of parameters are. These parameters indicate that the time spent commuting by a particular travel mode always decreases the utility of taking that mode, but that these marginal utilities of time differ by travel mode. Additionally, the car and walk intercepts are positive and significant, while the bus intercept is not statistically significant. These results suggest that, \emph{ceteris paribus}, driving or walking would be preferred to taking the bus or biking.
+
+		\item Conduct a likelihood ratio test on this model to test if the alternative-specific parameters on time are equal to one another. That is, test the null hypothesis:
+		$$H_0 \text{: } \gamma_{bike} = \gamma_{bus} = \gamma_{car} = \gamma_{walk}$$
+		Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct likelihood ratio test of models 1a and 1b}
+\hlstd{test_1c} \hlkwb{<-} \hlkwd{test_likelihood_ratio}\hlstd{(model_1b, model_1c)}
+\hlcom{## Display test results}
+\hlstd{test_1c}
+\end{alltt}
+\begin{verbatim}
+## $reject
+## [1] TRUE
+## 
+## $p_value
+## [1] 5.179395e-10
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		We reject this null hypothesis and conclude that the alternative-specific marginal utilities of time are not all equal to one another. That is, this model provides a better fit than the model in part (b), which restricted these parameters to be equal.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Generalized Method of Moments}
+
+Use the \texttt{commute\_binary.csv} dataset for this question.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_binary} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'commute_binary.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  id = col\_double(),\\\#\#\ \  mode = col\_character(),\\\#\#\ \  time.car = col\_double(),\\\#\#\ \  cost.car = col\_double(),\\\#\#\ \  time.bus = col\_double(),\\\#\#\ \  cost.bus = col\_double(),\\\#\#\ \  price\_gas = col\_double(),\\\#\#\ \  snowfall = col\_double(),\\\#\#\ \  construction = col\_double(),\\\#\#\ \  bus\_detour = col\_double(),\\\#\#\ \  age = col\_double(),\\\#\#\ \  income = col\_double(),\\\#\#\ \  marital\_status = col\_character()\\\#\# )}}\end{kframe}
+\end{knitrout}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Express the representative utility of each alternative as a linear function of its cost and time. Include an alternative-specific intercept and allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from driving and taking the bus, respectively, are
+	\begin{align*}
+		V_{nc} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} \\
+		V_{nb} & = \gamma_{bus} T_{nb}
+		\intertext{where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. We exclude a bus-specific intercept term because only one intercept term is identified in this model, and we exclude the bus cost because it is free for all students. It may be easier to think about the difference in representative utility between driving and taking the bus for student $n$:}
+		V_{nc} - V_{nb} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} - \gamma_{bus} T_{nb}
+	\end{align*}
+	Because this is a binary logit model, we can express the choice probability of driving as a function of $V_{nc} - V_{nb}$:
+	$$P_{nc} = \frac{1}{1 + e^{-(V_{nc} - V_{nb})}}$$
+	Estimate the parameters of this model by method of moments. The following steps can provide a rough guide to creating your own method of moments estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Write down moment conditions for this model. You should have four moment conditions for this model.
+		\item Create a function that takes a set of parameters and a \emph{matrix} of data as inputs: \\
+		\texttt{function(parameters, data\_matrix)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the difference in representative utility for each decision maker.
+			\item Calculate the choice probability of driving for each decision maker.
+			\item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+			\item Calculate each of the $L$ moments for each decision maker.
+			\item Return the $N \times L$ matrix of individual moments.
+		\end{enumerate}
+		\item Find the MM estimator using \texttt{gmm()}. Your call of the \texttt{gmm()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{gmm(g = your\_function, x = your\_data\_matrix, t0 = your\_starting\_guesses, }} \\
+			&\qquad~ \text{\texttt{vcov = `iid', method = `Nelder-Mead'}} \\
+			&\qquad~ \text{\texttt{control = list(reltol = 1e-25, maxit = 10000))}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create dataset for use in MM moment function}
+\hlstd{data_2a} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{),}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{,}
+         \hlkwc{time.bus} \hlstd{=} \hlopt{-}\hlstd{time.bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(choice, constant, cost.car, time.car, time.bus)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Function to calculate moments for air conditioning choice}
+\hlstd{mm_fn_2a} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select data for X [N x K]}
+  \hlstd{X} \hlkwb{<-} \hlstd{data[,} \hlopt{-}\hlnum{1}\hlstd{]}
+  \hlcom{## Select data for y [N x 1]}
+  \hlstd{y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## Calculate representative utility of air conditioning [N x 1]}
+  \hlstd{utility} \hlkwb{<-} \hlstd{X} \hlopt{%*%} \hlstd{params}
+  \hlcom{## Calculate logit choice probability of air conditioning [N x 1]}
+  \hlstd{prob} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate econometric residuals [N x 1]}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{y} \hlopt{-} \hlstd{prob}
+  \hlcom{## Create moment matrix [N x K]}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{X}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\hlcom{## Use GMM to estimate model}
+\hlstd{model_2a} \hlkwb{<-} \hlkwd{gmm}\hlstd{(}\hlkwc{g} \hlstd{= mm_fn_2a,} \hlkwc{x} \hlstd{= data_2a,} \hlkwc{t0} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{4}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2a)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = mm_fn_2a, x = data_2a, t0 = rep(0, 4), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate     Std. Error   t value      Pr(>|t|)   
+## Theta[1]   2.2333e+00   3.7522e-01   5.9518e+00   2.6516e-09
+## Theta[2]  -2.0772e+00   7.1798e-01  -2.8930e+00   3.8153e-03
+## Theta[3]  -3.3222e-01   3.7929e-02  -8.7590e+00   1.9707e-18
+## Theta[4]  -1.3257e-01   3.1928e-02  -4.1523e+00   3.2919e-05
+## 
+## J-Test: degrees of freedom is 0 
+##                 J-test                P-value             
+## Test E(g)=0:    9.48387867832971e-23  *******             
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  0 
+## Function eval. =  1703 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The parameters on cost and time are statistically significant and are interpreted as marginal utilities. The cost of driving decreases the utility of driving, and the time spent commuting by a particular travel mode decreases the utility of taking that mode. This result is intuitive since people like both money and leisure time. Notably, the marginal utility of time spent driving and the marginal utility of time spent on the bus are different, indicating that time on the bus is preferred to time driving.
+
+	\item You might be concerned that the cost and time data are exogenous; for example, a student who enjoys driving is more likely to live farther from campus because they do not mind the extra cost and time spent driving, and a student who enjoys taking the bus is more likely to live close to a bus stop so the bus commute time is less. The \texttt{commute\_binary.csv} dataset includes four possible instruments that could be correlated with the cost or time of commuting: \texttt{price\_gas}, \texttt{snowfall}, \texttt{construction}, and \texttt{bus\_detour}. Again model the choice to drive to campus during winter as in (a). That is, the representative utility to student $n$ from driving and taking the bus, respectively, are
+	\begin{align*}
+		V_{nc} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} \\
+		V_{nb} & = \gamma_{bus} T_{nb}
+	\end{align*}
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by generalized method of moments, constructing moment conditions using the instruments described above. Thus, you will have five instruments: constant term, \texttt{price\_gas}, \texttt{snowfall}, \texttt{construction}, and \texttt{bus\_detour}. The steps to creating your own generalized method of moments estimator are the same as in part (a), but now you have four parameters and five moment conditions.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create dataset for use in MM moment function}
+\hlstd{data_2b} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{choice} \hlstd{=} \hlnum{1} \hlopt{*} \hlstd{(mode} \hlopt{==} \hlstr{'car'}\hlstd{),}
+         \hlkwc{constant} \hlstd{=} \hlnum{1}\hlstd{,}
+         \hlkwc{time.bus} \hlstd{=} \hlopt{-}\hlstd{time.bus)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(choice, constant, cost.car, time.car, time.bus,}
+         \hlstd{price_gas, snowfall, construction, bus_detour)} \hlopt{%>%}
+  \hlkwd{as.matrix}\hlstd{()}
+\hlcom{## Function to calculate moments for air conditioning choice}
+\hlstd{gmm_fn_2b} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{data}\hlstd{)\{}
+  \hlcom{## Select data for X [N x K]}
+  \hlstd{X} \hlkwb{<-} \hlstd{data[,} \hlnum{2}\hlopt{:}\hlnum{5}\hlstd{]}
+  \hlcom{## Select data for y [N x 1]}
+  \hlstd{y} \hlkwb{<-} \hlstd{data[,} \hlnum{1}\hlstd{]}
+  \hlcom{## select data for Z [N x L]}
+  \hlstd{Z} \hlkwb{<-} \hlstd{data[,} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{6}\hlopt{:}\hlnum{9}\hlstd{)]}
+  \hlcom{## Calculate representative utility of air conditioning [N x 1]}
+  \hlstd{utility} \hlkwb{<-} \hlstd{X} \hlopt{%*%} \hlstd{params}
+  \hlcom{## Calculate logit choice probability of air conditioning [N x 1]}
+  \hlstd{prob} \hlkwb{<-} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility))}
+  \hlcom{## Calculate econometric residuals [N x 1]}
+  \hlstd{residuals} \hlkwb{<-} \hlstd{y} \hlopt{-} \hlstd{prob}
+  \hlcom{## Create moment matrix [N x K]}
+  \hlstd{moments} \hlkwb{<-} \hlkwd{c}\hlstd{(residuals)} \hlopt{*} \hlstd{Z}
+  \hlkwd{return}\hlstd{(moments)}
+\hlstd{\}}
+\hlcom{## Use GMM to estimate model}
+\hlstd{model_2b} \hlkwb{<-} \hlkwd{gmm}\hlstd{(}\hlkwc{g} \hlstd{= gmm_fn_2b,} \hlkwc{x} \hlstd{= data_2b,} \hlkwc{t0} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{4}\hlstd{),} \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,}
+                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2b)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## gmm(g = gmm_fn_2b, x = data_2b, t0 = rep(0, 4), vcov = "iid", 
+##     control = list(reltol = 1e-25, maxit = 10000))
+## 
+## 
+## Method:  twoStep 
+## 
+## Coefficients:
+##           Estimate    Std. Error  t value     Pr(>|t|)  
+## Theta[1]   2.9119907   3.8112201   0.7640573   0.4448331
+## Theta[2]  -3.9860510   8.0529200  -0.4949821   0.6206128
+## Theta[3]  -0.3509452   0.1228629  -2.8563966   0.0042848
+## Theta[4]  -0.1502996   0.0525380  -2.8607772   0.0042260
+## 
+## J-Test: degrees of freedom is 1 
+##                 J-test     P-value  
+## Test E(g)=0:    0.0060018  0.9382488
+## 
+## Initial values of the coefficients
+##   Theta[1]   Theta[2]   Theta[3]   Theta[4] 
+##  2.0681542 -2.1903611 -0.3290997 -0.1453720 
+## 
+## #############
+## Information related to the numerical optimization
+## Convergence code =  10 
+## Function eval. =  1059 
+## Gradian eval. =  NA
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The parameter estimates are roughly the same as those in the previous model. However, the intercept and cost parameters now have much larger standard errors, rendering those parameters not statistically significant. Using instruments can reduce the precision of our parameter estimates, especially if they are not sufficiently correlated with the relevant variables, which may be the case here.
+
+		\item Test if your model is correctly specified by performing an overidentifying restrictions test. Report the results of this test and briefly interpret these results. (Reminder: the \texttt{specTest()} function from the \texttt{gmm} package conducts this specification test.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Test overidentifying restrictions}
+\hlkwd{specTest}\hlstd{(model_2b)}
+\end{alltt}
+\begin{verbatim}
+## 
+##  ##  J-Test: degrees of freedom is 1  ## 
+## 
+##                 J-test     P-value  
+## Test E(g)=0:    0.0060018  0.9382488
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The overidentifying restrictions test fails to reject the null hypothesis, so we conclude that all empirical moments are sufficiently close to zero. This result implies that this model is correctly specified and provides a good fit for our data.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
