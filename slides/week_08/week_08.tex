@@ -109,7 +109,7 @@
         \item Logit estimation using maximum likelihood
     \end{itemize}
     \vspace{3ex}
-    Today
+    This week's topics
     \begin{columns}
         \begin{column}{0.48\textwidth}
             \begin{itemize}
@@ -1002,7 +1002,7 @@
 \begin{alltt}
 \hlcom{## Find the MM estimator}
 \hlstd{model_1} \hlkwb{<-} \hlkwd{gmm}\hlstd{(}\hlkwc{g} \hlstd{= mm_fn,} \hlkwc{x} \hlstd{= mm_data,} \hlkwc{t0} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{),}
-               \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,}
+               \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{'Nelder-Mead'}\hlstd{,}
                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
 \end{alltt}
 \end{kframe}
@@ -1021,7 +1021,7 @@
 \begin{verbatim}
 ## 
 ## Call:
-## gmm(g = mm_fn, x = mm_data, t0 = rep(0, 3), vcov = "iid", method = "BFGS", 
+## gmm(g = mm_fn, x = mm_data, t0 = rep(0, 3), vcov = "iid", method = "Nelder-Mead", 
 ##     control = list(reltol = 1e-25, maxit = 10000))
 ## 
 ## 
@@ -1029,19 +1029,19 @@
 ## 
 ## Coefficients:
 ##           Estimate     Std. Error   t value      Pr(>|t|)   
-## Theta[1]  -2.5079e-05   8.4525e-01  -2.9670e-05   9.9998e-01
-## Theta[2]   1.3655e-03   1.3959e-03   9.7819e-01   3.2798e-01
-## Theta[3]  -3.6700e-03   1.9571e-03  -1.8752e+00   6.0761e-02
+## Theta[1]   4.4366e+00   9.4473e-01   4.6962e+00   2.6506e-06
+## Theta[2]  -2.9743e-03   1.4865e-03  -2.0010e+00   4.5398e-02
+## Theta[3]  -1.5428e-02   2.4017e-03  -6.4236e+00   1.3312e-10
 ## 
 ## J-Test: degrees of freedom is 0 
-##                 J-test           P-value        
-## Test E(g)=0:    6199.8179263019  *******        
+##                 J-test                P-value             
+## Test E(g)=0:    2.37195931661001e-20  *******             
 ## 
 ## #############
 ## Information related to the numerical optimization
 ## Convergence code =  0 
-## Function eval. =  119 
-## Gradian eval. =  7
+## Function eval. =  1460 
+## Gradian eval. =  NA
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -1056,8 +1056,8 @@
 \hlkwd{coef}\hlstd{(model_1)}
 \end{alltt}
 \begin{verbatim}
-##      Theta[1]      Theta[2]      Theta[3] 
-## -2.507872e-05  1.365487e-03 -3.670016e-03
+##     Theta[1]     Theta[2]     Theta[3] 
+##  4.436646632 -0.002974325 -0.015427739
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -1183,7 +1183,7 @@
 \begin{alltt}
 \hlcom{## Find the GMM estimator}
 \hlstd{model_2} \hlkwb{<-} \hlkwd{gmm}\hlstd{(}\hlkwc{g} \hlstd{= gmm_fn,} \hlkwc{x} \hlstd{= gmm_data,} \hlkwc{t0} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{3}\hlstd{),}
-               \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,}
+               \hlkwc{vcov} \hlstd{=} \hlstr{'iid'}\hlstd{,} \hlkwc{method} \hlstd{=} \hlstr{'Nelder-Mead'}\hlstd{,}
                \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{reltol} \hlstd{=} \hlnum{1e-25}\hlstd{,} \hlkwc{maxit} \hlstd{=} \hlnum{10000}\hlstd{))}
 \end{alltt}
 \end{kframe}
@@ -1200,7 +1200,7 @@
 \begin{verbatim}
 ## 
 ## Call:
-## gmm(g = gmm_fn, x = gmm_data, t0 = rep(0, 3), vcov = "iid", method = "BFGS", 
+## gmm(g = gmm_fn, x = gmm_data, t0 = rep(0, 3), vcov = "iid", method = "Nelder-Mead", 
 ##     control = list(reltol = 1e-25, maxit = 10000))
 ## 
 ## 
@@ -1208,23 +1208,23 @@
 ## 
 ## Coefficients:
 ##           Estimate     Std. Error   t value      Pr(>|t|)   
-## Theta[1]   4.3198e-02   1.0415e+00   4.1476e-02   9.6692e-01
-## Theta[2]   6.7707e-03   1.9085e-03   3.5477e+00   3.8862e-04
-## Theta[3]  -2.3280e-02   3.0593e-03  -7.6095e+00   2.7525e-14
+## Theta[1]   4.8181e+00   1.2242e+00   3.9357e+00   8.2951e-05
+## Theta[2]   1.9330e-04   1.9520e-03   9.9023e-02   9.2112e-01
+## Theta[3]  -3.0459e-02   3.6807e-03  -8.2756e+00   1.2786e-16
 ## 
 ## J-Test: degrees of freedom is 1 
 ##                 J-test      P-value   
-## Test E(g)=0:    2.5290e+02  6.0459e-57
+## Test E(g)=0:    1.2643e+02  2.4738e-29
 ## 
 ## Initial values of the coefficients
-##      Theta[1]      Theta[2]      Theta[3] 
-## -4.991223e-06  3.508251e-04 -7.491893e-04 
+##    Theta[1]    Theta[2]    Theta[3] 
+##  1.76601518  0.04517918 -0.17724070 
 ## 
 ## #############
 ## Information related to the numerical optimization
 ## Convergence code =  0 
-## Function eval. =  57 
-## Gradian eval. =  5
+## Function eval. =  578 
+## Gradian eval. =  NA
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -1238,8 +1238,8 @@
 \hlkwd{coef}\hlstd{(model_2)}
 \end{alltt}
 \begin{verbatim}
-##     Theta[1]     Theta[2]     Theta[3] 
-##  0.043198025  0.006770724 -0.023279903
+##      Theta[1]      Theta[2]      Theta[3] 
+##  4.8180601696  0.0001932951 -0.0304594326
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -1269,7 +1269,7 @@
 ##  ##  J-Test: degrees of freedom is 1  ## 
 ## 
 ##                 J-test      P-value   
-## Test E(g)=0:    2.5290e+02  6.0459e-57
+## Test E(g)=0:    1.2643e+02  2.4738e-29
 \end{verbatim}
 \end{kframe}
 \end{knitrout}

@@ -63,7 +63,7 @@ options(width = 70)
         \item Logit estimation using maximum likelihood
     \end{itemize}
     \vspace{3ex}
-    Today
+    This week's topics
     \begin{columns}
         \begin{column}{0.48\textwidth}
             \begin{itemize}
@@ -900,7 +900,7 @@ options(width = 70)
     <<>>=
     ## Find the MM estimator
     model_1 <- gmm(g = mm_fn, x = mm_data, t0 = rep(0, 3), 
-                   vcov = 'iid', method = 'BFGS', 
+                   vcov = 'iid', method = 'Nelder-Mead', 
                    control = list(reltol = 1e-25, maxit = 10000))
     @
 \end{frame}
@@ -1012,7 +1012,7 @@ options(width = 70)
     <<>>=
     ## Find the GMM estimator
     model_2 <- gmm(g = gmm_fn, x = gmm_data, t0 = rep(0, 3), 
-                   vcov = 'iid', method = 'BFGS', 
+                   vcov = 'iid', method = 'Nelder-Mead', 
                    control = list(reltol = 1e-25, maxit = 10000))
     @
 \end{frame}

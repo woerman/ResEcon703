@@ -4,7 +4,7 @@
 #####         Matt Woerman, UMass Amherst          #####
 ########################################################
 
-### Generalized Method of Moments Example in R ---------------------------------
+### Generalized Method of Moments R Example ------------------------------------
 
 ### Load and look at dataset
 ## Load tidyverse
@@ -51,7 +51,7 @@ mm_fn <- function(params, data){
 gmm(g, x, t0, ...)
 ## Find the MM estimator
 model_1 <- gmm(g = mm_fn, x = mm_data, t0 = rep(0, 3), 
-               vcov = 'iid', method = 'BFGS', 
+               vcov = 'iid', method = 'Nelder-Mead', 
                control = list(reltol = 1e-25, maxit = 10000))
 ## Summarize model results
 summary(model_1)
@@ -90,7 +90,7 @@ gmm_fn <- function(params, data){
 }
 ## Find the GMM estimator
 model_2 <- gmm(g = gmm_fn, x = gmm_data, t0 = rep(0, 3), 
-               vcov = 'iid', method = 'BFGS', 
+               vcov = 'iid', method = 'Nelder-Mead', 
                control = list(reltol = 1e-25, maxit = 10000))
 ## Summarize model results
 summary(model_2)
