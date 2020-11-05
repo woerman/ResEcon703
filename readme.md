@@ -67,3 +67,6 @@ Week 13: **Dynamics and Endogeneity**
 
 **Problem Set 3**
 * [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/camping_dataset.zip)
+
+**Problem Set 4**
+* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/problem_set_4.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/camping_dataset.zip)
