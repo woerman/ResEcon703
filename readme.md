@@ -51,7 +51,7 @@ Week 11: **Simulation-Based Estimation**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_11/week_11.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_11/week_11.R)
 * Videos: [1](https://www.youtube.com/watch?v=pupOLyR-Df8&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [2](https://www.youtube.com/watch?v=6cgaHBoKH9E&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [3](https://www.youtube.com/watch?v=yj0hQGYCmSo&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [4](https://www.youtube.com/watch?v=8B7ijH3D5p4&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq)
 
-Week 12: **Individual-Specific Coefficients**
+Week 12: **Individual-Level Coefficients**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_12/week_12.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_12/week_12.R)
 * Videos: [1](https://www.youtube.com/watch?v=YVyoK28w2G0&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT) | [2](https://www.youtube.com/watch?v=7JZsqzUjwnI&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT) | [3](https://www.youtube.com/watch?v=aO6VJ0CYnEk&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT)
 
