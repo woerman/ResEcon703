@@ -1,0 +1,637 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc} 
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 3}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{lm()}, \texttt{glm()}, and \texttt{mlogit()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_3/camping_dataset.zip}{\texttt{camping\_dataset.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains the dataset \texttt{camping.csv}, which you will use for this problem set. This dataset contains simulated data on the state park choice of 1000 visitors who camped at one of five Massachusetts State Parks. See the file \texttt{camping\_description.txt} for a description of the variables in the dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(mlogit)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_camping} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'camping.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Parsed with column specification:\\\#\# cols(\\\#\#\ \  camper\_id = col\_double(),\\\#\#\ \  park\_id = col\_double(),\\\#\#\ \  park = col\_character(),\\\#\#\ \  visit = col\_double(),\\\#\#\ \  mountain = col\_double(),\\\#\#\ \  beach = col\_double(),\\\#\#\ \  cost = col\_double(),\\\#\#\ \  time = col\_double()\\\#\# )}}\end{kframe}
+\end{knitrout}
+
+
+\section*{Problem 1: Generalized Extreme Value Models}
+
+We are studying how campers at Massachusetts State Parks choose the park where they camp, which will assist the Massachusetts Department of Conservation and Recreation (DCR) in their planning. In particular, they want to understand how campers value their time to travel to the park and the setting---mountain or beach---of the park. Additionally, DCR is considering an increase to the camping fee at Mount Greylock due to the cost of maintaining those camp sites, and they want to know how this change would affect park visitation patterns.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the camping park choice as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with common parameters on each variable. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj} + \beta_3 M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains, and the $\beta$ parameters are to be estimated. Importantly, do not include alternative-specific intercepts because $\beta_3$ would not be identified. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a multinomial logit model, but the data must first be converted to an indexed data frame using the \texttt{dfidx()} function from the \texttt{dfidx} package. See the Week 4 slides or the \texttt{mlogit} vignettes at \href{https://cran.r-project.org/web/packages/mlogit/index.html}{\texttt{cran.r-project.org/web/packages/mlogit/index.html}} for information on specifying a \texttt{formula} for the \texttt{mlogit()} function.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Convert dataset to dfidx format}
+\hlstd{data_dfidx} \hlkwb{<-} \hlkwd{dfidx}\hlstd{(}\hlkwc{data} \hlstd{= data_camping,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                    \hlkwc{choice} \hlstd{=} \hlstr{'visit'}\hlstd{,} \hlkwc{idx} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'camper_id'}\hlstd{,} \hlstr{'park_id'}\hlstd{))}
+\hlcom{# Model camping park visit as a multinomial logit}
+\hlstd{model_1a} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= visit} \hlopt{~} \hlstd{cost} \hlopt{+} \hlstd{time} \hlopt{+} \hlstd{mountain} \hlopt{|} \hlnum{0}\hlstd{,}
+                   \hlkwc{data} \hlstd{= data_dfidx)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_1a)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = visit ~ cost + time + mountain | 0, data = data_dfidx, 
+##     method = "nr")
+## 
+## Frequencies of alternatives:choice
+##     1     2     3     4     5 
+## 0.274 0.202 0.209 0.167 0.148 
+## 
+## nr method
+## 5 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 3.77E-05 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##             Estimate  Std. Error z-value  Pr(>|z|)    
+## cost     -0.01478389  0.00368970 -4.0068 6.155e-05 ***
+## time     -0.00163201  0.00040778 -4.0022 6.275e-05 ***
+## mountain -0.33105186  0.17595101 -1.8815    0.0599 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1524.2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The cost and time parameters---$\beta_1$ and $\beta_2$, respectively---are statistically significant and can be interpreted as marginal utilities. The cost of camping at a park reduces the utility of camping there, and the time spent traveling to the park reduces the utility of camping there. The mountain parameter, $\beta_3$, is statistically significant at the 10\% level and is interpreted as the relative utility of camping in the mountains. The campers in our dataset obtain less utility, \emph{ceteris paribus}, from camping in the mountains than from camping at the beach.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains, relative to camping at the beach.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate value of time and mountain park}
+\hlkwd{coef}\hlstd{(model_1a)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_1a)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{60}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##       time   mountain 
+##   6.623449 -22.392742
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		These campers value their time spent traveling to the park at \$6.62 per hour, and they value camping in the mountains at \$22.39 less than camping at the beach.
+
+		\item Calculate the elasticity of choosing each park with respect to the cost of camping at Mount Greylock (\texttt{park\_id == 1}) for each camper; that is, 5 alternatives $\times$ 1000 campers $=$ 5000 elasticities. For each park, report the mean of its elasticity with respect to the cost of camping at Mount Greylock. Describe how these elasticities and substitution patterns relate to an important property of the logit model. (Reminder: the \texttt{fitted()} function with argument \texttt{type = `probabilities'} calculates the choice probabilities of each alternative for each decision maker.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate mean elasticities with respect to the cost of alternative 1}
+\hlstd{data_camping} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(park_id} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob} \hlstd{=} \hlkwd{fitted}\hlstd{(model_1a,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[,} \hlnum{1}\hlstd{],}
+         \hlkwc{own_elas} \hlstd{=} \hlkwd{coef}\hlstd{(model_1a)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cost} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{prob),}
+         \hlkwc{cross_elas} \hlstd{=} \hlopt{-}\hlkwd{coef}\hlstd{(model_1a)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cost} \hlopt{*} \hlstd{prob)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{own_elas} \hlstd{=} \hlkwd{mean}\hlstd{(own_elas),}
+            \hlkwc{cross_elas} \hlstd{=} \hlkwd{mean}\hlstd{(cross_elas))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1 x 2
+##   own_elas cross_elas
+##      <dbl>      <dbl>
+## 1   -0.676      0.223
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The mean elasticity of camping at Mount Greylock with respect to its cost is -0.676, and the mean elasticity of camping at any of the other four parks with respect to the cost of camping at Mount Greylock is 0.223. This model implies that campers will substitute to the other park in proportion to their observed visits. In other words, campers will substitute to other parks with no consideration for whether those parks share attributes with Mount Greylock. This proportional substitution is an example of the rigid substitution patterns imposed by the logit model.
+	\end{enumerate}
+
+	\item The multinomial logit model of part (a) is not the best model for this setting if a camper's unobserved (and random) utility includes an individual preference for the mountains or the beach, which would create correlations among parks with the same setting. Model the camping park choice as a nested logit model with two nests, one for each park setting: mountains and beach. As in part (a), model the representative utility for park $j$ as
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj} + \beta_3 M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains, and the $\beta$ parameters are to be estimated. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a nested logit model if you use the \texttt{nests} argument to specify nests as a named list.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Model camping park visit as a nested logit}
+\hlstd{model_1b} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= visit} \hlopt{~} \hlstd{cost} \hlopt{+} \hlstd{time} \hlopt{+} \hlstd{mountain} \hlopt{|} \hlnum{0}\hlstd{,}
+                   \hlkwc{data} \hlstd{= data_dfidx,}
+                   \hlkwc{nests} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{mountain} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{2}\hlstd{,} \hlkwc{beach} \hlstd{=} \hlnum{3}\hlopt{:}\hlnum{5}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_1b)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = visit ~ cost + time + mountain | 0, data = data_dfidx, 
+##     nests = list(mountain = 1:2, beach = 3:5))
+## 
+## Frequencies of alternatives:choice
+##     1     2     3     4     5 
+## 0.274 0.202 0.209 0.167 0.148 
+## 
+## bfgs method
+## 12 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 1.65E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##                Estimate  Std. Error z-value  Pr(>|z|)    
+## cost        -0.00607442  0.00151849 -4.0003 6.326e-05 ***
+## time        -0.00146685  0.00024578 -5.9681 2.400e-09 ***
+## mountain    -0.19944206  0.09847759 -2.0253   0.04284 *  
+## iv:mountain  0.27206879  0.05790001  4.6989 2.615e-06 ***
+## iv:beach     0.31647461  0.06018706  5.2582 1.455e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1500.9
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The cost, time, and mountain parameters---$\beta_1$, $\beta_2$, and $\beta_3$, respectively---are interpreted as they were in part (a), although the mountain parameter is now statistically significant at the 5\% level. This model contains two additional parameters, the coefficients on the inclusive value for each nest, which are statistically significant. These parameters represent the independence of random utility within each nest, with a value of 1 indicating full independence and a value close to 0 indicating high dependence. Thus, we conclude, there is some dependence within each of the nests. That is, the random utility that a camper obtains from camping at each of the parks in the mountains is correlated, as is the random utility from camping at each of the parks at the beach. This result is consistent with each camper having an individual preference for the mountains or the beach beyond the average preference represented by $\beta_3$, the common mountain parameter.
+
+		\item The model in part (a) is effectively imposing a restriction on the model in part (b). Write the null hypothesis that is imposed by the model in part (a) and describe this hypothesis in words. Conduct a likelihood ratio test to test this null hypothesis. Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test. (Reminder: the \texttt{lrtest()} function performs a likelihood ratio test.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct likelihood ratio test of the models in parts b and d}
+\hlkwd{lrtest}\hlstd{(model_1a, model_1b)}
+\end{alltt}
+\begin{verbatim}
+## Likelihood ratio test
+## 
+## Model 1: visit ~ cost + time + mountain | 0
+## Model 2: visit ~ cost + time + mountain | 0
+##   #Df  LogLik Df  Chisq Pr(>Chisq)    
+## 1   3 -1524.2                         
+## 2   5 -1500.9  2 46.564  7.739e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The null hypothesis is that the inclusive value coefficients equal 1 for both nests:
+		$$H_0 \text{: } \lambda_{mountain} = \lambda_{beach} = 1$$
+		In words, this null hypothesis imposes that there is no correlation among the random utility terms, or that the random utility of every alternative is i.i.d. But if a camper has an individual preference for camping in the mountains or at the beach beyond the average preference represented by $\beta_3$, this hypothesis would not hold. We reject this hypothesis with a p-value of approximately 0, indicating that we have strong statistical evidence to conclude there are correlations among the random utility terms within each nest.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains, relative to camping at the beach.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate value of time and mountain park}
+\hlkwd{coef}\hlstd{(model_1b)[}\hlnum{2}\hlopt{:}\hlnum{3}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlkwd{c}\hlstd{(}\hlnum{60}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##     time mountain 
+##  14.4888 -32.8331
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		These campers value their time spent traveling to the park at \$14.49 per hour, and they value camping in the mountains at \$32.83 less than camping at the beach.
+
+		\item Calculate the elasticity of choosing each park with respect to the cost of camping at Mount Greylock (\texttt{park\_id == 1}) for each camper; that is, 5 alternatives $\times$ 1000 campers $=$ 5000 elasticities. For each park, report the mean of its elasticity with respect to the cost of camping at Mount Greylock. Compare these elasticities to those you found in part (a) and describe any important differences.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate choice probabilities for every alternative}
+\hlstd{probs_1b} \hlkwb{<-} \hlkwd{fitted}\hlstd{(model_1b,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)}
+\hlcom{## Calculate mean elasticities with respect to the cost of alternative 1}
+\hlstd{data_camping} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(park_id} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob} \hlstd{= probs_1b[,} \hlnum{1}\hlstd{],}
+         \hlkwc{prob_nest} \hlstd{=} \hlkwd{rowSums}\hlstd{(probs_1b[,} \hlnum{1}\hlopt{:}\hlnum{2}\hlstd{]),}
+         \hlkwc{prob_cond} \hlstd{= prob} \hlopt{/} \hlstd{prob_nest,}
+         \hlkwc{own_elas} \hlstd{=} \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cost} \hlopt{*}
+           \hlstd{((}\hlnum{1} \hlopt{/} \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{4}\hlstd{])} \hlopt{-}
+              \hlstd{((}\hlnum{1} \hlopt{-} \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{4}\hlstd{])} \hlopt{/}
+                 \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{prob_cond)} \hlopt{-}
+              \hlstd{prob),}
+         \hlkwc{cross_elas_mountain} \hlstd{=} \hlopt{-}\hlkwd{coef}\hlstd{(model_1b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cost} \hlopt{*} \hlstd{prob} \hlopt{*}
+           \hlstd{(}\hlnum{1} \hlopt{+} \hlstd{((}\hlnum{1} \hlopt{-} \hlkwd{coef}\hlstd{(model_1b)[}\hlnum{4}\hlstd{])} \hlopt{/}
+                   \hlstd{(}\hlkwd{coef}\hlstd{(model_1b)[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{prob_nest))),}
+         \hlkwc{cross_elas_beach} \hlstd{=} \hlopt{-}\hlkwd{coef}\hlstd{(model_1b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cost} \hlopt{*} \hlstd{prob)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{own_elas} \hlstd{=} \hlkwd{mean}\hlstd{(own_elas),}
+            \hlkwc{cross_elas_mountain} \hlstd{=} \hlkwd{mean}\hlstd{(cross_elas_mountain),}
+            \hlkwc{cross_elas_beach} \hlstd{=} \hlkwd{mean}\hlstd{(cross_elas_beach))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1 x 3
+##   own_elas cross_elas_mountain cross_elas_beach
+##      <dbl>               <dbl>            <dbl>
+## 1   -0.709               0.649           0.0952
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The mean elasticity of camping at Mount Greylock with respect to its cost is -0.709; the mean elasticity of camping at October Mountain with respect to the cost of camping at Mount Greylock is 0.649; and the mean elasticity of camping at any of beach parks with respect to the cost of camping at Mount Greylock is 0.095. This model implies that campers will substitute to October Mountain in much greater proportion than to the beach parks. These elasticities are more intuitive than the elasticities in part (a)---which imposed proportional substitution---if campers have individual preferences for camping in the mountains.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Mixed Logit Model}
+
+The models in problem 1 have common parameters for all campers in the dataset. In reality, however, some or all of these parameters are likely to vary by camper for unobserved reasons. DCR is interested in understanding this heterogeneity and how it could affect park visitation patterns.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+
+	\item Model the camping park choice as a mixed logit model. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with random coefficients on each variable. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_{1n} C_{nj} + \beta_{2n} T_{nj} + \beta_{3n} M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains. Model all three $\beta$ coefficients as random with a normal distribution:
+	\begin{align*}
+		\beta_1 & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+		\beta_2 & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_3 & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*}
+	Estimate this model using 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}). (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a mixed logit model if you use the \texttt{rpar} argument to specify the random coefficients as a named vector.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Model camping park visit as a mixed logit}
+\hlstd{model_2a} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= visit} \hlopt{~} \hlstd{cost} \hlopt{+} \hlstd{time} \hlopt{+} \hlstd{mountain} \hlopt{|} \hlnum{0}\hlstd{,}
+                   \hlkwc{data} \hlstd{= data_dfidx,}
+                   \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{cost} \hlstd{=} \hlstr{'n'}\hlstd{,} \hlkwc{time} \hlstd{=} \hlstr{'n'}\hlstd{,} \hlkwc{mountain} \hlstd{=} \hlstr{'n'}\hlstd{),}
+                   \hlkwc{R} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{703}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2a)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = visit ~ cost + time + mountain | 0, data = data_dfidx, 
+##     rpar = c(cost = "n", time = "n", mountain = "n"), R = 100, 
+##     seed = 703)
+## 
+## Frequencies of alternatives:choice
+##     1     2     3     4     5 
+## 0.274 0.202 0.209 0.167 0.148 
+## 
+## bfgs method
+## 17 iterations, 0h:0m:12s 
+## g'(-H)^-1g = 3.19E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##               Estimate Std. Error z-value  Pr(>|z|)    
+## cost        -0.0214846  0.0042303 -5.0788 3.799e-07 ***
+## time        -0.0061720  0.0010827 -5.7007 1.193e-08 ***
+## mountain    -0.8444033  0.3083382 -2.7386  0.006171 ** 
+## sd.cost      0.0126612  0.0166059  0.7624  0.445791    
+## sd.time      0.0036772  0.0015353  2.3951  0.016616 *  
+## sd.mountain -5.6000997  1.1536954 -4.8541 1.210e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1504.5
+## 
+## random coefficients
+##          Min.      1st Qu.       Median         Mean      3rd Qu. Max.
+## cost     -Inf -0.030024408 -0.021484581 -0.021484581 -0.012944754  Inf
+## time     -Inf -0.008652227 -0.006171992 -0.006171992 -0.003691758  Inf
+## mountain -Inf -4.621613130 -0.844403300 -0.844403300  2.932806531  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The cost coefficient, $\beta_1$, is interpreted as the marginal utility of the cost of the camping trip, or the negative of the marginal utility of money. We model this coefficient as being random with a normal distribution, meaning that different campers can have a different marginal utility of money. We estimate that this coefficient has a mean of -0.021 and a standard deviation of 0.013. The standard deviation parameter is not statistically significant, however, so we cannot conclude that this coefficient has any variance, suggesting it may be better to model it as a fixed coefficient. The other parameters have similar interpretations, and all other parameters are statistically significant. The time coefficient parameters, $\mu_2$ and $\sigma_2^2$, indicate that the marginal utility of time traveling to camp is normally distributed with a mean of -0.0062 and a standard deviation of 0.0036. The mountain coefficient parameters, $\mu_3$ and $\sigma_3^2$, indicate that the utility obtained by camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -0.84 and a standard deviation of 5.6.
+	\end{enumerate}
+
+	\item It is easier to calculate how campers value their time to travel to the park and the setting---mountain or beach---of the park when cost has a fixed (not-random) coefficient. Model the camping park choice as a mixed logit model with a fixed coefficient on cost. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with random coefficients on time and mountain. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_1 C_{nj} + \beta_{2n} T_{nj} + \beta_{3n} M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains. Model $\beta_1$ as a fixed coefficient and $\beta_2$ and $\beta_3$ as random with a normal distribution:
+	\begin{align*}
+		\beta_2 & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_3 & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*}
+	Estimate this model using 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}).
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Model camping park visit as a mixed logit with fixed cost coefficient}
+\hlstd{model_2b} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= visit} \hlopt{~} \hlstd{cost} \hlopt{+} \hlstd{time} \hlopt{+} \hlstd{mountain} \hlopt{|} \hlnum{0}\hlstd{,}
+                   \hlkwc{data} \hlstd{= data_dfidx,}
+                   \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{time} \hlstd{=} \hlstr{'n'}\hlstd{,} \hlkwc{mountain} \hlstd{=} \hlstr{'n'}\hlstd{),}
+                   \hlkwc{R} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{703}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2b)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = visit ~ cost + time + mountain | 0, data = data_dfidx, 
+##     rpar = c(time = "n", mountain = "n"), R = 100, seed = 703)
+## 
+## Frequencies of alternatives:choice
+##     1     2     3     4     5 
+## 0.274 0.202 0.209 0.167 0.148 
+## 
+## bfgs method
+## 16 iterations, 0h:0m:25s 
+## g'(-H)^-1g = 0.00651 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                Estimate  Std. Error z-value  Pr(>|z|)    
+## cost        -0.01872287  0.00410751 -4.5582 5.159e-06 ***
+## time        -0.00487803  0.00089451 -5.4533 4.945e-08 ***
+## mountain    -0.82439901  0.28712024 -2.8713  0.004088 ** 
+## sd.time      0.00194078  0.00100759  1.9262  0.054084 .  
+## sd.mountain  4.67359368  1.00229284  4.6629 3.118e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -1503.2
+## 
+## random coefficients
+##          Min.      1st Qu.       Median         Mean      3rd Qu. Max.
+## time     -Inf -0.006187071 -0.004878034 -0.004878034 -0.003568997  Inf
+## mountain -Inf -3.976690042 -0.824399010 -0.824399010  2.327892021  Inf
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The cost coefficient, $\beta_1$, is now fixed at a value of -0.018, indicating this value is the marginal utility of cost for all campers. The interpretation of the other parameters is similar to that in part (a). The time coefficient parameters, $\mu_2$ and $\sigma_2^2$, indicate that the marginal utility of time traveling to camp is normally distributed with a mean of -0.0049 and a standard deviation of 0.0019. The mountain coefficient parameters, $\mu_3$ and $\sigma_3^2$, indicate that the utility obtained by camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -0.82 and a standard deviation of 4.7.
+
+		\item We can test if $\beta_1$ is a fixed or random coefficient. Write the null hypothesis of your test and describe this hypothesis in words. Conduct a likelihood ratio test to test this null hypothesis. Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct likelihood ratio test of the models in parts a and b}
+\hlkwd{lrtest}\hlstd{(model_2a, model_2b)}
+\end{alltt}
+\begin{verbatim}
+## Likelihood ratio test
+## 
+## Model 1: visit ~ cost + time + mountain | 0
+## Model 2: visit ~ cost + time + mountain | 0
+##   #Df  LogLik Df  Chisq Pr(>Chisq)
+## 1   6 -1504.5                     
+## 2   5 -1503.2 -1 2.5395      0.111
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The null hypothesis is that the variance of the random $\beta_1$ coefficient equals 0:
+		$$H_0 \text{: } \sigma_1^2 = 0$$
+		In words, this null hypothesis imposes that there is no heterogeneity in this cost coefficient, so all campers have the same marginal utility of cost or income. We fail to reject this hypothesis with a p-value of 0.11, so we conclude that the cost coefficient, $\beta_1$, is fixed for all campers.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains, relative to camping at the beach. Because we have distributions for $\beta_2$ and $\beta_3$, these dollar values will also be distributions. Report the mean and standard deviation of each of these dollar value distributions. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate distribution of the value of time}
+\hlkwd{c}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{2}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlnum{60}\hlstd{,}
+  \hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{4}\hlstd{])} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{]} \hlopt{*} \hlnum{60}\hlstd{)} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'time'}\hlstd{,} \hlstr{'sd.time'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##      time   sd.time 
+## 15.632328  6.219499
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate distribution of the value of a mountain park}
+\hlkwd{c}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{3}\hlstd{]} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{],}
+  \hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{5}\hlstd{])} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{])} \hlopt{%>%}
+  \hlkwd{setNames}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{'mountain'}\hlstd{,} \hlstr{'sd.mountain'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+##    mountain sd.mountain 
+##   -44.03166   249.61950
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		These campers have a heterogeneous valuation of their time spent traveling to the park. These time values are normally distributed with a mean of \$15.63 and a standard deviation of \$6.22. Similarly, the dollar value of camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -\$44.03 and a standard deviation of \$249.62.
+
+		\item Calculate the proportion of campers who have a positive value of camping in the mountains, relative to camping at the beach.
+		
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate proportion of visitors with a positive value of mountain parks}
+\hlnum{1} \hlopt{-} \hlkwd{pnorm}\hlstd{(}\hlkwc{q} \hlstd{=} \hlnum{0}\hlstd{,}
+          \hlkwc{mean} \hlstd{=} \hlkwd{coef}\hlstd{(model_2b)[}\hlnum{3}\hlstd{]} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{],}
+          \hlkwc{sd} \hlstd{=} \hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{5}\hlstd{])} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{])}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.4299918
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Of the 1000 campers in this dataset, 43\% have a positive valuation of camping in the mountains relative to camping at the beach. That is, \emph{ceteris paribus}, 43\% of these campers would prefer to camp in the mountains than at the beach.
+	\end{enumerate}
+
+	\item DCR is considering an increase to the camping fee at Mount Greylock, which would increase the cost by \$20 for each camper in our dataset. Use your parameter estimates from part (b) to simulate this counterfactual.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create counterfactual camping dataset}
+\hlstd{data_camping_counter} \hlkwb{<-} \hlstd{data_camping} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cost} \hlstd{=} \hlkwd{if_else}\hlstd{(park_id} \hlopt{==} \hlnum{1}\hlstd{, cost} \hlopt{+} \hlnum{20}\hlstd{, cost))}
+\hlcom{## Convert dataset to dfidx format}
+\hlstd{data_counter_dfidx} \hlkwb{<-} \hlkwd{dfidx}\hlstd{(}\hlkwc{data} \hlstd{= data_camping_counter,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                            \hlkwc{choice} \hlstd{=} \hlstr{'visit'}\hlstd{,} \hlkwc{idx} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'camper_id'}\hlstd{,} \hlstr{'park_id'}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item How many fewer campers---of the 1000 campers in this dataset---do you expect will camp at Mount Greylock because of this fee increase? How many more campers do you expect will camp at each of the other four parks?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate aggregate choices using observed data}
+\hlstd{agg_choices_obs_2b} \hlkwb{<-} \hlkwd{predict}\hlstd{(model_2b,} \hlkwc{newdata} \hlstd{= data_dfidx)}
+\hlcom{## Calculate aggregate choices using counterfactual data}
+\hlstd{agg_choices_counter_2b} \hlkwb{<-} \hlkwd{predict}\hlstd{(model_2b,} \hlkwc{newdata} \hlstd{= data_counter_dfidx)}
+\hlcom{## Calculate difference between aggregate choices}
+\hlkwd{colSums}\hlstd{(agg_choices_counter_2b} \hlopt{-} \hlstd{agg_choices_obs_2b)}
+\end{alltt}
+\begin{verbatim}
+##          1          2          3          4          5 
+## -47.108365  32.020511   5.906957   4.544644   4.636252
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Due to this camping fee increase at Mount Greylock, we would expect 47.1 fewer campers at that park. We would also expect an additional 32.0 campers at the other mountain park, October Mountain, and approximately only 5 or 6 additional campers at each of the beach parks, as reported above.
+
+		\item How do you expect this increased camping fee at Mount Greylock will affect the economic surplus of the 1000 campers in this dataset?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate log-sum values using observed data}
+\hlstd{logsum_obs_2b} \hlkwb{<-} \hlkwd{logsum}\hlstd{(model_2b,} \hlkwc{data} \hlstd{= data_dfidx)}
+\hlcom{## Calculate log-sum values using counterfactual data}
+\hlstd{logsum_counter_2b} \hlkwb{<-} \hlkwd{logsum}\hlstd{(model_2b,} \hlkwc{data} \hlstd{= data_counter_dfidx)}
+\hlcom{## Calculate change in consumer surplus from subsidy}
+\hlkwd{sum}\hlstd{((logsum_counter_2b} \hlopt{-} \hlstd{logsum_obs_2b))} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{1}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+##      cost 
+## -4302.969
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		This increased camping fee is expected to reduce the economic surplus of these 1000 campers by a total of roughly \$4303.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
