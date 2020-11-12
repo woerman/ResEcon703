@@ -56,6 +56,8 @@ Week 12: **Individual-Level Coefficients**
 * Videos: [1](https://www.youtube.com/watch?v=YVyoK28w2G0&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT) | [2](https://www.youtube.com/watch?v=7JZsqzUjwnI&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT) | [3](https://www.youtube.com/watch?v=aO6VJ0CYnEk&list=PLnC0w4gG7um1VZMPuz3Mrya1YbewYwBbT)
 
 Week 13: **Dynamics and Endogeneity**
+* [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_13/week_13.pdf)
+* Videos: [1](https://www.youtube.com/watch?v=-7jSiiYhYPc&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [2](https://www.youtube.com/watch?v=FaDC5mNiy70&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [3](https://www.youtube.com/watch?v=6Q8vN02_DMs&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [4](https://www.youtube.com/watch?v=cNeGABDeNGo&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [5](https://www.youtube.com/watch?v=RC2Ku41dEY4&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [6](https://www.youtube.com/watch?v=TVFWSNwgZZY&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2)
 
 ## Problem Sets
 
