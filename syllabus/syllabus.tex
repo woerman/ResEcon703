@@ -1,0 +1,165 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage[backend=biber, 
+authordate, 
+maxcitenames=2, 
+uniquename=false, 
+uniquelist=false, 
+url=false, 
+doi=false, 
+isbn=false]{biblatex-chicago}
+\addbibresource{refs.bib}
+\usepackage{bibentry}
+\setlength{\bibhang}{0pt}
+
+\begin{document}
+
+\title{Topics in Advanced Econometrics (ResEcon 703)}
+\subtitle{Fall 2021 Syllabus\vspace{-2ex}}
+\author{Matt Woerman\\Resource Economics, UMass Amherst}
+%\date{}  % Toggle commenting to test
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Course Info}
+
+\begin{tabular}{ll} 
+	\textbf{When:} & Tuesday \& Thursday, 11:30 am--12:45 pm \\
+	\textbf{Where:} & 301 Stockbridge Hall \\
+	\textbf{Website:} & \href{https://github.com/woerman/ResEcon703}{\texttt{github.com/woerman/ResEcon703}} \\
+	\\
+	\textbf{Instructor:} & Matt Woerman \\
+	\textbf{Email:} & \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} \\
+	\textbf{Office:} & 218 Stockbridge Hall \\
+	\textbf{Hours:} & Tuesday, 1:00--3:00 pm, sign up at \href{https://calendly.com/mwoerman/officehours}{\texttt{calendly.com/mwoerman/officehours}}
+\end{tabular} 
+
+\section*{Course Description}
+
+This is the final course in the graduate econometrics sequence in the Department of Resource Economics. Following previous courses on probability and statistics and on linear regression, this course will cover the more advanced topic of structural estimation. The goal of this course is to provide students with an in-depth understanding of the most common structural estimation methods in modern empirical economics and with the technical ability to apply these methods to their own research. The course will focus on the application of these methods to discrete choice models, which underlie many economic decisions studied in applied microeconomics and related fields.
+
+\section*{Prerequisites}
+
+Students should have a strong familiarity with statistics, linear algebra, and the classical linear regression model at the level of ResEcon 702 (the prior course in the econometrics sequence). If you have not taken that course but think your background in these topics is sufficient, please see me and we can discuss whether this course is appropriate for you.
+
+\section*{Course Structure}
+
+This course will be presented ``in person,'' as determined by university administration, and I do recommend attending in-person classes when safely possible for the best learning environment. I understand, however, that COVID-19 and its Delta Variant greatly complicate in-person classes. For this reason, I will ensure all course materials---slides, lecture videos, recordings of in-class discussions and exercises, etc.---are available online for students who are not able to attend in-person classes for any reason. \\
+
+\noindent The general structure of the course is that we will cover one topic each week; most topics will include both ``theory'' and ``applications.'' I will record lecture videos on the theory material each week, which you will watch asynchronously (on your own time) before Tuesday's class. During the scheduled class time, we will meet in person. I will use this time to summarize the lecture videos and answer questions about the material. Most importantly, we will also use these in-person classes to interactively work through applications of the material in the R statistical programming language. Note that watching each week's asynchronous lecture videos is mandatory. Due to current circumstances, in-person class attendance is not mandatory, but it is strongly encouraged; if you cannot attend, you should watch the class recordings and work through the coding exercises on your own to ensure you understand how to apply these estimation methods.
+
+\section*{Safety Measures}
+
+Due to the presence of COVID-19 and the emergence of its Delta Variant, university administration has instituted strict public health and safety measures on campus; information is available at: \href{https://www.umass.edu/coronavirus/}{\texttt{www.umass.edu/coronavirus}}. To help protect everyone in this course and the people we all interact with---particularly those not able to able to be vaccinated---masks are required in the classroom; a mask must cover both your nose and your mouth to be effective. Anyone who arrives to class without a mask will be asked once to put on a mask. Anyone who needs to be asked more than once to wear a mask correctly will be asked to leave the class and the incident will be reported to the Dean of Students Office. Due to this mask requirement, no one may eat in the classroom. As circumstances and university guidance evolve throughout the semester, I may reevaluate these safety measures. My first priority is the health and safety of everyone in this course, and I greatly appreciate your contributions to fostering a safe learning environment for yourself and your classmates.
+
+\section*{Textbook}
+
+The textbook for this course is:
+\begin{itemize}
+	\item[] \begin{refsection} \nocite{trainDiscreteChoiceMethods2009} \printbibliography[heading=none] \end{refsection}
+\end{itemize}
+This textbook is available for free at: \href{https://eml.berkeley.edu/books/choice2.html}{\texttt{eml.berkeley.edu/books/choice2.html}}; a paperback version is available at a reasonable (relative to other textbooks) price. I will regularly assign readings from this textbook. \\
+
+\noindent I recommend also having access to a graduate-level ``econometric theory'' textbook, such as:
+\begin{itemize}
+	\item[] \begin{refsection} \nocite{cameronMicroeconometricsMethodsApplications2005} \printbibliography[heading=none] \end{refsection}
+  \item[] \begin{refsection} \nocite{greeneEconometricAnalysis2018} \printbibliography[heading=none] \end{refsection}
+  \item[] \begin{refsection} \nocite{hayashiEconometrics2000} \printbibliography[heading=none] \end{refsection}
+	\item[] \begin{refsection} \nocite{wooldridgeEconomtericAnalysisCross2010} \printbibliography[heading=none] \end{refsection}
+\end{itemize}
+This list is not exhaustive, and many similar textbooks exist. Most students already have an applicable textbook from a previous course. I will not assign reading from these textbooks, but you will likely find one of these ``more rigorous'' textbooks to be a helpful reference at times.
+
+\section*{Software}
+
+We will use the R statistical programming language in this course. R is a free and powerful software environment for statistical analysis. It can be used for almost all analysis in applied economics and related fields: basic statistics, data cleaning, linear regression, structural estimation, data visualization, etc. I will work through examples in class using R, and I will provide example R code for your own use. You may use another programming language in this course if you would like, but I strongly recommend that you learn and use R. I will not provide any support for this course in other programming languages, nor will I provide partial credit on problem sets or exams written in a programming language other than R. \\
+
+\noindent I will give an introduction to R early in this course to ensure all students have a basic understanding of key features of the R language. If you have never used R, this introduction may not be sufficient to implement the methods we will cover in this course. I also provide links to many additional R resources to help you become familiar with the R language and to aid you as you work on problem sets. I can also answer questions about R during class or office hours.
+
+\section*{Grades}
+
+I will assign four problem sets during the semester; each problem set is worth 15\% of your final grade. You may submit these problem sets in groups of up to three (and I recommend you do). These problems will ask you to apply the estimation methods we learn in class, interpret their results, and draw policy-relevant conclusions, just as you will do in your own research. Some problems will allow you to use ``canned'' estimation routines, but many will require you to write your own estimation code. A tentative schedule of problem sets, including due dates, is shown below. \\
+
+\begin{table}[!ht]
+	\centering
+	\begin{threeparttable}
+		\caption*{\textbf{Tentative problem set schedule}}
+   		\begin{tabular}{@{\extracolsep{0.25cm}} c l l l @{}}
+    		\toprule
+		    \textbf{Problem Set} & \textbf{Date Assigned} & \textbf{Date Due} & \textbf{Material Covered} \\ \toprule
+    		1 & Sept. 21 & Oct. 14 & Random Utility and Logit Models \\
+    		2 & Oct. 19 & Nov. 4 & Logit Estimation (MLE and GMM) \\
+    		3 & Nov. 2 & Nov. 24 & GEV and Mixed Logit Models \\
+    		4 & Nov. 18 & Dec. 9 & Simulation-Based Estimation \\
+    		\bottomrule
+  		\end{tabular}
+  	\end{threeparttable}
+\end{table}
+
+\noindent I will assign a final project that is worth 30\% of your final grade. You may submit the final project in groups of up to three (and I recommend you do) You are not allowed to collaborate with or consult anyone else while completing this exam. I will give more details about the exam as we get closer to the end of the semester. \\
+
+\noindent The remaining 10\% of your final grade is for participation. Due to the unusual circumstances this semester, I am defining ``participation'' as keeping up with assigned reading, watching asynchronous lecture videos, and keeping up with in-class discussions and exercises; the tentative schedule of topics and assigned readings is shown below. Because all of these activities can be done asynchronous, I will only excuse you from them under exceptional circumstances. In-person class attendance is not mandatory but strongly encouraged when safely possible; you are responsible for this material even if you do not attend.
+
+\begin{NoHyper}
+\begin{table}[!htb]
+	\centering
+	\begin{threeparttable}
+		\caption*{\textbf{Tentative lecture and reading schedule}}
+   		\begin{tabular}{@{\extracolsep{0.35cm}} c l l l @{}}
+    		\toprule
+		    \textbf{Week} & \textbf{Dates} & \textbf{Topic} & \textbf{Reading}\tnote{1} \\ \toprule
+		    0 & Sept. 2 & Course Overview \\
+    		1 & Sept. 7 \& 9 & Structural Estimation & \textcite{nevoTakingDogmaOut2010} \\
+    		2 & Sept. 14 \& 16 & R Tutorial & \\
+	        3 & Sept. 21 \& 23 & Random Utility Model & KT 1-2 \\
+	        4 & Sept. 28 \& 30 & Logit Model & KT 3.1--3.6 \\
+	        5 & Oct. 5 \& 7 & Logit Model & \\
+	        6 & Oct. 12 \& 14 & Maximum Likelihood Estimation & MLE Supplement, KT 8 \\
+	        7 & Oct. 19 \& 21 & Logit Estimation & KT 3.7--3.8 \\
+	        8 & Oct. 26 \& 28 & Generalized Method of Moments & GMM Supplement \\
+	        9 & Nov. 2 \& 4 & Generalized Extreme Value Models & KT 4 \\
+	        10 & Nov. 9 \& 16 & Mixed Logit Model & KT 6 \\
+	        11 & Nov. 18 \& 23 & Simulation-Based Estimation & KT 10 \\
+	        12 & Nov. 30 \& Dec. 2 & Individual-Level Coefficients & KT 11 \\
+	        13 & Dec. 7 & Dynamics and Endogeneity & KT 7.7, KT 13 \\
+    		\bottomrule
+  		\end{tabular}
+  		\begin{tablenotes}
+  			\item[1] KT refers to chapters in the \textcite{trainDiscreteChoiceMethods2009} textbook. Supplement refers to the supplemental notes that I will provide. For other readings, I will provide full citations in slides or by email.
+  		\end{tablenotes}
+  	\end{threeparttable}
+\end{table}
+\end{NoHyper}
+
+\section*{Accommodation Statement}
+
+The University of Massachusetts Amherst is committed to providing an equal educational opportunity for all students. If you have a documented physical, psychological, or learning disability on file with Disability Services, you may be eligible for reasonable academic accommodations to help you succeed in this course. If you have a documented disability that requires an accommodation, please notify me within the first two weeks of the semester so that we may make appropriate arrangements. For further information, please visit Disability Services (\href{https://www.umass.edu/disability/}{\texttt{www.umass.edu/disability}}).
+
+\section*{Academic Honesty Statement}
+
+Since the integrity of the academic enterprise of any institution of higher education requires honesty in scholarship and research, academic honesty is required of all students at the University of Massachusetts Amherst. Academic dishonesty is prohibited in all programs of the University. Academic dishonesty includes but is not limited to: cheating, fabrication, plagiarism, and facilitating dishonesty. Appropriate sanctions may be imposed on any student who has committed an act of academic dishonesty. Instructors should take reasonable steps to address academic misconduct. Any person who has reason to believe that a student has committed academic dishonesty should bring such information to the attention of the appropriate course instructor as soon as possible. Instances of academic dishonesty not related to a specific course should be brought to the attention of the appropriate department Head or Chair. Since students are expected to be familiar with this policy and the commonly accepted standards of academic integrity, ignorance of such standards is not normally sufficient evidence of lack of intent. (\href{https://www.umass.edu/honesty/}{\texttt{www.umass.edu/honesty}})
+
+\end{document}
