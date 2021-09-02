@@ -4,6 +4,8 @@ Welcome to **Topics in Advanced Econometrics** (ResEcon 703) at the University o
 
 For detailed information on this course, please see the [syllabus](https://raw.githack.com/woerman/ResEcon703/master/syllabus/syllabus.pdf).
 
+Enrolled students can access videos of in-person classes on [Echo360](https://echo360.org/section/709335f7-9af8-416d-a199-97204223036d/home).
+
 ## Course Materials
 
 Week 0: **Course Overview**
