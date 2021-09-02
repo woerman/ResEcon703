@@ -12,8 +12,8 @@ Week 0: **Course Overview**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_00/week_00.pdf)
 
 Week 1: **Structural Estimation**
-<!-- * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_01/week_01.pdf)
-* Videos: [1](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [2](https://www.youtube.com/watch?v=-nsiFv30KNg&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [3](https://www.youtube.com/watch?v=5uO0frAGgl0&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [4](https://www.youtube.com/watch?v=AvbEOSqzd-s&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) -->
+* [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_01/week_01.pdf)
+* Videos: [1](https://www.youtube.com/watch?v=UGJvX8sQxY4&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [2](https://www.youtube.com/watch?v=-nsiFv30KNg&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [3](https://www.youtube.com/watch?v=5uO0frAGgl0&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG) | [4](https://www.youtube.com/watch?v=AvbEOSqzd-s&list=PLnC0w4gG7um283B3tWKr9TvS_8wBhQ5nG)
 
 Week 2: **R Tutorial**
 <!-- * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_02/week_02.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_02/week_02.R)
