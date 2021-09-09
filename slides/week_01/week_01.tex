@@ -58,6 +58,7 @@
         \item \hyperlink{page.\getpagerefnumber{what}}{What is structural econometrics?}
         \item \hyperlink{page.\getpagerefnumber{why}}{Why add structure to an econometric model?}
         \item \hyperlink{page.\getpagerefnumber{how}}{How to construct a structural econometric model}
+        \item \hyperlink{page.\getpagerefnumber{mw}}{Miller and Weinberg (2017)}
     \end{itemize}
     \vspace{2ex}
     This week's reading
@@ -627,6 +628,173 @@
     		\item Method of simulated moments
     	\end{itemize}
     \end{enumerate}
+\end{frame}
+
+\section{Miller and Weinberg (2017)}
+\label{mw}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Miller and Weinberg (2017)
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Research Setting and Research Question}
+    US beer industry
+    \begin{itemize}
+        \item Dominated by three larger firms: Miller, Coors, and ABI
+    \end{itemize}
+    \vspace{2ex}
+    MillerCoors merger
+    \begin{itemize}
+        \item Miller and Coors combined operations to create a new joint venture
+        \item Merger was reviewed by US DOJ and approved in June 2008
+        \begin{itemize}
+            \item Some concern that increased concentration would harm consumers
+            \item But cost efficiencies could reduce consumer prices
+            \item DOJ determined that consumers would benefit on net
+        \end{itemize}
+        \item But what if the merger changed the nature of competition?
+    \end{itemize}
+    \vspace{2ex}
+    Research question: Did the MillerCoors merger lead to new coordinated pricing between MillerCoors and ABI?
+\end{frame}
+
+\begin{frame}\frametitle{Data}
+    Retail scanner data on supermarket beer sales
+    \begin{itemize}
+        \item Weekly revenue and unit sales by UPC code, week, and store
+        \item 2001--2011, 39 geographic regions, 13 flagship brands
+        \item Aggregated to region-month or region-quarter levels
+    \end{itemize}
+    \vspace{2ex}
+    American Community Survey Public Use Microdata Sample
+    \begin{itemize}
+        \item Household demographics (income) for a subsample of US households
+    \end{itemize}
+    \vspace{2ex}
+    Locations of geographic regions and breweries
+    \begin{itemize}
+        \item Driving distance from nearest brewery to market
+    \end{itemize}
+    \vspace{2ex}
+    Diesel fuel prices from US EIA and US DOE
+    \begin{itemize}
+        \item Transportation cost to deliver goods to market
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Descriptive Evidence of Price Effects}
+    \centering
+    \includegraphics[width=0.95\linewidth]{fig_1}
+\end{frame}
+
+\begin{frame}\frametitle{Regression Evidence of Time-Series Price Effects}
+    \centering
+    \includegraphics[width=0.5\linewidth]{eq_1} \\
+    \vspace{2ex}
+    \includegraphics[width=0.95\linewidth]{table_2}
+\end{frame}
+
+\begin{frame}\frametitle{Regression Evidence of Cross-Sectional Price Effects}
+    \centering
+    \includegraphics[width=0.5\linewidth]{eq_2} \\
+    \vspace{2ex}
+    \includegraphics[width=0.95\linewidth]{table_3}
+\end{frame}
+
+\begin{frame}\frametitle{Regression Evidence of Cross-Sectional Price Effects}
+    \centering
+    \includegraphics[width=0.5\linewidth]{eq_2} \\
+    \vspace{2ex}
+    \includegraphics[width=0.95\linewidth]{table_3}
+\end{frame} 
+
+\begin{frame}\frametitle{Event Study of Concentration Effects (AHW 2015)}
+    \centering
+    \includegraphics[width=0.95\linewidth]{ahw_fig_5}
+\end{frame} 
+
+\begin{frame}\frametitle{Event Study of Distance Effects (AHW 2015)}
+    \centering
+    \includegraphics[width=0.95\linewidth]{ahw_fig_6}
+\end{frame} 
+
+\begin{frame}\frametitle{Heterogeneity in Price Effects (AHW 2015)}
+    \centering
+    \includegraphics[width=0.95\linewidth]{ahw_table_6}
+\end{frame} 
+
+\begin{frame}\frametitle{Economic Model of Demand}
+    \centering
+    \includegraphics[width=0.95\linewidth]{eq_3}
+\end{frame}
+
+\begin{frame}\frametitle{Statistical Assumptions of Demand Model}
+    \centering
+    \includegraphics[width=0.95\linewidth]{eq_4}
+\end{frame}
+
+\begin{frame}\frametitle{Implied Market Shares}
+    \centering
+    \includegraphics[width=0.6\linewidth]{eq_6} \\
+    \vspace{4ex}
+    \includegraphics[width=0.9\linewidth]{eq_5} \\
+    \vspace{4ex}
+    \includegraphics[width=0.8\linewidth]{eq_7}
+\end{frame}
+
+\begin{frame}\frametitle{Demand Estimation Results}
+    \centering
+    \includegraphics[width=0.95\linewidth]{table_4}
+\end{frame}
+
+\begin{frame}\frametitle{Estimated Demand Elasticities}
+    \centering
+    \includegraphics[width=0.95\linewidth]{table_5}
+\end{frame}
+
+\begin{frame}\frametitle{Economic Model of Supply (or Pricing)}
+    \centering
+    \includegraphics[width=0.6\linewidth]{eq_9} \\
+    \vspace{4ex}
+    \includegraphics[width=0.6\linewidth]{eq_10}
+\end{frame}
+
+\begin{frame}\frametitle{Statistical Assumptions of Supply Model}
+    \centering
+    \includegraphics[width=0.95\linewidth]{eq_11} \\
+    \vspace{4ex}
+    \includegraphics[width=\linewidth]{eq_12}
+\end{frame}
+
+\begin{frame}\frametitle{Supply Estimation Results}
+    \centering
+    \includegraphics[width=0.95\linewidth]{table_6}
+\end{frame}
+
+\begin{frame}\frametitle{Estimated Markups and Implied Cost Shocks}
+    \centering
+    \includegraphics[width=0.95\linewidth]{table_7} \\
+    \vspace{2ex}
+    \includegraphics[width=0.95\linewidth]{table_8}
+\end{frame}
+
+\begin{frame}\frametitle{Counterfactual Price Simulations}
+    \centering
+    \includegraphics[width=0.95\linewidth]{fig_4}
+\end{frame}
+
+\begin{frame}\frametitle{Counterfactual Price Simulations}
+    \centering
+    \includegraphics[width=0.95\linewidth]{fig_5}
+\end{frame}
+
+\begin{frame}\frametitle{Welfare Calculations}
+    \centering
+    \includegraphics[width=0.95\linewidth]{table_10}
 \end{frame}
 
 \end{document}
