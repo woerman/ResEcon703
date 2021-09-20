@@ -62,18 +62,18 @@ Week 13: **Dynamics and Endogeneity**
 <!-- * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_13/week_13.pdf)
 * Videos: [1](https://www.youtube.com/watch?v=-7jSiiYhYPc&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [2](https://www.youtube.com/watch?v=FaDC5mNiy70&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [3](https://www.youtube.com/watch?v=6Q8vN02_DMs&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [4](https://www.youtube.com/watch?v=cNeGABDeNGo&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [5](https://www.youtube.com/watch?v=RC2Ku41dEY4&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) | [6](https://www.youtube.com/watch?v=TVFWSNwgZZY&list=PLnC0w4gG7um22cQQfmMEPowiPHgjQjIE2) -->
 
-<!-- ## Problem Sets
+## Problem Sets
 
 **Problem Set 1**
-* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/commute_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.R)
+* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/commute_datasets.zip) <!-- | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_1/problem_set_1_solutions.R) -->
 
-**Problem Set 2**
-* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/commute_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.R)
+<!-- **Problem Set 2**
+* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/commute_datasets.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_2/problem_set_2_solutions.R) -->
 
-**Problem Set 3**
-* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/camping_dataset.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3_solutions.R)
+<!-- **Problem Set 3**
+* [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/camping_dataset.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_3/problem_set_3_solutions.R) -->
 
-**Problem Set 4**
+<!-- **Problem Set 4**
 * [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/problem_set_4.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/camping_dataset.zip) | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/problem_set_4_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_4/problem_set_4_solutions.R) -->
 
 <!-- ## Final Project
