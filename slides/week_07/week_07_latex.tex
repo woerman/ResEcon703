@@ -1,0 +1,621 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Week 7:\ Logit Estimation]{Week 7:\ Logit Estimation}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Maximum likelihood estimation
+    \end{itemize}
+    \vspace{3ex}
+    This week's topics
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{recap}}{Logit model recap}
+        \item \hyperlink{page.\getpagerefnumber{estim}}{Logit estimation}
+        \item \hyperlink{page.\getpagerefnumber{alt}}{Alternate logit estimation methods}
+        \item \hyperlink{page.\getpagerefnumber{example}}{Logit estimation R example}
+    \end{itemize}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Train textbook, chapters 3.7--3.8
+    \end{itemize}
+\end{frame}
+
+\section{Logit Model Recap}
+\label{recap}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Model Recap
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Course So Far}
+    So far we have covered
+    \begin{itemize}
+    	\item Structural econometric models
+    	\item Discrete choice framework
+    	\item Random utility model
+    	\item Logit model
+    	\item Maximum likelihood estimation
+    	\item Numerical optimization
+    \end{itemize}
+    \vspace{3ex}
+    We can finally put all these pieces together and estimate a structural econometric model ourselves! \\
+    \vspace{3ex}
+    But first, a recap of the random utility and logit models
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model Recap}
+    A decision maker chooses the alternative that maximizes utility
+    \begin{itemize}
+		\item A decision maker, $n$, faces a choice among $J$ discrete alternatives
+    	\item Alternative $j$ provides utility $U_{nj}$ (where $j = 1, \ldots, J$)
+    	\item $n$ chooses $i$ if and only if $U_{ni} > U_{nj} \; \forall j \neq i$
+   	\end{itemize}
+   	\vspace{2ex}
+   	We (the econometricians) do not observe utility $U_{nj}$, so we model it as being composed of
+   	\begin{itemize}
+		\item $V_{nj}$: Utility from observed attributes 
+		\item $\varepsilon_{nj}$: Utility from unobserved attributes, which we treat as random
+	\end{itemize}
+	$$U_{nj} = V_{nj} + \varepsilon_{nj}$$ \\
+	\vspace{2ex}
+	The probability that decision maker $n$ chooses alternative $i$ is
+    \begin{align*}
+    	P_{ni} & = \Pr(U_{ni} > U_{nj} \; \forall j \neq i) \\
+    	& = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Model Recap}
+    The logit model makes a simple (but sometimes overly strong) assumption about the joint density of unobserved utility, $f(\bm{\varepsilon}_n)$
+    $$\varepsilon_{nj} \sim \text{i.i.d.\ type I extreme value (Gumbel) with } Var(\varepsilon_{nj}) = \frac{\pi^2}{6}$$ \\
+    \vspace{2ex}
+    This assumption yields a closed-form expression for choice probabilities
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$ \\
+    \vspace{2ex}
+    These choice probabilities make estimation relatively easy, but they imply rigid and often unrealistic substitution patterns
+    \begin{itemize}
+    	\item Independence of irrelevant alternatives (IIA)
+    	\item Proportional substitution
+    \end{itemize}
+\end{frame}
+
+\section{Logit Estimation}
+\label{estim}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Estimation
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Probability Mass Function of Logit Model}
+	We observe the following data about a discrete choice setting
+    \begin{itemize}
+    	\item $\bm{y}$: Vector of choices 
+    	\begin{itemize}
+    		\item $y_{ni} = 1$ if and only if decision maker $n$ chooses alternative $i$
+    	\end{itemize}
+    	\item $\bm{X}$: Matrix of data including attributes of alternatives and information on decision makers
+    \end{itemize}
+    \vspace{2ex}
+    Under the random utility model, $y_{ni}$ is a binary (Bernoulli) random variable with conditional probability mass function equal to the choice probability
+    \begin{align*}
+	    \Pr(y_{ni} = 1 \mid \bm{x}_n, \bm{\theta}) & = P_{ni}(\bm{x}_n, \bm{\theta})
+	    \intertext{Under the logit assumption, this PMF and choice probability are}
+	    \Pr(y_{ni} = 1 \mid \bm{x}_n, \bm{\theta}) & = P_{ni}(\bm{x}_n, \bm{\theta}) = \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}}
+	\end{align*}
+	We will use this distributional assumption to estimate the MLE, $\widehat{\bm{\theta}}$
+\end{frame}
+
+\begin{frame}\frametitle{Joint Probability Mass Function of Logit Model}
+	A decision maker chooses exactly one alternative, so the probability of observing the decision maker's vector of choices equals the choice probability of the observed choice
+	\begin{align*}
+		\Pr(\bm{y}_n \mid \bm{x}_n, \bm{\theta}) & = \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Assuming each decision maker is independent, the probability of observing the entire vector of choices is}
+		\Pr(\bm{y} \mid \bm{X}, \bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Under the logit assumption, this joint PMF is}
+		\Pr(\bm{y} \mid \bm{X}, \bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]^{y_{ni}}
+	\end{align*} \\
+	\vspace{-2ex}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Likelihood Function}
+	The joint PMF implies that we know $\bm{X}$ and $\bm{\theta}$ and want to know probabilities of $\bm{y}$, but we actually know $\bm{y}$ and $\bm{X}$ and want to estimate $\bm{\theta}$ \\
+	\vspace{3ex}
+	We simply switch the conditioning on this joint PMF to yield the likelihood function of the parameters, $\bm{\theta}$, conditional on the data, $\bm{y}$ and $\bm{X}$
+	\begin{align*}
+		L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ P_{ni}(\bm{x}_n, \bm{\theta}) \right]^{y_{ni}}
+		\intertext{Under the logit assumption, this likelihood function is}
+		L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \prod_{n = 1}^N \prod_{i = 1}^J \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]^{y_{ni}}
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Log-Likelihood Function}
+    Then the log-likelihood function of the parameters, $\bm{\theta}$, conditional on the data, $\bm{y}$ and $\bm{X}$, is
+    \begin{align*}
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}(\bm{x}_n, \bm{\theta})
+    	\intertext{Under the logit assumption, this likelihood function is}
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]
+    	\intertext{If we further assume that representative utility is liner, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then this log-likelihood function is}
+    	\ln L(\bm{\beta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_j e^{\bm{\beta}' \bm{x}_{nj}}} \right]
+    \end{align*} \\
+    \vspace{-2ex}
+\end{frame}
+
+\begin{frame}\frametitle{Logit Maximum Likelihood Estimator}
+	The maximum likelihood estimator is the set of parameters that maximizes this log-likelihood function
+	$$\widehat{\bm{\theta}} = \argmax_{\bm{\theta}} \ln L(\bm{\theta} \mid \bm{y}, \bm{X})$$ \\
+	These parameters make it most likely to generate the choices that you observe, conditional on the data describing the choice setting
+	\begin{itemize}
+		\item The MLE makes the choice probability close to one for chosen alternatives and close to zero for alternatives that are not chosen
+	\end{itemize}
+	\vspace{2ex}
+    The first-order conditions for maximization are
+    $$\frac{\partial \ln L(\bm{\theta} \mid \bm{y}, \bm{X})}{\partial \bm{\theta}} = \bm{0}$$
+    These first-order conditions do not have a closed-form solution, so we will need to use numerical optimization to find the MLE
+\end{frame}
+
+\section{Alternate Logit Estimation Methods}
+\label{alt}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Alternate Logit Estimation Methods
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Logit Moment Conditions and GMM}
+    If we assume representative utility is linear, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then the logit MLE first-order conditions are equivalent to
+    $$\sum_{n = 1}^N \sum_{i = 1}^J \left[ y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta}) \right] \bm{x}_n = \bm{0}$$ \\
+    \vspace{2ex}
+    This expression implies the orthogonality of econometric residuals, $y_{ni} - P_{ni}(\bm{x}_n, \bm{\beta})$, and the data, $\bm{x}_n$
+    \begin{itemize}
+        \item Analogous to OLS finding the parameters that make the residuals orthogonal to the data
+    \end{itemize}
+    \vspace{2ex}
+    These equalities are sample moment conditions that we could use to estimate the logit parameters by GMM
+    \begin{itemize}
+        \item More on GMM next week
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Endogeneity in the Logit Model}
+    The previous slides require that the data describing the choice settings, $\bm{X}$, are exogenous
+    \begin{itemize}
+        \item If the data are endogenous to the choice, then coefficients may be inconsistent
+        \begin{itemize}
+            \item The institution is the same as endogeneity in an OLS regression
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    If we have some exogenous instruments that generate variation in our data, we can use a kind of instrumental variables method to estimate consistent parameters
+    \begin{itemize}
+        \item We will construct moment conditions using these instruments, rather than the data, and solve with GMM
+        \item More on this topic next week
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Estimation Using a Subset of Alternatives}
+    In some settings, it is computationally infeasible to consider the full choice set for every decision maker
+    \begin{itemize}
+    	\item We can instead consider only a subset of the alternatives available to each decision maker
+    \end{itemize}
+    \vspace{2ex}
+    If we sample the alternatives for each decision maker in such a way that each alternative has an equal probability of being considered, we can use the standard ML method from the previous slides
+    \begin{itemize}
+    	\item In this case, the MLE is consistent but not efficient
+    \end{itemize}
+    \vspace{2ex}
+    If we sample with unequal probabilities, we need to make a small adjustment to estimation to account for this unequal sampling
+    \begin{itemize}
+    	\item We may want unequal probabilities when some alternatives have very low take-up
+    	\item See the Train textbook for details of this the estimation method
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice-Based Sampling of Decision Makers}
+    The previous slides require that the sampling of decision makers is random (or at least exogenous to the choice)
+    \begin{itemize}
+    	\item If the sample is endogenous to the choice, then coefficients may be inconsistent
+    	\begin{itemize}
+    		\item Example: What could go wrong if you take a survey of commute choices, but you take the survey at the bus stop?
+    	\end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    In some case, we may want to oversample some choices
+    \begin{itemize}
+    	\item If an important alternative has low take-up, we may want to oversample those decision makers to obtain more information about that choice
+    \end{itemize}
+    \vspace{2ex}
+    We can recover consistent estimates from a choice-based sample of decision makers, but estimation is more complex and depends on the specific sampling method used
+    \begin{itemize}
+    	\item See the Train textbook for more details and references
+    \end{itemize}
+\end{frame}
+
+\section{Logit Estimation R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Logit Estimation R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Choice Example}
+    We are studying how consumers make choices about expensive and highly energy-consuming appliances in their homes, but now with different data
+    \begin{itemize}
+        \item We have (real) data on 900 households in California and the type of heating system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Choice set
+            \begin{itemize}
+                \item \texttt{gc}: gas central
+                \item \texttt{gr}: gas room
+                \item \texttt{ec}: electric central
+                \item \texttt{er}: electric room
+                \item \texttt{hp}: heat pump
+            \end{itemize}
+            \vspace{8ex}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Alternative-specific data
+            \begin{itemize}
+                \item \texttt{ic}: installation cost
+                \item \texttt{oc}: annual operating cost
+            \end{itemize}
+            \vspace{1ex}
+            Household demographic data
+            \begin{itemize}
+                \item \texttt{income}: annual income
+                \item \texttt{agehed}: age of household head
+                \item \texttt{rooms}: number of rooms
+                \item \texttt{region}: home location
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    The \texttt{Heating} dataset is part of the \texttt{mlogit} package, so we can load it using the \texttt{data()} function \\
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model of Heating System Choice}
+    We model the utility to household $n$ of installing heating system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    The probability that household $n$ installs heating system $i$ is
+ 	$$P_{ni} = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n$$ \\
+ 	\vspace{2ex}
+  	Under the logit assumption, these choice probabilities simplify to
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of Heating System Choice}
+	What might affect the utility of the different heating systems?
+	\begin{itemize}
+		\item Installation cost
+		\item Annual operating cost
+		\item Heating system technology
+		\begin{itemize}
+			\item Gas systems might be preferred to electric systems
+			\item Central systems might be preferred to room systems
+		\end{itemize}
+		\item Anything else?
+	\end{itemize}
+    \vspace{3ex}
+    We model the representative utility of heating system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}\frametitle{Multinomial Logit Model of Heating System Choice}
+    Under the logit assumption, the choice probability that household $n$ installs heating system $i$ is
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$ \\
+    \vspace{1ex}
+    We model the representative utility of heating system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$ \\
+    \vspace{1ex}
+    Substituting this representative utility into the choice probabilities gives
+    $$P_{ni} = \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_j e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}}$$ \\
+    \vspace{1ex}
+    We have six parameters to estimate using maximum likelihood
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Likelihood Estimator of Logit Model}
+    The likelihood function of the parameters is
+    \begin{align*}
+        L(\bm{\theta}) & = \prod_{n = 1}^N \prod_{i = 1}^J P_{ni}^{y_{ni}}
+        \intertext{and the log-likelihood function of the parameters is}
+        \ln L(\bm{\theta}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}
+        \intertext{The maximum likleihood estimator of these parameters is}
+        \widehat{\bm{\theta}} & = \argmax_{\bm{\theta}} \ln L(\bm{\theta})
+    \end{align*}
+    We will use numerical optimization to find the parameters values that maximize the log-likelihood function
+\end{frame}
+
+\begin{frame}\frametitle{Numerical Optimization for MLE}
+    We want to find the set of parameters, $\widehat{\bm{\theta}}$, that maximize the log-likelihood function, $\ln L(\bm{\theta})$
+    \begin{enumerate}
+        \item Begin with some initial parameter values, $\bm{\theta}^0$
+        \item Check if you can ``walk up'' to a higher value
+        \item If so, take a step in the right direction to $\bm{\theta}^1$
+        \item Repeat steps (2) and (3), stepping from $\bm{\theta}^s$ to $\bm{\theta}^{s + 1}$ until you reach the maximum
+    \end{enumerate}
+    \vspace{3ex}
+    The \texttt{optim()} function in R will perform this numerical optimization for us
+    \begin{itemize}
+        \item We just have to give the \texttt{optim()} function two things:
+        \begin{itemize}
+            \item Some initial parameter values, $\bm{\theta}^0$
+            \item A function that will take those parameters as an argument and calculate the log-likelihood, $\ln L(\bm{\theta})$
+            \item (And sometimes additional information to fine-tune the optimization procedure and output)
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Optimization in R}
+    <<R CODE HERE>>
+    \vspace{1ex}
+    \texttt{optim()} requires that you create a function, \texttt{fn}, that
+    \begin{enumerate}
+        \item Takes a set of parameters and other arguments as inputs
+        \item Calculates your objective function given those parameters
+        \item Returns this value of the objective function
+    \end{enumerate}
+    \vspace{1ex}
+    You also have to give \texttt{optim()} arguments for
+    \begin{itemize}
+        \item \texttt{par}: starting parameter values
+        \item \texttt{\ldots}: dataset and other things needed by your function
+        \item \texttt{method}: optimization algorithm
+        \begin{itemize}
+            \item I recommend \texttt{method = `BFGS'} for our estimation
+        \end{itemize}
+    \end{itemize}
+    \vspace{1ex}
+    \texttt{optim()} will find the parameters that minimize the objective function
+    \begin{itemize}
+        \item To maximize, minimize the negative of the objective function
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Steps to Calculate the Logit Log-Likelihood}
+    The logit log-likelihood function is
+    $$\ln L(\bm{\theta}) = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}$$
+    where the choice probabilities for our model are
+    $$P_{ni} = \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_j e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}}$$ \\
+    \vspace{2ex}
+    Steps to calculate the logit log-likelihood conditional on $\bm{\theta}$
+    \begin{enumerate}
+        \item Calculate the representative utility of each alternative-household
+        \item Calculate the choice probability of each alternative-household
+        \item Calculate the log of the choice probability for each chosen alternative
+        \item Calculate the negative of the log-likelihood
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Log-Likelihood}
+	\vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Logit Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+    <<R CODE HERE>>
+    \vspace{2ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+	\vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+	$$\widehat{Var}(\widehat{\bm{\theta}}) = \left\{ \left. -\frac{\partial^2 \ln L(\bm{\theta})}{\partial \bm{\theta} \partial \bm{\theta}'} \right\vert_{\bm{\theta} = \widehat{\bm{\theta}}} \right\}^{-1}$$
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    $$\widehat{\bm{\theta}} \overset{a}{\sim} \mathcal{N} \left( \bm{\theta}_0, I(\bm{\theta}_0)^{-1} \right)$$ \\
+    \vspace{2ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Another Way to Calculate Logit Log-Likelihood}
+	We can make our function to calculate log-likelihood more efficient if we work with a long dataset \\
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in Long Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{A Different Function to Calculate Logit Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Yet Another Function to Calculate Logit Log-Likelihood}
+	We can make our function to calculate log-likelihood even more efficient if we work with matrices \\
+	\vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Logit Model}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximum Likelihood Estimator and Hessian}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Variance-Covariance Matrix}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Standard Errors, Z-Stats, and P-Values}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Likelihood Ratio Test}
+    We can test hypotheses about the model parameters using the likelihood ratio test \\
+    \vspace{3ex}
+    We will test if these households have heating technology preferences
+    \begin{itemize}
+    	\item Are all of the the alternative-specific intercepts equal zero?
+    \end{itemize}
+    \vspace{1ex}
+    $$H_0: \begin{pmatrix}
+    	\alpha_{ec} \\ 
+    	\alpha_{er} \\
+    	\alpha_{gc} \\
+    	\alpha_{gr}
+    \end{pmatrix} = \begin{pmatrix}
+    	0 \\
+    	0 \\
+    	0 \\
+    	0
+    \end{pmatrix}$$
+\end{frame}
+
+\begin{frame}\frametitle{Likelihood Ratio Test Statistic}
+    The likelihood ratio test statistic is
+    $$-2 \ln \lambda = 2 \left( \ln L(\widehat{\bm{\theta}}_U) - \ln L(\widehat{\bm{\theta}}_R) \right)$$
+    and is distributed $\chi^2$ with degrees of freedom equal to the number of model restrictions
+    $$-2 \ln \lambda \sim \chi^2(4)$$ \\
+    \vspace{2ex}
+    We need both the unrestricted MLE, $\widehat{\bm{\theta}}_U$, and the restricted MLE, $\widehat{\bm{\theta}}_R$, to calculate this test statistic
+    \begin{itemize}
+    	\item $\widehat{\bm{\theta}}_U$: MLE from the full model that we have already estimated
+    	\item $\widehat{\bm{\theta}}_R$: MLE from a model with no alternative-specific intercepts
+    \end{itemize}
+    \vspace{2ex}
+    We need to find the MLE of a model with representative utility
+    $$V_{nj} = \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function to Calculate Restricted Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimate Restricted Model}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Estimation Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test Statistic}
+	The likelihood ratio test statistic is
+    $$-2 \ln \lambda = 2 \left( \ln L(\widehat{\bm{\theta}}_U) - \ln L(\widehat{\bm{\theta}}_R) \right)$$
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test}
+	The likelihood ratio test statistic is distributed $\chi^2$ with degrees of freedom equal to the number of model restrictions
+    $$-2 \ln \lambda \sim \chi^2(4)$$
+    <<R CODE HERE>>
+\end{frame}
+
+\end{document}

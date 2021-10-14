@@ -35,8 +35,8 @@ Week 6: **Maximum Likelihood Estimation**
 * Videos: [1](https://www.youtube.com/watch?v=12M8wJT3GR8&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [2](https://www.youtube.com/watch?v=H0EPloe8qhs&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [3](https://www.youtube.com/watch?v=fF9yhX2Q8CQ&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [4](https://www.youtube.com/watch?v=kKYY_OXGHxY&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [5](https://www.youtube.com/watch?v=esY21bNZEEg&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [6](https://www.youtube.com/watch?v=E0B-vSIT0Nc&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [7](https://www.youtube.com/watch?v=Y9WgOTwQYXw&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal)
 
 Week 7: **Logit Estimation**
-<!-- * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_07/week_07.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_07/week_07.R)
-* Videos: [1](https://www.youtube.com/watch?v=SMfQxTHVIqA&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay) | [2](https://www.youtube.com/watch?v=cmdaAEyUtEM&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay) | [3](https://www.youtube.com/watch?v=vE6wAFkYeNc&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay) -->
+* [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_07/week_07.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_07/week_07.R)
+* Videos: [1](https://www.youtube.com/watch?v=SMfQxTHVIqA&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay) | [2](https://www.youtube.com/watch?v=cmdaAEyUtEM&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay) | [3](https://www.youtube.com/watch?v=vE6wAFkYeNc&list=PLnC0w4gG7um0f2Do4-1n76OA9cA9aJbay)
 
 Week 8: **Generalized Method of Moments**
 <!-- * [Notes](https://raw.githack.com/woerman/ResEcon703/master/notes/gmm/gmm.pdf) | [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/week_08.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/week_08.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/ac_renters.csv)
