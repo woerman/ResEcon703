@@ -963,7 +963,7 @@
     \vspace{2ex}
     Steps to calculate the OLS log-likelihood conditional on $\bm{\theta}$
     \begin{enumerate}
-        \item Construct matrices $\bm{X}$ and $\bm{y}$
+        \item Construct matrices $\bm{X}$ and $\bm{y}$ and organize parameters $\bm{\beta}$ and $\sigma^2$
         \item Calculate fitted values of $\bm{y}$, $\widehat{\bm{y}} = \bm{\beta}' \bm{x}_i$, which is the mean of each $y_i$
         \item Calculate the density for each $y_i$, $f(y_i \mid \bm{x}_i, \bm{\theta})$
         \item Calculate the log-likelihood, $\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{i = 1}^n \ln f(y_i \mid \bm{x}_i, \bm{\theta})$
@@ -1096,7 +1096,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlcom{## Maximize the OLS log-=likelihood function}
+\hlcom{## Maximize the OLS log-likelihood function}
 \hlstd{mle_ols_2} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{5}\hlstd{),} \hlnum{1}\hlstd{),} \hlkwc{fn} \hlstd{= ll_ols,}
                    \hlkwc{data} \hlstd{= mtcars,} \hlkwc{y_var} \hlstd{=} \hlstr{'mpg'}\hlstd{,}
                    \hlkwc{x_vars} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'hp'}\hlstd{,} \hlstr{'disp'}\hlstd{,} \hlstr{'wt'}\hlstd{,} \hlstr{'qsec'}\hlstd{),}
@@ -1131,7 +1131,7 @@
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlcom{## Maximize the OLS log-=likelihood function}
+\hlcom{## Maximize the OLS log-likelihood function}
 \hlstd{mle_ols_3} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{4}\hlstd{),} \hlnum{1}\hlstd{),} \hlkwc{fn} \hlstd{= ll_ols,}
                    \hlkwc{data} \hlstd{= iris,} \hlkwc{y_var} \hlstd{=} \hlstr{'Petal.Length'}\hlstd{,}
                    \hlkwc{x_vars} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'Petal.Width'}\hlstd{,} \hlstr{'Sepal.Length'}\hlstd{,}

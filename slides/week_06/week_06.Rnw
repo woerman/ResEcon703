@@ -863,7 +863,7 @@ options(width = 70)
     \vspace{2ex}
     Steps to calculate the OLS log-likelihood conditional on $\bm{\theta}$
     \begin{enumerate}
-        \item Construct matrices $\bm{X}$ and $\bm{y}$
+        \item Construct matrices $\bm{X}$ and $\bm{y}$ and organize parameters $\bm{\beta}$ and $\sigma^2$
         \item Calculate fitted values of $\bm{y}$, $\widehat{\bm{y}} = \bm{\beta}' \bm{x}_i$, which is the mean of each $y_i$
         \item Calculate the density for each $y_i$, $f(y_i \mid \bm{x}_i, \bm{\theta})$
         \item Calculate the log-likelihood, $\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{i = 1}^n \ln f(y_i \mid \bm{x}_i, \bm{\theta})$
@@ -945,7 +945,7 @@ options(width = 70)
         \item Regress \texttt{mpg} on \texttt{hp}, \texttt{disp}, \texttt{wt}, \texttt{qsec} from the \texttt{mtcars} dataset
     \end{itemize}
     <<warning = FALSE>>=
-    ## Maximize the OLS log-=likelihood function
+    ## Maximize the OLS log-likelihood function
     mle_ols_2 <- optim(par = c(rep(0, 5), 1), fn = ll_ols, 
                        data = mtcars, y_var = 'mpg', 
                        x_vars = c('hp', 'disp', 'wt', 'qsec'),
@@ -966,7 +966,7 @@ options(width = 70)
         \item Regress \texttt{Petal.Length} on \texttt{Petal.Width}, \texttt{Sepal.Length}, and \texttt{Sepal.Width} from the \texttt{iris} dataset
     \end{itemize}
     <<warning = FALSE>>=
-    ## Maximize the OLS log-=likelihood function
+    ## Maximize the OLS log-likelihood function
     mle_ols_3 <- optim(par = c(rep(0, 4), 1), fn = ll_ols, 
                        data = iris, y_var = 'Petal.Length', 
                        x_vars = c('Petal.Width', 'Sepal.Length', 

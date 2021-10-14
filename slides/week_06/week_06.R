@@ -67,7 +67,7 @@ mle_ols_1$hessian %>%
   sqrt()
 
 ### Estimate regression of mpg on disp, wt, and qsec using MLE
-## Maximize the OLS log-=likelihood function
+## Maximize the OLS log-likelihood function
 mle_ols_2 <- optim(par = c(rep(0, 5), 1), fn = ll_ols, 
                    data = mtcars, y_var = 'mpg', 
                    x_vars = c('hp', 'disp', 'wt', 'qsec'),
@@ -81,7 +81,7 @@ mle_ols_2$hessian %>%
   sqrt()
 
 ### Estimate regression of Petal.Length on other iris variables using MLE
-## Maximize the OLS log-=likelihood function
+## Maximize the OLS log-likelihood function
 mle_ols_3 <- optim(par = c(rep(0, 4), 1), fn = ll_ols, 
                    data = iris, y_var = 'Petal.Length', 
                    x_vars = c('Petal.Width', 'Sepal.Length',

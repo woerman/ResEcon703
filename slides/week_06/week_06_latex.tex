@@ -837,7 +837,7 @@
     \vspace{2ex}
     Steps to calculate the OLS log-likelihood conditional on $\bm{\theta}$
     \begin{enumerate}
-        \item Construct matrices $\bm{X}$ and $\bm{y}$
+        \item Construct matrices $\bm{X}$ and $\bm{y}$ and organize parameters $\bm{\beta}$ and $\sigma^2$
         \item Calculate fitted values of $\bm{y}$, $\widehat{\bm{y}} = \bm{\beta}' \bm{x}_i$, which is the mean of each $y_i$
         \item Calculate the density for each $y_i$, $f(y_i \mid \bm{x}_i, \bm{\theta})$
         \item Calculate the log-likelihood, $\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{i = 1}^n \ln f(y_i \mid \bm{x}_i, \bm{\theta})$
