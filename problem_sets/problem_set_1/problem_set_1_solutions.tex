@@ -1,0 +1,734 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 1}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{lm()}, \texttt{glm()}, and \texttt{mlogit()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_set_1/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(lmtest)}
+\hlkwd{library}\hlstd{(sandwich)}
+\hlkwd{library}\hlstd{(car)}
+\hlkwd{library}\hlstd{(mlogit)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Problem 1: Linear Probability Model}
+
+We are studying how UMass graduate students choose how to commute to campus during winter when only driving a car or taking a bus are feasible options---assume the weather is too severe for even the heartiest graduate students to ride a bike or walk. This information will help the university to plan for parking and bus needs during the winter months. Use the \texttt{commute\_binary.csv} dataset for this problem. (Reminder: the \texttt{read\_csv()} function from the \texttt{tidyverse} package reads a .csv file into memory.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_binary} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'commute_binary.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Rows: 1000 Columns: 13}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Column specification ---------------------------------------------------\\\#\# Delimiter: "{},"{}\\\#\# chr \ (2): mode, marital\_status\\\#\# dbl (11): id, time.car, cost.car, time.bus, cost.bus, price\_gas, snowfa...}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# i Use `spec()` to retrieve the full column specification for this data.\\\#\# i Specify the column types or set `show\_col\_types = FALSE` to quiet this message.}}\end{kframe}
+\end{knitrout}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a linear probability model. Include the cost of driving and the time of each alternative as independent variables in your model:
+$$Y_n = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb} + \varepsilon_{n}$$
+where $Y_n$ is a binary indicator if student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{lm()} function estimates an OLS regression model.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Clean choice variable}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{car} \hlstd{= (mode} \hlopt{==} \hlstr{'car'}\hlstd{))}
+\hlcom{## Model choice as a linear probability model}
+\hlstd{reg_1a} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwc{formula} \hlstd{= car} \hlopt{~} \hlstd{cost.car} \hlopt{+} \hlstd{time.car} \hlopt{+} \hlstd{time.bus,}
+             \hlkwc{data} \hlstd{= data_binary)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and heteroskedastic-robust standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{coeftest()} function from the \texttt{lmtest} package tests the statistical significance of your coefficient estimates, and the \texttt{vcovHC()} function from the \texttt{sandwich} package estimates the heteroskedastic-robust covariance matrix of coefficient estimates.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate heteroskedastic-robust standard errors}
+\hlkwd{coeftest}\hlstd{(reg_1a,} \hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_1a))}
+\end{alltt}
+\begin{verbatim}
+## 
+## t test of coefficients:
+## 
+##               Estimate Std. Error  t value  Pr(>|t|)    
+## (Intercept)  0.9205109  0.0737943  12.4740 < 2.2e-16 ***
+## cost.car    -0.4375642  0.1392888  -3.1414  0.001731 ** 
+## time.car    -0.0652505  0.0058747 -11.1070 < 2.2e-16 ***
+## time.bus     0.0283670  0.0065722   4.3162 1.746e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		All three independent variables have statistically significant and economically meaningful effects on the choice to drive or take a bus to campus. An additional 10 cents of driving cost reduces the probability of driving by 4.4\%, an additional minute of driving reduces the probability of driving by 6.5\%, and an additional minute riding the bus increases the probability of driving by 2.8\%. Because there are only two alternatives, the marginal effects on the choice to ride the bus are the negatives of the driving marginal effects.
+
+		\item One potential problem with a linear probability model is that predicted probabilities can fall outside the $[0, 1]$ range. How many students have infeasible choice probabilities? Given these results, are you worried about using a linear probability model in this case? (Reminder: the \texttt{predict()} function calculates fitted values of an \texttt{lm} regression.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate estimated probability of car for each individual}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob_car_1a} \hlstd{=} \hlkwd{predict}\hlstd{(reg_1a))}
+\hlcom{## Count number of individuals with probabilities outside [0, 1]}
+\hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(prob_car_1a} \hlopt{<} \hlnum{0} \hlopt{|} \hlstd{prob_car_1a} \hlopt{>} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{nrow}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 22
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Only 22 students, or 2.2\% of the sample, have estimated probabilities outside the $[0, 1]$ range. This result suggests that our estimated marginal effects are not likely to be inconsistent and our interpretation of the results is sound.
+
+		\item Test if the two time coefficients are equal in absolute value. Interpret the result of this test and briefly explain why it could make intuitive sense. If a delay were to increase equally the time to drive and the time to take the bus, would you expect the proportion of drivers to increase, decrease, or stay the same? (Hint: There are many ways to conduct this Wald test. I like the \texttt{linearHypothesis()} function from the \texttt{car} (companion to applied regression) package. You may need to use the help file or a Google search to learn how to use this function.) 
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct a Wald test on time coefficients}
+\hlkwd{linearHypothesis}\hlstd{(reg_1a,} \hlstr{'time.car = -time.bus'}\hlstd{,} \hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_1a))}
+\end{alltt}
+\begin{verbatim}
+## Linear hypothesis test
+## 
+## Hypothesis:
+## time.car  + time.bus = 0
+## 
+## Model 1: restricted model
+## Model 2: car ~ cost.car + time.car + time.bus
+## 
+## Note: Coefficient covariance matrix supplied.
+## 
+##   Res.Df Df      F    Pr(>F)    
+## 1    997                        
+## 2    996  1 17.203 3.646e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The result of Wald test indicates that the time coefficients are statistically different from one another. This result is intuitive because the experience of driving and riding a bus are different; for example, a student can read or catch up on email while riding the bus, but not while driving. So a minute of each mode might differently affect the decision to drive or ride the bus. The marginal effect of driving time is larger in absolute, so an equal increase in the time of both modes would decrease the utility of driving and cause some drivers to substitute to the bus.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Binary Logit Model}
+
+The model in problem 1 assumes the probability of driving is a linear function of the data. In reality, however, a different functional form may provide a better fit for the data. Again use the \texttt{commute\_binary.csv} dataset for this problem.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Include the cost of driving and the time of each alternative as independent variables in your model:
+$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+where $P_n$ is the probability that student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{glm()} function with argument \texttt{family = `binomial'} estimates a binary logit model.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Model choice as binary logit}
+\hlstd{model_2a} \hlkwb{<-} \hlkwd{glm}\hlstd{(}\hlkwc{formula} \hlstd{= car} \hlopt{~} \hlstd{cost.car} \hlopt{+} \hlstd{time.car} \hlopt{+} \hlstd{time.bus,}
+                \hlkwc{family} \hlstd{=} \hlstr{'binomial'}\hlstd{,}
+                \hlkwc{data} \hlstd{= data_binary)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{summary()} function summarize the results of a \texttt{glm} model.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2a)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = car ~ cost.car + time.car + time.bus, family = "binomial", 
+##     data = data_binary)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.7722  -0.9983  -0.5338   1.0524   3.1361  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  2.23327    0.34662   6.443 1.17e-10 ***
+## cost.car    -2.07716    0.73245  -2.836  0.00457 ** 
+## time.car    -0.33222    0.03534  -9.400  < 2e-16 ***
+## time.bus     0.13257    0.03240   4.092 4.28e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1365.5  on 999  degrees of freedom
+## Residual deviance: 1200.9  on 996  degrees of freedom
+## AIC: 1208.9
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		All three independent variables again have statistically significant and economically meaningful coefficients. Those coefficients, however, are now interpreted as marginal utilities rather than marginal effects. The cost of driving and the time spent driving both decrease the utility of driving, and the time spent riding the bus increases the utility of driving relative to riding the bus.
+
+		\item Calculate the marginal effect of each independent variable for each student; that is, 3 variables $\times$ 1000 students $=$ 3000 marginal effects. For each of these three variables, report the mean, minimum, maximum, and quartiles of its marginal effects. Compare these marginal effects to your estimates in problem 1. (Reminder: the \texttt{predict()} function calculates fitted values of a \texttt{glm} model, and the \texttt{summary()} function reports these summary statistics for a vector or data frame.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate estimated utility and probability of car}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{utility_2a} \hlstd{=} \hlkwd{predict}\hlstd{(model_2a),}
+         \hlkwc{prob_car_2a} \hlstd{=} \hlnum{1} \hlopt{/} \hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{exp}\hlstd{(}\hlopt{-}\hlstd{utility_2a)))}
+\hlcom{## Calculate marginal effects}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob_prod_2a} \hlstd{= prob_car_2a} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{prob_car_2a),}
+         \hlkwc{mfx_cost_car} \hlstd{=} \hlkwd{coef}\hlstd{(model_2a)[}\hlnum{2}\hlstd{]} \hlopt{*} \hlstd{prob_prod_2a,}
+         \hlkwc{mfx_time_car} \hlstd{=} \hlkwd{coef}\hlstd{(model_2a)[}\hlnum{3}\hlstd{]} \hlopt{*} \hlstd{prob_prod_2a,}
+         \hlkwc{mfx_time_bus} \hlstd{=} \hlkwd{coef}\hlstd{(model_2a)[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{prob_prod_2a)}
+\hlcom{## Summarize marginal effects}
+\hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlkwd{starts_with}\hlstd{(}\hlstr{'mfx'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##   mfx_cost_car       mfx_time_car        mfx_time_bus      
+##  Min.   :-0.51929   Min.   :-0.083054   Min.   :0.0009629  
+##  1st Qu.:-0.51007   1st Qu.:-0.081579   1st Qu.:0.0248228  
+##  Median :-0.47723   Median :-0.076326   Median :0.0304589  
+##  Mean   :-0.43143   Mean   :-0.069001   Mean   :0.0275357  
+##  3rd Qu.:-0.38892   3rd Qu.:-0.062203   3rd Qu.:0.0325551  
+##  Max.   :-0.01509   Max.   :-0.002413   Max.   :0.0331436
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The means of these marginal effects---reported above---are comparable to the estimated coefficients in problem 1, but there is heterogeneity around these means. For each marginal effect, there is a long tail that approaches zero, corresponding to students that have a probability of driving close to 0 or 1.
+
+		\item Use your coefficient estimates to calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus. (Hint: think about how to use your coefficient estimates to convert a student's time to money.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate hourly time-value for each commute mode}
+\hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_2a)[}\hlnum{3}\hlopt{:}\hlnum{4}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_2a)[}\hlnum{2}\hlstd{])} \hlopt{*} \hlnum{60}
+\end{alltt}
+\begin{verbatim}
+## time.car time.bus 
+## 9.596257 3.829494
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Each hour of driving has a dollar value of \$9.60 and each hour of bus riding has a dollar value of \$3.83. In other words, a student would be willing to pay \$9.60 to spend one less hour commuting by car but only \$3.83 to spend one less hour commuting by bus.
+	\end{enumerate}
+
+	\item Demographic information might affect a student's commute decision or underlying preferences. For example, students with different incomes might have different sensitivities to cost. Again model the choice to drive to campus during winter as a binary logit model, but now allow the parameter on cost to vary inversely with income:
+$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \frac{\beta_1}{I_n} C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+where $I_n$ is the income of student $n$. (Reminder: the \texttt{I()} function allows you to include math inside a \texttt{formula} object.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Model choice as binary logit with cost divided by income}
+\hlstd{model_2b} \hlkwb{<-} \hlkwd{glm}\hlstd{(}\hlkwc{formula} \hlstd{= car} \hlopt{~} \hlkwd{I}\hlstd{(cost.car} \hlopt{/} \hlstd{income)} \hlopt{+} \hlstd{time.car} \hlopt{+} \hlstd{time.bus,}
+                \hlkwc{family} \hlstd{=} \hlstr{'binomial'}\hlstd{,}
+                \hlkwc{data} \hlstd{= data_binary)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_2b)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = car ~ I(cost.car/income) + time.car + time.bus, 
+##     family = "binomial", data = data_binary)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.7489  -0.9967  -0.5234   1.0442   3.1429  
+## 
+## Coefficients:
+##                     Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)          2.26541    0.33110   6.842 7.81e-12 ***
+## I(cost.car/income) -53.63314   14.54884  -3.686 0.000227 ***
+## time.car            -0.33521    0.03484  -9.622  < 2e-16 ***
+## time.bus             0.13589    0.02880   4.719 2.37e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1365.5  on 999  degrees of freedom
+## Residual deviance: 1194.9  on 996  degrees of freedom
+## AIC: 1202.9
+## 
+## Number of Fisher Scoring iterations: 4
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		All three independent variables again have statistically significant and economically meaningful coefficients. The time coefficients are comparable to those estimated in part (a). The cost coefficient now varies with income; a higher level of income yields a lower marginal utility of income. 
+
+		\item Use your coefficient estimates to calculate the marginal utility of income for a student at three different income levels: \$15,000, \$25,000, and \$35,000. For each of these three income levels, also calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate marginal utility of income at different incomes}
+\hlopt{-}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{2}\hlstd{]} \hlopt{/} \hlkwd{c}\hlstd{(}\hlnum{15}\hlstd{,} \hlnum{25}\hlstd{,} \hlnum{35}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3.575543 2.145326 1.532375
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate hourly time-value for each commute mode at different incomes}
+\hlkwd{rep}\hlstd{(}\hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_2b)[}\hlnum{3}\hlopt{:}\hlnum{4}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_2b)[}\hlnum{2}\hlstd{]),} \hlnum{3}\hlstd{)} \hlopt{*}
+  \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{15}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwd{rep}\hlstd{(}\hlnum{25}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwd{rep}\hlstd{(}\hlnum{35}\hlstd{,} \hlnum{2}\hlstd{))} \hlopt{*} \hlnum{60}
+\end{alltt}
+\begin{verbatim}
+##  time.car  time.bus  time.car  time.bus  time.car  time.bus 
+##  5.625096  2.280260  9.375160  3.800433 13.125224  5.320607
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The marginal utility of income at each of these progressively higher incomes is 3.58, 2.15, and 1.53, respectively. At each of these incomes, each hour of driving has a dollar value of \$5.63, \$9.38, and \$13.13, respectively; and each hour of bus riding has a dollar value of \$2.28, \$3.80, and \$5.32, respectively.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 3: Multinomial Logit Model}
+
+We are again studying how UMass graduate students choose how to commute to campus, but we are now interested in this choice in the spring when riding a bike and walking are feasible alternatives. This information will help the university to plan for car parking, bike racks, and bus needs during this time of year. Additionally, the university is considering a change to bus routes, and they want to know how this change will affect commute choices. Use the \texttt{commute\_multinomial.csv} dataset for this problem.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_multi} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'commute_multinomial.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Rows: 1000 Columns: 13}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Column specification ---------------------------------------------------\\\#\# Delimiter: "{},"{}\\\#\# chr \ (2): mode, marital\_status\\\#\# dbl (11): id, time.car, cost.car, time.bus, cost.bus, time.bike, cost.b...}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# i Use `spec()` to retrieve the full column specification for this data.\\\#\# i Specify the column types or set `show\_col\_types = FALSE` to quiet this message.}}\end{kframe}
+\end{knitrout}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the commute choice during spring as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost and time. Include an alternative-specific intercept, assume cost has a common parameter that does not vary with income, and allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from alternative $j$ is
+$$V_{nj} = \alpha_j + \beta_1 C_{nj} + \beta_j T_{nj}$$
+where $V_{nj}$ is the representative utility to student $n$ from alternative $j$, $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$ and $\beta$ parameters are to be estimated. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a multinomial logit model, but the data must first be converted to an indexed data frame using the \texttt{dfidx()} function from the \texttt{dfidx} package. The \texttt{dfidx()} function sometimes does not work on a \texttt{tibble}, so you may need to use the \texttt{as.data.frame()} function to ensure your data are in a \texttt{data.frame} format. See the Week 4 slides or the \texttt{mlogit} vignettes at \href{https://cran.r-project.org/web/packages/mlogit/index.html}{\texttt{cran.r-project.org/web/packages/mlogit/index.html}} for information on specifying a \texttt{formula} for the \texttt{mlogit()} function.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Convert dataset to data frame format}
+\hlstd{data_df} \hlkwb{<-} \hlkwd{as.data.frame}\hlstd{(data_multi)}
+\hlcom{## Convert dataset to mlogit format}
+\hlstd{data_dfidx} \hlkwb{<-} \hlkwd{dfidx}\hlstd{(data_df,} \hlkwc{shape} \hlstd{=} \hlstr{'wide'}\hlstd{,} \hlkwc{choice} \hlstd{=} \hlstr{'mode'}\hlstd{,} \hlkwc{varying} \hlstd{=} \hlnum{3}\hlopt{:}\hlnum{10}\hlstd{)}
+\hlcom{## Model choice as multinomial logit with common cost coefficient, }
+\hlcom{## alternative intercepts, and alternative-specific time coefficients}
+\hlstd{model_3a} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= mode} \hlopt{~} \hlstd{cost} \hlopt{|} \hlnum{1} \hlopt{|} \hlstd{time,}
+                   \hlkwc{data} \hlstd{= data_dfidx)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameter and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results}
+\hlkwd{summary}\hlstd{(model_3a)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = mode ~ cost | 1 | time, data = data_dfidx, method = "nr")
+## 
+## Frequencies of alternatives:choice
+##  bike   bus   car  walk 
+## 0.113 0.453 0.375 0.059 
+## 
+## nr method
+## 8 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 6.84E-06 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                   Estimate Std. Error z-value  Pr(>|z|)    
+## (Intercept):bus  -0.219000   0.385544 -0.5680 0.5700161    
+## (Intercept):car   2.745681   0.442595  6.2036 5.518e-10 ***
+## (Intercept):walk  2.975472   0.783182  3.7992 0.0001452 ***
+## cost             -2.604415   0.823533 -3.1625 0.0015643 ** 
+## time:bike        -0.289389   0.038564 -7.5041 6.195e-14 ***
+## time:bus         -0.143175   0.035108 -4.0781 4.540e-05 ***
+## time:car         -0.404666   0.046377 -8.7255 < 2.2e-16 ***
+## time:walk        -0.296615   0.038420 -7.7204 1.155e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -982.36
+## McFadden R^2:  0.1382 
+## Likelihood ratio test : chisq = 315.07 (p.value = < 2.22e-16)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		All independent variables again have statistically significant and economically meaningful parameters. The cost parameter is negative, indicating that the marginal utility of cost is negative and, hence, the marginal utility of income is positive. The time parameter varies by alternative and is negative for all four alternatives, indicating that the marginal utility of commute time is consistently negative regardless of commute mode. The parameter values differ, however, providing evidence that time driving creates the greatest disutility and time riding the bus creates the least disutility.
+
+		\item Calculate the elasticity of each commute alternative with respect to the cost of driving for each student; that is, 4 alternatives $\times$ 1000 students $=$ 4000 elasticities. For each alternative, report the mean, minimum, maximum, and quartiles of its elasticity with respect to the cost of driving. Describe how these elasticities and substitution patterns relate to an important property of the logit model. (Reminder: the \texttt{fitted()} function with argument \texttt{type = `probabilities'} calculates the choice probabilities of each alternative for each decision maker.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate the choice probabilities for car}
+\hlstd{data_multi} \hlkwb{<-} \hlstd{data_multi} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob_car_3a} \hlstd{=} \hlkwd{fitted}\hlstd{(model_3a,} \hlkwc{type} \hlstd{=} \hlstr{'probabilities'}\hlstd{)[,} \hlnum{3}\hlstd{])}
+\hlcom{## Calculate the own elasticity of car cost}
+\hlstd{data_multi} \hlkwb{<-} \hlstd{data_multi} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{elas_own_car_cost_3a} \hlstd{=}
+           \hlkwd{coef}\hlstd{(model_3a)[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{cost.car} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{prob_car_3a))}
+\hlcom{## Calculate the cross-elasticity of car cost}
+\hlstd{data_multi} \hlkwb{<-} \hlstd{data_multi} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{elas_cross_car_cost_3a} \hlstd{=}
+           \hlopt{-}\hlkwd{coef}\hlstd{(model_3a)[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{cost.car} \hlopt{*} \hlstd{prob_car_3a)}
+\hlcom{## Summarize elasticities}
+\hlstd{data_multi} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(}\hlkwd{starts_with}\hlstd{(}\hlstr{'elas'}\hlstd{))} \hlopt{%>%}
+  \hlkwd{summary}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+##  elas_own_car_cost_3a elas_cross_car_cost_3a
+##  Min.   :-4.6129      Min.   :0.02001       
+##  1st Qu.:-0.8759      1st Qu.:0.25086       
+##  Median :-0.5256      Median :0.34872       
+##  Mean   :-0.7237      Mean   :0.34964       
+##  3rd Qu.:-0.3550      3rd Qu.:0.44536       
+##  Max.   :-0.1088      Max.   :0.91753
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The summary statistics for own-elasticity and cross-elasticity of driving cost are reported above. Note that all three other alternatives---biking, riding the bus, and walking---have the same elasticity with respect to the cost of driving. This common cross-elasticity is an example of the independence of irrelevant alternatives (IIA), which implies proportional substitution to or from all other alternatives.
+	\end{enumerate}
+
+	\item A student's family status might also affect their commute decision or underlying preferences. Estimate the model from part (a) on two subsets of the data based on student marital status; that is, estimate one model using only single students, and estimate a second model using only married students.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create a separate dataset of single students}
+\hlstd{data_dfidx_single} \hlkwb{<-} \hlstd{data_dfidx} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(marital_status} \hlopt{==} \hlstr{'single'}\hlstd{)}
+\hlcom{## Create a separate datasets of married students}
+\hlstd{data_dfidx_married} \hlkwb{<-} \hlstd{data_dfidx} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(marital_status} \hlopt{==} \hlstr{'married'}\hlstd{)}
+\hlcom{## Model choice for single students}
+\hlstd{model_3b_single} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= mode} \hlopt{~} \hlstd{cost} \hlopt{|} \hlnum{1} \hlopt{|} \hlstd{time,}
+                          \hlkwc{data} \hlstd{= data_dfidx_single)}
+\hlcom{## Model choice for single students}
+\hlstd{model_3b_married} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= mode} \hlopt{~} \hlstd{cost} \hlopt{|} \hlnum{1} \hlopt{|} \hlstd{time,}
+                           \hlkwc{data} \hlstd{= data_dfidx_married)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from both models. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Summarize model results for single students}
+\hlkwd{summary}\hlstd{(model_3b_single)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = mode ~ cost | 1 | time, data = data_dfidx_single, 
+##     method = "nr")
+## 
+## Frequencies of alternatives:choice
+##     bike      bus      car     walk 
+## 0.136508 0.412698 0.373016 0.077778 
+## 
+## nr method
+## 7 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 2.36E-07 
+## gradient close to zero 
+## 
+## Coefficients :
+##                   Estimate Std. Error z-value  Pr(>|z|)    
+## (Intercept):bus  -0.552670   0.451603 -1.2238 0.2210298    
+## (Intercept):car   1.934913   0.498573  3.8809 0.0001041 ***
+## (Intercept):walk  2.687992   0.815153  3.2975 0.0009754 ***
+## cost             -2.711833   1.018920 -2.6615 0.0077799 ** 
+## time:bike        -0.272877   0.046166 -5.9108 3.404e-09 ***
+## time:bus         -0.128379   0.044525 -2.8833 0.0039357 ** 
+## time:car         -0.316254   0.053243 -5.9398 2.854e-09 ***
+## time:walk        -0.269539   0.039545 -6.8159 9.366e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -666.61
+## McFadden R^2:  0.12086 
+## Likelihood ratio test : chisq = 183.29 (p.value = < 2.22e-16)
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Summarize model results for married students}
+\hlkwd{summary}\hlstd{(model_3b_married)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## mlogit(formula = mode ~ cost | 1 | time, data = data_dfidx_married, 
+##     method = "nr")
+## 
+## Frequencies of alternatives:choice
+##     bike      bus      car     walk 
+## 0.072973 0.521622 0.378378 0.027027 
+## 
+## nr method
+## 9 iterations, 0h:0m:0s 
+## g'(-H)^-1g = 4.33E-06 
+## successive function values within tolerance limits 
+## 
+## Coefficients :
+##                   Estimate Std. Error z-value  Pr(>|z|)    
+## (Intercept):bus   0.154527   0.798997  0.1934 0.8466446    
+## (Intercept):car   4.781125   0.987391  4.8422 1.284e-06 ***
+## (Intercept):walk  4.610041   2.452583  1.8797 0.0601533 .  
+## cost             -2.726736   1.489068 -1.8312 0.0670753 .  
+## time:bike        -0.362261   0.078168 -4.6344 3.580e-06 ***
+## time:bus         -0.182139   0.058976 -3.0884 0.0020125 ** 
+## time:car         -0.656574   0.100850 -6.5104 7.494e-11 ***
+## time:walk        -0.439187   0.130516 -3.3650 0.0007654 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Log-Likelihood: -292.07
+## McFadden R^2:  0.2073 
+## Likelihood ratio test : chisq = 152.76 (p.value = < 2.22e-16)
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		In both models, the marginal utility parameters are again statistically significant---at the 10\% level in some cases---and economically meaningful. They also have the same signs as in part (a), so the general interpretation is the same.
+		
+		\item Can you use your estimated parameters to compare the marginal utility of income for single students to the marginal utility of income for married students? If so, describe the similarity or difference in these values. If not, explain why you cannot make this comparison using your estimated parameters. (Hint: think about what component of the random utility model is assumed to be the same in both models.)
+		
+		The marginal utility parameters are not directly comparable because they are estimated in different models. In every logit model, the variance of the random utility component has the same assumed value. In reality, however, this variance may differ for single students and married students. As a result, the parameters of these models are estimated relative to the true variance of the random utility component---greater variance of random utility yields lower parameter estimates. Thus, if single students and married students have different variances of random utility, these models could yield different parameter estimates, even for the same underlying preferences and valuations of commute time. Conversely, these models could yield similar parameter estimates, even for the very different underlying preferences and valuations of commute time, so long as the variances differ similarly.
+
+		\item For each marital status, use the corresponding parameter estimates to calculate the dollar value that a student places on one hour of commute time for each of the four commute alternatives. Can you compare these dollar values for single students to those for married students? If so, describe the similarity or difference in these values. If not, explain why you cannot make this comparison.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate hourly time-value for each commute mode for single students}
+\hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_3b_single)[}\hlnum{5}\hlopt{:}\hlnum{8}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_3b_single)[}\hlnum{4}\hlstd{])} \hlopt{*} \hlnum{60}
+\end{alltt}
+\begin{verbatim}
+## time:bike  time:bus  time:car time:walk 
+##  6.037481  2.840412  6.997210  5.963612
+\end{verbatim}
+\begin{alltt}
+\hlcom{## Calculate hourly time-value for each commute mode for married students}
+\hlkwd{abs}\hlstd{(}\hlkwd{coef}\hlstd{(model_3b_married)[}\hlnum{5}\hlopt{:}\hlnum{8}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(model_3b_married)[}\hlnum{4}\hlstd{])} \hlopt{*} \hlnum{60}
+\end{alltt}
+\begin{verbatim}
+## time:bike  time:bus  time:car time:walk 
+##  7.971306  4.007852 14.447473  9.664010
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		A single student has an hourly dollar value of \$6.04 for biking, \$2.84 for riding the bus, \$7.00 for driving, and \$5.96 for walking. A married student has an hourly dollar value of \$7.97 for biking, \$4.01 for riding the bus, \$14.45 for driving, and \$9.66 for walking. Yes, these dollar values can be compared. Intuitively, dollars provide a standardized metric for comparison, unlike utility. Mathematically, taking the ratio of two model parameters cancels out the normalization due to the assumed variance of the random utility component. These hourly dollar values indicate that married students place a greater value on their commute time, especially time spent driving.
+	\end{enumerate}
+
+	\item The university has a strong commitment to environmental sustainability and would like to convince graduate students to take the bus rather than drive to campus. One proposal is to introduce more buses on the existing bus routes, which would reduce bus commute time by 20\%. Use your parameter estimates from part (a) to simulate this counterfactual.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Create counterfactual data with more frequent buses}
+\hlstd{data_df_counter} \hlkwb{<-} \hlstd{data_df} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{time.bus} \hlstd{=} \hlnum{0.8} \hlopt{*} \hlstd{time.bus)}
+\hlcom{## Convert counterfactual data to dfidx format}
+\hlstd{data_counter_dfidx} \hlkwb{<-} \hlkwd{dfidx}\hlstd{(data_df_counter,} \hlkwc{shape} \hlstd{=} \hlstr{'wide'}\hlstd{,}
+                            \hlkwc{choice} \hlstd{=} \hlstr{'mode'}\hlstd{,} \hlkwc{varying} \hlstd{=} \hlnum{3}\hlopt{:}\hlnum{10}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item How many additional students---of the 1000 students in this dataset---do you expect will commute by bus because of this reduction in bus commute time? How many fewer students do you expect will choose each of the three other commute alternatives?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate aggregate choices using observed data}
+\hlstd{agg_choices_obs} \hlkwb{<-} \hlkwd{predict}\hlstd{(model_3a,} \hlkwc{newdata} \hlstd{= data_dfidx)}
+\hlcom{## Calculate aggregate choices using counterfactual data}
+\hlstd{agg_choices_counter} \hlkwb{<-} \hlkwd{predict}\hlstd{(model_3a,} \hlkwc{newdata} \hlstd{= data_counter_dfidx)}
+\hlcom{## Calculate difference between aggregate choices}
+\hlkwd{colSums}\hlstd{(agg_choices_counter} \hlopt{-} \hlstd{agg_choices_obs)}
+\end{alltt}
+\begin{verbatim}
+##       bike        bus        car       walk 
+## -17.646719  78.164883 -54.675570  -5.842595
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		This reduction in bus commute time is expected to yield an additional 78.2 students riding the bus, or an additional 7.82\% of the students in the dataset. Of these 78.2 additional bus riders, 17.6 previously biked, 54.7 previously drove, and 5.8 previously walked.
+
+		\item How much additional economic surplus do you expect this reduction in bus commute time will generate for the 1000 students in this dataset?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate log-sum values using observed data}
+\hlstd{logsum_obs} \hlkwb{<-} \hlkwd{logsum}\hlstd{(model_3a,} \hlkwc{data} \hlstd{= data_dfidx)}
+\hlcom{## Calculate log-sum values using counterfactual data}
+\hlstd{logsum_counter} \hlkwb{<-} \hlkwd{logsum}\hlstd{(model_3a,} \hlkwc{data} \hlstd{= data_counter_dfidx)}
+\hlcom{## Calculate change in consumer surplus from subsidy}
+\hlkwd{sum}\hlstd{((logsum_counter} \hlopt{-} \hlstd{logsum_obs)} \hlopt{/ -}\hlkwd{coef}\hlstd{(model_3a)[}\hlnum{4}\hlstd{])}
+\end{alltt}
+\begin{verbatim}
+## [1] 82.74048
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		This reduction in bus commute time is expected to generate \$82.74 in economic surplus for these 1000 students each day.
+	\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
