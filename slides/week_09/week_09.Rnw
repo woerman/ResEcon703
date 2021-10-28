@@ -1,0 +1,828 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\usepackage{forest}
+\tikzset{
+Above/.style={
+  midway,
+  above,
+  font=\scriptsize,
+  text width=1.5cm,
+  align=center,
+  },
+Below/.style={
+  midway,
+  below,
+  font=\scriptsize,
+  text width=1.5cm,
+  align=center
+  }
+}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 9:\ Generalized Extreme Value Models]{Week 9:\ Generalized Extreme Value Models}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Generalized method of moments
+    \end{itemize}
+    \vspace{3ex}
+    This week's topics
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{nested}}{Nested logit}
+    	\item \hyperlink{page.\getpagerefnumber{two_step}}{Two-step nested logit}
+    	\item \hyperlink{page.\getpagerefnumber{props}}{Nested logit properties}
+    	\item \hyperlink{page.\getpagerefnumber{empirical}}{Empirical considerations}
+    	\item \hyperlink{page.\getpagerefnumber{other}}{Other generalized extreme value models}
+    	\item \hyperlink{page.\getpagerefnumber{example}}{Nested logit R example}
+    \end{itemize}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Train textbook, chapter 4
+    \end{itemize}
+\end{frame}
+
+\section{Nested Logit}
+\label{nested}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Nested Logit
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Course Recap}
+    Structural econometric models
+    \begin{itemize}
+    	\item Random utility model
+    	\item Logit model
+    \end{itemize}
+    \vspace{3ex}
+    Estimation methods
+    \begin{itemize}
+    	\item Maximum likelihood estimation
+    	\item Generalized method of moments
+    \end{itemize}
+    \vspace{3ex}
+    Now that we know these estimation methods, we will look at discrete choice models that allow for richer representations of individual decision making
+    \begin{itemize}
+    	\item Nested logit: unobserved correlations between alternatives
+    	\item Mixed logit: preference variation due to unobserved factors
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit}
+    The nested logit model relaxes the (sometimes overly) strong assumption of the logit model
+    \begin{itemize}
+    	\item Nested logit allows for the unobserved (and random) components of utility, $\varepsilon_{nj}$, to be correlated for the same decision maker
+    \end{itemize}
+    \vspace{3ex}
+    The nested logit model groups alternatives into ``nests''
+    \begin{itemize}
+    	\item $Cov(\varepsilon_{ni}, \varepsilon_{nm}) = 0$ if $i$ and $m$ are in different nests
+    	\item $Cov(\varepsilon_{ni}, \varepsilon_{nm}) \geq 0$ if $i$ and $m$ are in the same nest
+    \end{itemize}
+    \vspace{3ex}
+    These correlations relax the substitution patterns of the logit model
+    \begin{itemize}
+    	\item IIA holds for two alternatives within the same nest
+    	\item IIA does not necessarily hold for alternatives in different nests
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Example}
+    Commuters in Boston have four alternatives to commute to work
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+   			\begin{itemize}
+    			\item Drive alone
+    			\item Carpool
+    			\item Bus
+    			\item Train
+    		\end{itemize}
+    		\vspace{4ex}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+   			\begin{forest}
+		    	[Commuter [Car[Drive][Carpool]] [Transit[Bus][Train]]]
+		    \end{forest}
+		\end{column}
+    \end{columns}
+    \vspace{3ex}
+    Commute travel mode nests
+    \begin{itemize}
+    	\item Drive alone and carpool might belong in a ``private car'' nest
+    	\item Bus and train might belong together in a ``public transit'' nest
+    \end{itemize}
+    \vspace{3ex}
+    Can you rationalize any other sets of nests?
+    \begin{itemize}
+    	\item Choosing nests is more an art than a science
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit GEV Distribution}
+    We partition the $J$ alternatives into $K$ nonoverlapping subsets denoted $B_1, B_2, \ldots, B_K$ and called ``nests'' \\
+    \vspace{3ex}
+    The utility for each alternative is again $U_{nj} = V_{nj} + \varepsilon_{nj}$ where the vector of unobserved utility, $\bm{\varepsilon}_n = (\varepsilon_{n1}, \varepsilon_{n2}, \ldots, \varepsilon_{nJ})$, has cumulative distribution
+    $$F(\bm{\varepsilon}_n) = \exp \left( -\sum_{k = 1}^K \left( \sum_{j \in B_k} e^{-\varepsilon_{nj} / \lambda_k} \right)^{\lambda_k} \right)$$
+    which is a type of generalized extreme value (GEV) distribution
+    \begin{itemize}
+    	\item The marginal distribution of $\varepsilon_{nj}$ is extreme value 
+    	\item $Cov(\varepsilon_{ni}, \varepsilon_{nm}) = 0$ if $i \in B_k$ and $m \in B_{\ell}$ with $k \neq \ell$
+    	\item $Cov(\varepsilon_{ni}, \varepsilon_{nm}) \geq 0$ if $i \in B_k$ and $m \in B_k$
+    	\item $\lambda_k$ is a measure of independence in nest $k$
+    	\begin{itemize}
+    		\item $\lambda_k = 1 ~\forall k$ gives the logit model
+    	\end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Two-Step Nested Logit}
+\label{two_step}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Two-Step Nested Logit
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Two-Step Nested Logit}
+    We can decompose the nested logit model into a two-step logit model
+    \begin{enumerate}
+    	\item The decision maker chooses a nest
+    	\item The decision maker chooses an alternative within that nest
+    \end{enumerate}
+    \vspace{3ex}
+    Then the choice probability of alternative $i \in B_k$ is
+    $$P_{ni} = P_{nB_k} P_{ni \mid B_k}$$
+    where
+    \begin{itemize}
+    	\item $P_{nB_k}$ is the probability that decision maker $n$ chooses nest $k$ in the first step
+    	\item $P_{ni \mid B_k}$ is the probability that decision maker $n$ chooses alternative $i$ in the second step conditional on having chosen nest $k$ in the first step
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of Two-Step Nested Logit}
+    We first generalize our original random utility model by decomposing representative utility into nest attributes and alternative attributes \\
+    \vspace{2ex}
+	We express the utility of alternative $j \in B_k$ as
+    $$U_{nj} = W_{nk} + Y_{nj} + \varepsilon_{nj}$$
+    where
+    \begin{itemize}
+    	\item $W_{nk}$ is utility that depends on observed attributes of nest $k$
+    	\item $Y_{nj}$ is utility that depends on observed attributes of alternative $j$
+    \end{itemize}
+    \vspace{2ex}
+    Example: consumer product choice
+    \begin{itemize}
+    	\item If products are nested by brands, $W_{nk}$ could include a variable for brand quality or an indicator for brand preferences
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities of Two-Step Nested Logit}
+    The second-step choice probability is a logit choice probability among the alternatives in nest $k$ using alternative-specific representative utility, $Y_{nj}$, scaled by $\lambda_k$ (just as $\varepsilon_{nj}$ was scaled by $\lambda_k$ in the joint distribution of $\bm{\varepsilon}_n$)
+    \begin{align*}
+    	P_{ni \mid B_k} & = \frac{e^{Y_{ni} / \lambda_k}}{\sum_{j \in B_k} e^{Y_{nj} / \lambda_k}}
+    	\intertext{The first-step choice probability is a logit choice probability among the nests using the expected utility of each nest, $W_{nk} + \lambda_k I_{nk}$}
+    	P_{nB_k} & = \frac{e^{W_{nk} + \lambda_k I_{nk}}}{\sum_{\ell = 1}^K e^{W_{n \ell} + \lambda_{\ell} I_{n \ell}}}
+    	\intertext{where $I_{nk}$ is the log-sum term of nest $k$'s second step, known as the inclusive value of nest $k$}
+    	I_{nk} & = \ln \sum_{j \in B_k} e^{Y_{nj} / \lambda_k}
+    \end{align*}
+    \vspace{-2ex}
+\end{frame}
+
+\section{Nested Logit Properties}
+\label{props}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Nested Logit Properties
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Choice Probabilities}
+	Multiplying the two logit choice probabilities of the two-step nested logit gives the nested logit choice probability
+	$$P_{ni} = \frac{e^{V_{ni} / \lambda_k} \left( \sum_{j \in B_k} e^{V_{nj} / \lambda_k} \right)^{\lambda_k - 1}}{\sum_{\ell = 1}^K \left( \sum_{j \in B_{\ell}} e^{V_{nj} / \lambda_{\ell}} \right)^{\lambda_{\ell}}}$$ \\
+	\vspace{2ex}
+	This nested logit choice probability depends on the representative utility of each alternative and the degree of unobserved utility correlation within each nest
+	\begin{itemize}
+		\item $\lambda_k$ is a measure of independence in nest $k$ that we will estimate
+    	\item $1 - \lambda_k$ is an indicator of correlation within nest $k$
+    	\item The nested logit model is consistent with the random utility model when $\lambda_k \in (0, 1]  ~\forall k$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Substitution Patterns Across Nests}
+    The ratio of the choice probability of alternative $i$ in nest $k$ to the choice probability of alternative $m$ in nest $\ell$ is
+    $$\frac{P_{ni}}{P_{nm}} = \frac{e^{V_{ni} / \lambda_k} \left( \sum_{j \in B_k} e^{V_{nj} / \lambda_k} \right)^{\lambda_k - 1}}{e^{V_{nm} / \lambda_{\ell}} \left( \sum_{j \in B_{\ell}} e^{V_{nj} / \lambda_{\ell}} \right)^{\lambda_{\ell} - 1}}$$ \\
+    \vspace{3ex}
+	This ratio depends on all alternatives in nests $k$ and $\ell$, but no alternatives in other nests
+	\begin{itemize}
+		\item Independence of irrelevant nests (IIN) holds across nests
+	\end{itemize}
+	\vspace{3ex}
+	This IIN property follows from the nested logit first step being equivalent to a logit model of the nests
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Substitution Patterns Within a Nest}
+    The ratio of the choice probabilities simplifies when the two alternatives are in the same nest ($k = \ell$)
+    $$\frac{P_{ni}}{P_{nm}} = \frac{e^{V_{ni} / \lambda_k}}{e^{V_{nm} / \lambda_k}}$$ \\
+	\vspace{3ex}
+    This ratio depends on only alternatives $i$ and $m$
+    \begin{itemize}
+    	\item Independence of irrelevant alternatives (IIA) holds within a nest
+    \end{itemize}
+    \vspace{3ex}
+    IIA within a nest follows from the nested logit second step being equivalent to a logit model of the alternatives within the nest
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Elasticities}
+	  If we assume representative utility is linear, $V_{nj} = \bm{\beta}' \bm{x}_nj$, own elasticity of alternative $i$ in nest $k$ with respect to its attribute $z_{ni}$ is
+    \begin{align*}
+    	E_{iz_{ni}} & = \beta_z z_{ni} \left( \frac{1}{\lambda_k} - \frac{1 - \lambda_k}{\lambda_k} P_{ni \mid B_k} - P_{ni} \right) \\
+    	\intertext{and cross elasticity of alternative $i$ in nest $k$ with respect to attribute  $z_{nm}$ of alternative $m \neq i$ is}
+    	E_{iz_{nm}} & = 
+    	\begin{cases}
+    		-\beta_z z_{nm} P_{nm} \left( 1 + \frac{1 - \lambda_k}{\lambda_k} \frac{1}{P_{nB_k}} \right) &\text{if } m \in B_k \\
+    		-\beta_z z_{nm} P_{nm} &\text{if } m \notin B_k
+  		\end{cases}
+  	\end{align*}
+  	where $P_{nB_k}$ and $P_{ni \mid B_k}$ are calculated as
+  	$$P_{nB_k} = \sum_{j \in B_k} P_{nj} \quad \text{and} \quad P_{ni \mid B_k} = \frac{P_{ni}}{P_{nB_k}} = \frac{P_{ni}}{\sum_{j \in B_k} P_{nj}}$$
+\end{frame}
+
+\section{Empirical Considerations}
+\label{empirical}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Empirical Considerations
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Estimation}
+	Estimation of the nested logit model is similar to the logit model
+	\begin{itemize}
+		\item We have more complex choice probabilities in our estimation
+		\item Maximum likelihood is the standard method
+		\item Log-likelihood function is not globally concave, so numerical optimization can be more difficult than for logit
+	\end{itemize}
+	\vspace{3ex}
+	It is not recommended to estimate a nested logit model as two sequential steps
+	\begin{itemize}
+		\item You must bootstrap to get the correct variance estimator
+	\end{itemize}
+	\vspace{3ex}
+	We will use the \texttt{mlogit()} function in R to estimate nested logit models
+	\begin{itemize}
+		\item We specify our nesting structure using the \texttt{nests} argument in the \texttt{mlogit()} function
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit with Market-Level Data}
+    The nested logit model can also be estimated from market-level data
+    \begin{itemize}
+    	\item You observe the price, market share, and attributes of every cereal brand at the grocery store, and you want to estimate the structural parameters of consumer decision making that explain those purchases
+    \end{itemize}
+    \vspace{1ex}
+    When aggregated over many consumers, choice probabilities become market shares
+    $$S_i = \frac{e^{V_{i} / \lambda_k} \left( \sum_{j \in B_k} e^{V_{j} / \lambda_k} \right)^{\lambda_k - 1}}{\sum_{\ell = 1}^K \left( \sum_{j \in B_{\ell}} e^{V_{j} / \lambda_{\ell}} \right)^{\lambda_{\ell}}}$$
+    If we assume representative utility is liner, $V_j = \bm{\beta}' \bm{x}_j$
+    $$\ln(S_i) - \ln(S_m) = \bm{\beta}' (\bm{x}_i - \bm{x}_m) + (1 - \lambda_k) \ln S_{i \mid B_k} - (1 - \lambda_{\ell}) S_{m \mid B_{\ell}}$$
+    Set one alternative to be your reference in its own nest (usually the outside option) and estimate the linear regression for the other alternatives
+    $$\ln(S_i) - \ln(S_0) = \bm{\beta}' (\bm{x}_i - \bm{x}_0) + (1 - \lambda_k) \ln (S_{i \mid B_k}) + \omega_i$$
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit with Panel Data}
+    If we observe panel data for a discrete choice problem, we can add a time index to our random utility model and nested logit choice probabilities
+    $$U_{njt} = V_{njt} + \varepsilon_{njt} \quad \Rightarrow \quad P_{nit} = \frac{e^{V_{nit} / \lambda_k} \left( \sum_{j \in B_k} e^{V_{njt} / \lambda_k} \right)^{\lambda_k - 1}}{\sum_{\ell = 1}^K \left( \sum_{j \in B_{\ell}} e^{V_{njt} / \lambda_{\ell}} \right)^{\lambda_{\ell}}}$$ \\
+    \vspace{2ex}
+    We can estimate this model just as in the cross-section
+    \begin{itemize}
+        \item We can include lagged or future variables to capture ``dynamics''
+        \item We can include previous choices as explanatory variables to represent behavioral factors like habit formation
+    \end{itemize}
+    \vspace{2ex}
+    The i.i.d.\ assumption still has to hold across decision makers and across time periods
+    \begin{itemize}
+        \item But the unobserved characteristics of a decision maker that affect choice are unlikely to be independent over time
+    \end{itemize}
+\end{frame}
+
+\section{Other Generalized Extreme Value Models}
+\label{other}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Other Generalized Extreme Value Models
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Extreme Value Models}
+    The cumulative distribution of the nested logit model is a special case of a generalized extreme value (GEV) distribution \\
+    \vspace{3ex}
+    Many discrete choice models can be created from the GEV distribution
+    \begin{itemize}
+    	\item Nested logit
+    	\item Three-level nested logit
+    	\item Paired combinatorial logit
+    	\item Generalized nested logit
+    	\item Heteroskedastic logit
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Three-Level Nested Logit}
+    We can model a richer set of correlations between alternatives by including multiple levels of nests and subnests
+    \begin{itemize}
+    	\item As in the (two-level) nested logit model, we first group alternatives into nests
+    	\item Then, within each nest, we further group alternatives into subnests
+    \end{itemize}
+    \vspace{2ex}
+    This model yields correlations within nests and within subnests
+    \begin{itemize}
+    	\item $\lambda_k$ defines the level of independence within nest $k$
+    	\item $\sigma_{mk}$ defines the level of independence within subnest $m$ in nest $k$
+    	\item $1 - \lambda_k \sigma_{mk}$ is an indicator of correlation within subnest $m$ in nest $k$
+    	\item This model is consistent with the random utility model when $\lambda_k \in (0, 1] ~\forall k$ and $\sigma_{mk} \in (0, 1] ~\forall m$
+    \end{itemize}
+    \vspace{2ex}
+    We can even model more than three levels of nesting
+    \begin{itemize}
+    	\item Or use another GEV model for more complex correlation structures
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Three-Level Nested Logit Example}
+    Apartments in Amherst and Northampton \\
+    \vspace{1ex}
+    \centering
+    \begin{forest}
+    	[Renter [Amherst [1-Bedroom[A][B][C]] [2-Bedroom[D][E][F]]] [Northampton [1-Bedroom[G][H][I]] [2-Bedroom[J][K][L]]]]
+    \end{forest}
+    \begin{itemize}
+    	\item All 1-bedroom apartments in Amherst are correlated
+    	\item 1-bedroom apartments in Amherst are also correlated---but less so---with 2-bedroom apartments in Amherst
+    	\item 1-bedroom apartments in Amherst are uncorrelated with any apartment in Northampton
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Three-Level Nested Logit Example}
+    Or maybe the nesting should be in the other order? \\
+    \vspace{1ex}
+    \centering
+    \begin{forest}
+    	[Renter [1-Bedroom [Amherst[A][B][C]] [Northampton[G][H][I]]] [2-Bedroom [Amherst[D][E][F]] [Northampton[J][K][L]]]]
+    \end{forest}
+    \begin{itemize}
+    	\item All 1-bedroom apartments in Amherst are correlated
+    	\item 1-bedroom apartments in Amherst are also correlated---but less so---with 1-bedroom apartments in Northampton
+    	\item 1-bedroom apartments in Amherst are uncorrelated with any 2-bedroom apartment
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Paired Combinatorial Logit}
+	If we relax the definition of a nest to allow for overlaps, then we can create a separate nest for every pairwise combination of alternatives
+	\begin{itemize}
+		\item $J (J - 1) / 2$ nests with two alternatives in each nest
+		\item Each alternative appears in $J - 1$ nests
+	\end{itemize}
+    \vspace{2ex}
+    We more flexibly estimate the correlations between pairs of alternatives
+    \begin{itemize}
+    	\item $\lambda_{ij}$ defines the independence between alternatives $i$ and $j$
+    	\item $1 - \lambda_{ij}$ is an indicator of the correlation between alternatives $i$ and $j$
+    	\item We have $J (J - 1) / 2$ $\lambda$ parameters to estimate
+    	\begin{itemize}
+    		\item We can only identify $J (J - 1) / 2 - 1$ covariance parameters, so we have to normalize at least one $\lambda = 1$
+    	\end{itemize}
+    	\item This model is consistent with the random utility model when $\lambda_{ij} \in (0, 1] ~\forall i,j$ 
+    \end{itemize}
+    \vspace{2ex}
+    See the Train textbook for choice probabilities and more details
+\end{frame}
+
+\begin{frame}\frametitle{Generalized Nested Logit}
+    We can generalize the nested logit model by allowing an alternative to be in multiple nests and to varying degrees
+    \begin{itemize}
+    	\item Construct nests $B_1, B_2, \ldots, B_K$ by assigning each alternative to one or more nests
+    	\item Estimate two sets of parameters related to the nests
+    	\begin{itemize}
+    		\item $\lambda_k$: independence within nest $k$
+    		\item $\alpha_{jk}$: ``weight'' or proportion of alternative $j$ in nest $k$
+    	\end{itemize}
+    \end{itemize}
+    \vspace{3ex}
+    Example: apartment choice in Amherst and Northampton
+    \begin{itemize}
+    	\item Four nests: Amherst, Northampton, one-bedroom, two-bedroom
+    	\item A one-bedroom apartment in Amherst would be in both the Amherst nest and the one-bedroom nest, and we would estimate its ``weight'' or proportion in each of these nests
+    \end{itemize}
+    \vspace{3ex}
+    See the Train textbook for choice probabilities and more details
+\end{frame}
+
+\begin{frame}\frametitle{Heteroskedastic Logit}
+    We can use the GEV distribution to allow for heteroskedasticity among the alternatives
+    \begin{itemize}
+    	\item The variance of unobserved utility can be different for each alternative
+    \end{itemize}
+    \vspace{2ex}
+    Utility is specified as $U_{nj} = V_{nj} + \varepsilon_{nj}$ with
+    $$Var(\varepsilon_{nj}) = \frac{(\theta_j \pi)^2}{6}$$ \\
+    \begin{itemize}
+    	\item We have $J$ variance parameters to estimate
+    	\item We can only identify $J - 1$, so we have to normalize at least one $\theta = 1$
+    \end{itemize}
+    \vspace{2ex}
+    The choice probabilities for heteroskedastic logit do not have a closed-form expression
+    \begin{itemize}
+    	\item We have to use simulation methods to get choice probabilities and subsequently estimate model parameters
+    \end{itemize}
+\end{frame}
+
+\section{Nested Logit R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Nested Logit R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Model Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes
+    \begin{itemize}
+    	\item We have (real) data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item \texttt{ec}: electric central
+		    	\item \texttt{ecc}: electric central with AC
+		    	\item \texttt{er}: electric room
+		    	\item \texttt{erc}: electric room with AC
+		    	\item \texttt{gc}: gas central
+		    	\item \texttt{gcc}: gas central with AC
+		    	\item \texttt{hpc}: heat pump with AC
+		    \end{itemize}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item \texttt{ich}: installation cost for heat
+		    	\item \texttt{icca}: installation cost for AC
+		    	\item \texttt{och}: operating cost for heat
+		    	\item \texttt{occa}: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item \texttt{income}: annual income
+		    \end{itemize}
+		    \vspace{1ex}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model of HVAC System Choice}
+    We model the utility to household $n$ of installing HVAC system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    The probability that household $n$ installs HVAC system $i$ is
+ 	$$P_{ni} = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n$$ \\
+ 	\vspace{2ex}
+  	Under the logit assumption, these choice probabilities simplify to
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of HVAC System Choice}
+	What might affect the utility of the different HVAC systems?
+	\begin{itemize}
+		\item Installation cost
+		\item Annual operating cost
+		\item HVAC system technology
+		\begin{itemize}
+			\item Systems with cooling might be preferred to heating-only systems
+			\item Gas systems might be preferred to electric systems
+			\item Central systems might be preferred to room systems
+		\end{itemize}
+		\item Anything else?
+	\end{itemize}
+    \vspace{3ex}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset from mlogit package
+    data('HC', package = 'mlogit')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    tibble(HC)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<>>=
+    ## Combine heating and cooling costs into one variable
+    hvac_clean <- HC %>% 
+      mutate(id = 1:n(),
+             ic.gcc = ich.gcc + icca, ic.ecc = ich.ecc + icca,
+             ic.erc = ich.erc + icca, ic.hpc = ich.hpc + icca,
+             ic.gc = ich.gc, ic.ec = ich.ec, ic.er = ich.er,
+             oc.gcc = och.gcc + occa, oc.ecc = och.ecc + occa,
+             oc.erc = och.erc + occa, oc.hpc = och.hpc + occa,
+             oc.gc = och.gc, oc.ec = och.ec, oc.er = och.er) %>%
+      select(id, depvar, starts_with('ic.'), starts_with('oc.'), income)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<>>=
+    ## Look at cleaned dataset
+    tibble(hvac_clean)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{dfidx} Format}
+    <<>>=
+    ## Convert cleaned dataset to dfidx format
+    hvac_dfidx <- dfidx(hvac_clean, shape = 'wide', 
+                        choice = 'depvar', varying = 3:16)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{dfidx} Format}
+    <<>>=
+    ## Look at data in dfidx format
+    tibble(hvac_dfidx)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multinomial Logit Model}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    <<>>=
+    ## Model choice using alternative intercepts and cost data
+    model_1 <- mlogit(formula = depvar ~ ic + oc | 1 | 0,
+                      data = hvac_dfidx,
+                      reflevel = 'hpc')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multinomial Logit Model Summary}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_1)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Model of HVAC System Choice}
+    We model the utility to household $n$ of installing HVAC system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$ \\
+    \vspace{2ex}
+    How might unobserved utility, $\varepsilon_{nj}$, be correlated for a decision maker?
+    \begin{itemize}
+    	\item Cooling vs.\ heating-only
+    	\item Electric vs.\ gas
+    	\item Any other nest structures?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Nested Logit Choice Probabilities for HVAC System Choice}
+    The nested logit choice probabilities depend on our model of representative utility and our nests
+    $$P_{ni} = \frac{e^{V_{ni} / \lambda_k} \left( \sum_{j \in B_k} e^{V_{nj} / \lambda_k} \right)^{\lambda_k - 1}}{\sum_{\ell = 1}^K \left( \sum_{j \in B_{\ell}} e^{V_{nj} / \lambda_{\ell}} \right)^{\lambda_{\ell}}}$$ \\
+    \vspace{2ex}
+    We will use maximum likelihood to find the set of parameters---$\alpha_j$, $\beta_1$, $\beta_2$, and $\lambda_k$---that maximize the likelihood of generating the choices that we observe \\
+    \vspace{2ex}
+    We will use the \texttt{mlogit()} function in R to estimate nested logit models
+	\begin{itemize}
+		\item We specify our nesting structure using the \texttt{nests} argument in the \texttt{mlogit()} function
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Nested Logit Models in R}
+    <<eval = FALSE>>=
+    ## Help file for the mlogit function
+    ?mlogit
+    ## Arguments for mlogit GEV functionality
+    mlogit(formula, data, reflevel, nests, ...)
+    @
+    \vspace{2ex}
+    \texttt{mlogit()} arguments for nested logit
+    \begin{enumerate}
+        \item \texttt{formula, data, reflevel}: same as a multinomial logit model
+        \item \texttt{nests}: named list of character vectors that defines nests
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Nested Logit Model with Cooling Vs.\ Heating-Only Nests}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    and we have two nests for correlation of unobserved utility, $\varepsilon_{nj}$
+    \begin{itemize}
+    	\item Cooling: \texttt{ecc}, \texttt{erc}, \texttt{gcc}, and \texttt{hpc}
+    	\item Heating-only: \texttt{ec}, \texttt{er}, and \texttt{gc}
+    \end{itemize}
+    <<>>=
+    ## Model choice with cooling vs. heating-only nests
+    model_2 <- mlogit(formula = depvar ~ ic + oc | 1 | 0, 
+                      data = hvac_dfidx,
+                      reflevel = 'hpc',
+                      nests = list(cooling = c('ecc', 'erc', 'gcc', 'hpc'), 
+                                   heating_only = c('ec', 'er', 'gc')))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Nested Logit Model Summary}
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_2)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    <<>>=
+    ## Display model coefficients
+    coef(model_2)
+    @
+    \vspace{2ex}
+    How do we interpret these coefficients?
+    \begin{itemize}
+    	\item Alternative-specific intercepts
+    	\begin{itemize}
+    		\item \texttt{ecc} and \texttt{gcc} provide more utility, \emph{ceteris paribus}, than \texttt{hpc}
+	      \item \texttt{erc} provides the same utility, \emph{ceteris paribus}, as \texttt{hpc}
+	      \item \texttt{ec}, \texttt{er}, and \texttt{gc} provide less utility, \emph{ceteris paribus}, than \texttt{hpc}
+    	\end{itemize}
+        \item An additional \$100 of installation cost reduces utility by 0.12
+        \item An additional \$100 of annual operating cost reduces utility by 0.57
+        \item Each nest is highly correlated
+        \begin{itemize}
+        	\item $1 - \lambda_k$ gives a measure of within-nest correlation
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Test of Nest Correlations}
+    We can test if the within-nest correlations are statistically different from those implied by the multinomial logit model
+    \begin{itemize}
+    	\item The multinomial logit model assumes that all alternatives are independent, or $\lambda_k = 1 ~\forall k$
+    \end{itemize}
+    \vspace{3ex}
+    We will test the null hypothesis
+    $$H_0 \text{: } \lambda_{cooling} = \lambda_{heating} = 1$$ \\
+    \vspace{3ex}
+    We talked about three tests we can use for MLE
+    \begin{itemize}
+    	\item Likelihood ratio test, Wald test, and Lagrange multiplier test
+    	\item We will use the likelihood ratio test
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test}
+    \texttt{lrtest()} conducts a likelihood ratio test on the two models we specify as arguments \\
+    <<>>=
+    ## Conduct likelihood ratio test of models 1 and 2
+    lrtest(model_1, model_2)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Nested Logit Model with Electric Vs.\ Gas Nests}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    and we have two nests for correlation of unobserved utility, $\varepsilon_{nj}$
+    \begin{itemize}
+    	\item Electric: \texttt{ec}, \texttt{ecc}, \texttt{er}, \texttt{erc}, and \texttt{hpc}
+    	\item Gas: \texttt{gc} and \texttt{gcc}
+    \end{itemize}
+    <<>>=
+    ## Model choice with electric vs. gas nests
+    model_3 <- mlogit(formula = depvar ~ ic + oc | 1 | 0, 
+                      data = hvac_dfidx,
+                      reflevel = 'hpc',
+                      nests = list(electric = c('ec', 'ecc', 'er', 
+                                                'erc', 'hpc'),
+                                   gas = c('gc', 'gcc')))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Nested Logit Model Summary}
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_3)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    <<>>=
+    ## Display model coefficients
+    coef(model_3)
+    @
+    \vspace{2ex}
+    How do we interpret these coefficients?
+    \begin{itemize}
+    	\item Alternative-specific intercepts
+    	\begin{itemize}
+    		\item \texttt{gcc} provides more utility, \emph{ceteris paribus}, than \texttt{hpc}
+	      \item \texttt{ecc} and \texttt{erc} provide the same utility, \emph{ceteris paribus}, as \texttt{hpc}
+	      \item \texttt{ec}, \texttt{er}, and \texttt{gc} provide less utility, \emph{ceteris paribus}, than \texttt{hpc}
+    	\end{itemize}
+        \item An additional \$100 of installation cost reduces utility by 0.39
+        \item An additional \$100 of annual operating cost reduces utility by 2.93
+        \item $\lambda$ parameters are not easily interpretable when they are outside the $(0, 1]$ range
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test}
+    We can use a likelihood ratio test to test if these within-nest correlations are statistically different from those implied by the multinomial logit model
+    $$H_0 \text{: } \lambda_{electric} = \lambda_{gas} = 1$$ \\
+    <<>>=
+    ## Conduct likelihood ratio test of models 1 and 3
+    lrtest(model_1, model_3)
+    @
+\end{frame}
+
+\end{document}
