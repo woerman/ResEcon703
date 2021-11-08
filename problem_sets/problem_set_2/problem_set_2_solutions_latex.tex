@@ -1,0 +1,190 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+\title{Problem Set 2}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. This problem set requires you to code your own estimators, rather than using R's ``canned'' routines (e.g., \texttt{glm()} and \texttt{mlogit()}).
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_2/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+<<R CODE HERE>>
+
+\section*{Problem 1: Maximum Likelihood Estimation}
+
+We are again studying how UMass graduate students choose how to commute to campus in the spring when riding a bike and walking are feasible alternatives---as in problem 3 of problem set 1---but we are now estimating the model ``by hand'' to better understand the maximum likelihood estimation method. Use the \texttt{commute\_multinomial.csv} dataset for this question.
+
+<<R CODE HERE>>
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the commute choice during spring as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost and time with common parameters on these variables. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \beta C_{nj} + \gamma T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\beta$ and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The following steps can provide a rough guide to creating your own maximum likelihood estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function that takes a set of parameters and data as inputs: \texttt{function(parameters, data)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the representative utility of every alternative for each decision maker.
+			\item Calculate the choice probability of the chosen alternative for each decision maker.
+			\item Sum the log of these choice probabilities to get the log-likelihood.
+			\item Return the negative of the log-likelihood.
+		\end{enumerate}
+		\item Maximize the log-likelihood (by minimizing its negative) using \texttt{optim()}. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = your\_starting\_guesses, fn = your\_function, data = your\_data,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS', hessian = TRUE)}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+	<<R CODE HERE>>
+
+	Both parameters are statistically significant and are interpreted as marginal utilities. The cost of driving decreases the utility of driving, and the time spent commuting by a particular travel mode decreases the utility of taking that mode. This result is intuitive since people like both money and leisure time.
+
+	\item Again model the commute choice during spring as a multinomial logit model, but now add alternative-specific intercepts for all but one alternative. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta C_{nj} + \gamma T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The steps to creating your own maximum likelihood estimator are the same as in part (a), but some of the calculations will be different. 
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		As in the previous model, the cost parameter and the time parameter are both negative, indicating that the cost and the time spent commuting by a particular travel mode decrease the utility of taking that mode. Additionally, all three alternative-specific intercepts are positive and significant, suggesting that, \emph{ceteris paribus}, all other modes would be preferred to biking.
+
+		\item Conduct a likelihood ratio test on this model to test the joint significance of the alternative-specific intercepts. That is, test the null hypothesis:
+		$$H_0 \text{: } \alpha_{bus} = \alpha_{car} = \alpha_{walk} = 0$$
+		Your null hypothesis may be slightly different, depending on what you consider your ``reference alternative.'' Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test. (Reminder: to conduct this likelihood ratio test, you need the log-likelihood value of the model in part (b) and the log-likelihood value of the restricted model that is obtained when the hypothesized restrictions are imposed.)
+
+		<<R CODE HERE>>
+
+		We reject this null hypothesis and conclude that the alternative-specific intercepts are jointly significant. That is, this model provides a better fit than the model in part (a), which restricted these parameters to all be zero.
+	\end{enumerate}
+	
+	\item Again model the commute choice during spring as a multinomial logit model, but now allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta C_{nj} + \gamma_j T_{nj}$$
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by maximum likelihood estimation. The steps to creating your own maximum likelihood estimator are the same as in part (a), but some of the calculations will be different.
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, z-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		As in the previous models, the cost parameter is negative, indicating that the cost of driving decreases the utility of driving. The alternative-specific parameters on time are all negative but tend to be different from one another---the bike and walk parameters are not statistically different from one another, but all other pairwise combinations of parameters are. These parameters indicate that the time spent commuting by a particular travel mode always decreases the utility of taking that mode, but that these marginal utilities of time differ by travel mode. Additionally, the car and walk intercepts are positive and significant, while the bus intercept is not statistically significant. These results suggest that, \emph{ceteris paribus}, driving or walking would be preferred to taking the bus or biking.
+
+		\item Conduct a likelihood ratio test on this model to test if the alternative-specific parameters on time are equal to one another. That is, test the null hypothesis:
+		$$H_0 \text{: } \gamma_{bike} = \gamma_{bus} = \gamma_{car} = \gamma_{walk}$$
+		Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test.
+
+		<<R CODE HERE>>
+
+		We reject this null hypothesis and conclude that the alternative-specific marginal utilities of time are not all equal to one another. That is, this model provides a better fit than the model in part (b), which restricted these parameters to be equal.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Generalized Method of Moments}
+
+We are again studying how UMass graduate students choose how to commute to campus in the winter when riding a bike and walking are infeasible---as in problem 2 of problem set 1---but we are now estimating the model ``by hand'' to better understand the generalized method of moments estimation method. Use the \texttt{commute\_binary.csv} dataset for this question.
+
+<<R CODE HERE>>
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Express the representative utility of each alternative as a linear function of its cost and time. Include an alternative-specific intercept and allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from driving and taking the bus, respectively, are
+	\begin{align*}
+		V_{nc} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} \\
+		V_{nb} & = \gamma_{bus} T_{nb}
+		\intertext{where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. We exclude a bus-specific intercept term because only one intercept term is identified in this model, and we exclude the bus cost because it is free for all students. It may be easier to think about the difference in representative utility between driving and taking the bus for student $n$:}
+		V_{nc} - V_{nb} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} - \gamma_{bus} T_{nb}
+	\end{align*}
+	Because this is a binary logit model, we can express the choice probability of driving as a function of $V_{nc} - V_{nb}$:
+	$$P_{nc} = \frac{1}{1 + e^{-(V_{nc} - V_{nb})}}$$
+	Estimate the parameters of this model by method of moments. The following steps can provide a rough guide to creating your own method of moments estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Write down moment conditions for this model. You should have four moment conditions for this model.
+		\item Create a function that takes a set of parameters and a \emph{matrix} of data as inputs: \\
+		\texttt{function(parameters, data\_matrix)}.
+		\item Within that function, make the following calculations:
+		\begin{enumerate}[label=\roman*.]
+			\item Calculate the difference in representative utility for each decision maker.
+			\item Calculate the choice probability of driving for each decision maker.
+			\item Calculate the econometric residual, or the difference between the outcome and the probability, for each decision maker.
+			\item Calculate each of the $L$ moments for each decision maker.
+			\item Return the $N \times L$ matrix of individual moments.
+		\end{enumerate}
+		\item Find the MM estimator using \texttt{gmm()}. Your call of the \texttt{gmm()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{gmm(g = your\_function, x = your\_data\_matrix, t0 = your\_starting\_guesses, }} \\
+			&\qquad~ \text{\texttt{vcov = `iid', method = `BFGS'}} \\
+			&\qquad~ \text{\texttt{control = list(reltol = 1e-25, maxit = 10000))}}
+		\end{align*}
+	\end{enumerate}
+	Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+	<<R CODE HERE>>
+
+	The parameters on cost and time are statistically significant and are interpreted as marginal utilities. The cost of driving decreases the utility of driving, and the time spent commuting by a particular travel mode decreases the utility of taking that mode. This result is intuitive since people like both money and leisure time. Notably, the marginal utility of time spent driving and the marginal utility of time spent on the bus are different, indicating that time on the bus is preferred to time driving.
+
+	\item You might be concerned that the cost and time data are exogenous; for example, a student who enjoys driving is more likely to live farther from campus because they do not mind the extra cost and time spent driving, and a student who enjoys taking the bus is more likely to live close to a bus stop so the bus commute time is less. The \texttt{commute\_binary.csv} dataset includes four possible instruments that could be correlated with the cost or time of commuting: \texttt{price\_gas}, \texttt{snowfall}, \texttt{construction}, and \texttt{bus\_detour}. Again model the choice to drive to campus during winter as in (a). That is, the representative utility to student $n$ from driving and taking the bus, respectively, are
+	\begin{align*}
+		V_{nc} & = \alpha + \beta C_{nc} + \gamma_{car} T_{nc} \\
+		V_{nb} & = \gamma_{bus} T_{nb}
+	\end{align*}
+	where $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$, $\beta$, and $\gamma$ parameters are to be estimated. Estimate the parameters of this model by generalized method of moments, constructing moment conditions using the instruments described above. Thus, you will have five instruments: constant term, \texttt{price\_gas}, \texttt{snowfall}, \texttt{construction}, and \texttt{bus\_detour}. The steps to creating your own generalized method of moments estimator are the same as in part (a), but now you have four parameters and five moment conditions. (Note: this model may have challenges converging,  but you can help it along by giving it different starting values. I got it to converge by using \texttt{t0 = c(0, 0, -0.3, -0.1)}.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report your parameter estimates, standard errors, t-stats, and p-values. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		The parameter estimates are roughly the same as those in the previous model. However, the intercept and cost parameters now have much larger standard errors, rendering those parameters not statistically significant. Using instruments can reduce the precision of our parameter estimates, especially if they are not sufficiently correlated with the relevant variables, which may be the case here.
+
+		\item Test if your model is correctly specified by performing an overidentifying restrictions test. Report the results of this test and briefly interpret these results. (Reminder: the \texttt{specTest()} function from the \texttt{gmm} package conducts this specification test.)
+
+		<<R CODE HERE>>
+
+		The overidentifying restrictions test fails to reject the null hypothesis, so we conclude that all empirical moments are sufficiently close to zero. This result implies that this model is correctly specified and provides a good fit for our data.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
