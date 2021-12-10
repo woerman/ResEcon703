@@ -1,0 +1,594 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc} 
+\usepackage{textcomp}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 4}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Due: November 19, 11:30 am ET}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. This problem set requires you to code your own estimators, rather than using R's ``canned'' routines (e.g., \texttt{glm()} and \texttt{mlogit()}), except where indicated in problem 2.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_4/camping_dataset.zip}{\texttt{camping\_dataset.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains the dataset \texttt{camping.csv}, which you will use for this problem set. This dataset contains simulated data on the state park choice of 1000 visitors who camped at one of five Massachusetts State Parks. See the file \texttt{camping\_description.txt} for a description of the variables in the dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Attaching packages ---------------------------------- tidyverse 1.3.1 --}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# v ggplot2 3.3.5 \ \ \ \ v purrr \ \ 0.3.4\\\#\# v tibble \ 3.1.3 \ \ \ \ v dplyr \ \ 1.0.7\\\#\# v tidyr \ \ 1.1.3 \ \ \ \ v stringr 1.4.0\\\#\# v readr \ \ 2.0.1 \ \ \ \ v forcats 0.5.1}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Conflicts ------------------------------------- tidyverse\_conflicts() --\\\#\# x dplyr::filter() masks stats::filter()\\\#\# x dplyr::lag() \ \ \ masks stats::lag()}}\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_camping} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'camping.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Rows: 5000 Columns: 8}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# -- Column specification ---------------------------------------------------\\\#\# Delimiter: "{},"{}\\\#\# chr (1): park\\\#\# dbl (7): camper\_id, park\_id, visit, mountain, beach, cost, time}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# i Use `spec()` to retrieve the full column specification for this data.\\\#\# i Specify the column types or set `show\_col\_types = FALSE` to quiet this message.}}\end{kframe}
+\end{knitrout}
+
+
+\section*{Problem 1: Simulation-Based Estimation}
+
+We are again estimating a mixed logit model of state park choice among campers---as in problem 2 of problem set 3---but we are now coding our own estimator to better understand the simulation-based estimation method.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the camping park choice as a mixed logit model. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with a fixed coefficient on cost and random coefficients on time and mountain. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_1 C_{nj} + \beta_{2n} T_{nj} + \beta_{3n} M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains. Model $\beta_1$ as a fixed coefficient and $\beta_2$ and $\beta_3$ as random with a normal distribution:
+	\begin{align*}
+		\beta_2 & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_3 & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*}
+	Estimate the parameters of this model by maximum simulated likelihood estimation; use 100 draws for your simulation and set a seed of 703 for replication. The following steps can provide a rough guide to creating your own maximum simulated likelihood estimator:
+	\begin{enumerate}[label=\Roman*.]
+		\item Set a seed of 703 for replication.
+		\item Draw 200,000 standard normal random variables (2 random coefficients $\times$ 100 draws $\times$ 1000 campers).
+		\item Create a function to simulate choice probabilities for one camper:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one camper, and the data for one camper as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for every alternative for each draw.
+			\item Calculate the conditional choice probability for every alternative for each draw.
+			\item Calculate the simulated choice probability for every alternative as the mean over all draws.
+		\end{enumerate}
+		\item Create a function to calculate simulated log-likelihood:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for all campers, and the data for all campers as inputs: \texttt{function(parameters, draws, data)}.
+			\item Simulate choice probabilities for every alternative for each camper---that is, call your previous function for each camper.
+			\item Sum the log of the simulated choice probability for each camper's chosen alternative.
+			\item Return the negative of the log of simulated likelihood.
+		\end{enumerate}
+		\item Maximize the simulated log-likelihood (by minimizing its negative) using \texttt{optim()}. Your call of the \texttt{optim()} function may look something like:
+		\begin{align*}
+			&\text{\texttt{optim(par = your\_starting\_guesses, fn = your\_second\_function,}} \\
+			& \qquad \quad \; \text{\texttt{data = your\_data, draws = your\_draws,}} \\
+			& \qquad \quad \; \text{\texttt{method = `BFGS', hessian = TRUE)}}
+		\end{align*}
+	\end{enumerate}
+	A few additional notes on using the \texttt{optim()} function to estimate this mixed logit model:
+	\begin{itemize}
+		\item This estimation could potentially take hours to converge. To speed up convergence, we can start close to our expected parameter estimates. I recommend using starting guesses that are approximately equal to the parameters we estimated in problem 2(b) from problem set 3.
+		\item To see the progress of the optimization algorithm and receive an update on the value of the objective function at every iteration, add the argument \texttt{control = list(trace = 1, REPORT = 1)} to your call of the \texttt{optim()} function.
+	\end{itemize}
+	Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Set seed for replication}
+\hlkwd{set.seed}\hlstd{(}\hlnum{703}\hlstd{)}
+\hlcom{## Draw standard normal random variables and split into list}
+\hlstd{draws_camper} \hlkwb{<-} \hlkwd{map}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{1000}\hlstd{,} \hlopt{~} \hlkwd{tibble}\hlstd{(}\hlkwc{time_draw} \hlstd{=} \hlkwd{rnorm}\hlstd{(}\hlnum{100}\hlstd{),}
+                                     \hlkwc{mountain_draw} \hlstd{=} \hlkwd{rnorm}\hlstd{(}\hlnum{100}\hlstd{)))}
+\hlcom{## Split data into list by camper}
+\hlstd{data_camper} \hlkwb{<-} \hlstd{data_camping} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(camper_id)} \hlopt{%>%}
+  \hlkwd{group_split}\hlstd{()}
+\hlcom{## Function to simulate choice probabilities for one individual}
+\hlstd{sim_probs_ind} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{draws_ind}\hlstd{,} \hlkwc{data_ind}\hlstd{)\{}
+  \hlcom{## Select relevant variables and convert into a matrix}
+  \hlstd{data_matrix} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost, time, mountain)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Transform random draws into coefficients based on parameters}
+  \hlstd{coef_matrix} \hlkwb{<-} \hlstd{draws_ind} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cost_coef} \hlstd{= params[}\hlnum{1}\hlstd{],}
+           \hlkwc{time_coef} \hlstd{= params[}\hlnum{2}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{time_draw,}
+           \hlkwc{mountain_coef} \hlstd{= params[}\hlnum{3}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{5}\hlstd{]} \hlopt{*} \hlstd{mountain_draw)} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost_coef, time_coef, mountain_coef)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Calculate representative utility for each alternative in each draw}
+  \hlstd{utility} \hlkwb{<-} \hlstd{(coef_matrix} \hlopt{%*%} \hlkwd{t}\hlstd{(data_matrix))} \hlopt{%>%}
+    \hlkwd{pmin}\hlstd{(}\hlnum{700}\hlstd{)} \hlopt{%>%}
+    \hlkwd{pmax}\hlstd{(}\hlopt{-}\hlnum{700}\hlstd{)}
+  \hlcom{## Sum the exponential of utility over alternatives}
+  \hlstd{prob_denom} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{exp}\hlstd{()} \hlopt{%>%}
+    \hlkwd{rowSums}\hlstd{()}
+  \hlcom{## Calculate the conditional probability for each alternative in each draw}
+  \hlstd{cond_prob} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom}
+  \hlcom{## Calculate simulated choice probabilities as the means over all draws}
+  \hlstd{sim_prob} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(cond_prob)}
+  \hlcom{## Add simulated choice probability to initial dataset}
+  \hlstd{data_ind_out} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{prob} \hlstd{= sim_prob)}
+  \hlcom{## Return initial dataset with simulated probability variable}
+  \hlkwd{return}\hlstd{(data_ind_out)}
+\hlstd{\}}
+\hlcom{## Function to calculate simulated log-likelihood}
+\hlstd{sim_ll_fn} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{draws_list}\hlstd{,} \hlkwc{data_list}\hlstd{)\{}
+  \hlcom{## Simulate probabilities for each individual}
+  \hlstd{data_sim_ind} \hlkwb{<-} \hlkwd{map2}\hlstd{(}\hlkwc{.x} \hlstd{= draws_list,} \hlkwc{.y} \hlstd{= data_list,}
+                       \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{sim_probs_ind}\hlstd{(}\hlkwc{params} \hlstd{= params,}
+                                            \hlkwc{draws_ind} \hlstd{= .x,}
+                                            \hlkwc{data_ind} \hlstd{= .y))}
+  \hlcom{## Combine individual datasets into one}
+  \hlstd{data_sim} \hlkwb{<-} \hlstd{data_sim_ind} \hlopt{%>%}
+    \hlkwd{bind_rows}\hlstd{()}
+  \hlcom{## Calculate the log of simulated probability for the chosen alternative}
+  \hlstd{data_sim} \hlkwb{<-} \hlstd{data_sim} \hlopt{%>%}
+    \hlkwd{filter}\hlstd{(visit} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{log_prob} \hlstd{=} \hlkwd{log}\hlstd{(prob))}
+  \hlcom{## Calculate the simulated log-likelihood}
+  \hlstd{sim_ll} \hlkwb{<-} \hlkwd{sum}\hlstd{(data_sim}\hlopt{$}\hlstd{log_prob)}
+  \hlcom{## Return the negative of simulated log-likelihood}
+  \hlkwd{return}\hlstd{(}\hlopt{-}\hlstd{sim_ll)}
+\hlstd{\}}
+\hlcom{## Maximize the log-likelihood function}
+\hlstd{model_1a} \hlkwb{<-} \hlkwd{optim}\hlstd{(}\hlkwc{par} \hlstd{=} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{0.02}\hlstd{,} \hlopt{-}\hlnum{0.005}\hlstd{,} \hlopt{-}\hlnum{0.8}\hlstd{,} \hlnum{0.002}\hlstd{,} \hlnum{5}\hlstd{),} \hlkwc{fn} \hlstd{= sim_ll_fn,}
+                  \hlkwc{draws_list} \hlstd{= draws_camper,} \hlkwc{data_list} \hlstd{= data_camper,}
+                  \hlkwc{method} \hlstd{=} \hlstr{'BFGS'}\hlstd{,} \hlkwc{hessian} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlcom{## Function to summarize MLE model results}
+\hlstd{summarize_mle} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{model}\hlstd{,} \hlkwc{names}\hlstd{)\{}
+  \hlcom{## Extract model parameter estimates}
+  \hlstd{parameters} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{par}
+  \hlcom{## Calculate parameters standard errors}
+  \hlstd{std_errors} \hlkwb{<-} \hlstd{model}\hlopt{$}\hlstd{hessian} \hlopt{%>%}
+    \hlkwd{solve}\hlstd{()} \hlopt{%>%}
+    \hlkwd{diag}\hlstd{()} \hlopt{%>%}
+    \hlkwd{sqrt}\hlstd{()}
+  \hlcom{## Calculate parameter z-stats}
+  \hlstd{z_stats} \hlkwb{<-} \hlstd{parameters} \hlopt{/} \hlstd{std_errors}
+  \hlcom{## Calculate parameter p-values}
+  \hlstd{p_values} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlkwd{pnorm}\hlstd{(}\hlopt{-}\hlkwd{abs}\hlstd{(z_stats))}
+  \hlcom{## Summarize results in a list}
+  \hlstd{model_summary} \hlkwb{<-} \hlkwd{tibble}\hlstd{(}\hlkwc{names} \hlstd{= names,}
+                          \hlkwc{parameters} \hlstd{= parameters,}
+                          \hlkwc{std_errors} \hlstd{= std_errors,}
+                          \hlkwc{z_stats} \hlstd{= z_stats,}
+                          \hlkwc{p_values} \hlstd{= p_values)}
+  \hlcom{## Return model_summary object}
+  \hlkwd{return}\hlstd{(model_summary)}
+\hlstd{\}}
+\hlcom{## Summarize model results}
+\hlkwd{summarize_mle}\hlstd{(model_1a,}
+              \hlkwd{c}\hlstd{(}\hlstr{'cost'}\hlstd{,} \hlstr{'time'}\hlstd{,} \hlstr{'mountain'}\hlstd{,} \hlstr{'sd.time'}\hlstd{,} \hlstr{'sd.mountain'}\hlstd{))}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 5
+##   names       parameters std_errors z_stats     p_values
+##   <chr>            <dbl>      <dbl>   <dbl>        <dbl>
+## 1 cost          -0.0215     0.00416   -5.16 0.000000244 
+## 2 time          -0.00620    0.00115   -5.40 0.0000000668
+## 3 mountain      -0.879      0.322     -2.73 0.00628     
+## 4 sd.time        0.00375    0.00144    2.61 0.00894     
+## 5 sd.mountain    5.79       1.28       4.51 0.00000661
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	These five parameters are interpreted as they were in problem 2(b) of problem set 3, and the values are roughly comparable. The cost coefficient, $\beta_1$, is fixed at a value of -0.022, indicating this value is the marginal utility of cost for all campers. The time coefficient parameters, $\mu_2$ and $\sigma_2^2$, indicate that the marginal utility of time traveling to camp is normally distributed with a mean of -0.0062 and a standard deviation of 0.0038. The mountain coefficient parameters, $\mu_3$ and $\sigma_3^2$, indicate that the utility obtained by camping in the mountains (relative to camping at the beach), \emph{ceteris paribus}, is normally distributed with a mean of -0.88 and a standard deviation of 5.8.
+
+	\item As in problem set 3, the Massachusetts Department of Conservation and Recreation (DCR) is considering an increase to the camping fee at Mount Greylock due to the cost of maintaining those camp sites, and they want to know how this change would affect park visitation patterns. Use the model and simulation draws in part (a) to simulate the elasticity of choosing each park with respect to the cost of camping at Mount Greylock (\texttt{park\_id == 1}) for each camper; that is, 5 alternatives $\times$ 1000 campers $=$ 5000 elasticities. Then, for each park, calculate the mean of its elasticity with respect to the cost of camping at Mount Greylock. The following steps can provide a rough guide to simulating elasticities:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function to simulate elasticities for one camper:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one camper, and the data for one camper as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for every alternative for each draw.
+			\item Calculate the conditional choice probability for every alternative for each draw.
+			\item Calculate the simulated choice probability for every alternative as the mean over all draws.
+			\item Calculate the term inside the integral of the elasticity formula for every alternative for each draw by taking products of conditional choice probabilities and the cost coefficient.
+			\item Simulate the integral in the elasticity formula by taking the mean of the previous values over all draws for every alternative.
+			\item Calculate the elasticities by multiplying these simulated integrals by the cost of camping at Mount Greylock and dividing by the simulated choice probability of the respective alternative.
+		\end{enumerate}
+		\item Simulate elasticities for each camper---that is, call this function for each camper---using your parameter estimates from part (a).
+		\item Average the simulated elasticity of each park over all campers.
+	\end{enumerate}
+	Report these five mean elasticities. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to simulate elasticities for one individual}
+\hlstd{sim_elas_ind} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{draws_ind}\hlstd{,} \hlkwc{data_ind}\hlstd{)\{}
+  \hlcom{## Select relevant variables and convert into a matrix}
+  \hlstd{data_matrix} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost, time, mountain)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Transform random draws into coefficients based on parameters}
+  \hlstd{coef_matrix} \hlkwb{<-} \hlstd{draws_ind} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cost_coef} \hlstd{= params[}\hlnum{1}\hlstd{],}
+           \hlkwc{time_coef} \hlstd{= params[}\hlnum{2}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{time_draw,}
+           \hlkwc{mountain_coef} \hlstd{= params[}\hlnum{3}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{5}\hlstd{]} \hlopt{*} \hlstd{mountain_draw)} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost_coef, time_coef, mountain_coef)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Calculate representative utility for each alternative in each draw}
+  \hlstd{utility} \hlkwb{<-} \hlstd{(coef_matrix} \hlopt{%*%} \hlkwd{t}\hlstd{(data_matrix))} \hlopt{%>%}
+    \hlkwd{pmin}\hlstd{(}\hlnum{700}\hlstd{)} \hlopt{%>%}
+    \hlkwd{pmax}\hlstd{(}\hlopt{-}\hlnum{700}\hlstd{)}
+  \hlcom{## Sum the exponential of utility over alternatives}
+  \hlstd{prob_denom} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{exp}\hlstd{()} \hlopt{%>%}
+    \hlkwd{rowSums}\hlstd{()}
+  \hlcom{## Calculate the conditional probability for each alternative in each draw}
+  \hlstd{cond_prob} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom}
+  \hlcom{## Calculate simulated choice probabilities as the means over all draws}
+  \hlstd{sim_prob} \hlkwb{<-} \hlkwd{colMeans}\hlstd{(cond_prob)}
+  \hlcom{## Calculate simulated integral for own elasticity}
+  \hlstd{sim_int_own_elas} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]} \hlopt{*}
+    \hlkwd{mean}\hlstd{(cond_prob[,} \hlnum{1}\hlstd{]} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlstd{cond_prob[,} \hlnum{1}\hlstd{]))}
+  \hlcom{## Calculate simulated integral for cross elasticities}
+  \hlstd{sim_int_cross_elas} \hlkwb{<-} \hlstd{params[}\hlnum{1}\hlstd{]} \hlopt{*}
+    \hlkwd{colMeans}\hlstd{(cond_prob[,} \hlnum{1}\hlstd{]} \hlopt{*} \hlstd{cond_prob[,} \hlopt{-}\hlnum{1}\hlstd{])}
+  \hlcom{## Combine elasticity simulated integrals into one vector}
+  \hlstd{sim_int_elas} \hlkwb{<-} \hlkwd{c}\hlstd{(sim_int_own_elas, sim_int_cross_elas)}
+  \hlcom{## Calculate own-price and cross-price simulated elasticities}
+  \hlstd{sim_elas} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwd{rep}\hlstd{(}\hlopt{-}\hlnum{1}\hlstd{,} \hlnum{4}\hlstd{))} \hlopt{*} \hlstd{data_ind}\hlopt{$}\hlstd{cost[}\hlnum{1}\hlstd{]} \hlopt{/} \hlstd{sim_prob} \hlopt{*} \hlstd{sim_int_elas}
+  \hlcom{## Add simulated elasticities to initial dataset}
+  \hlstd{data_ind_out} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{elasticity} \hlstd{= sim_elas)}
+  \hlcom{## Return initial dataset with simulated elasticity variable}
+  \hlkwd{return}\hlstd{(data_ind_out)}
+\hlstd{\}}
+\hlcom{## Simulate elasticities for each individual}
+\hlstd{data_1b_ind} \hlkwb{<-} \hlkwd{map2}\hlstd{(}\hlkwc{.x} \hlstd{= draws_camper,} \hlkwc{.y} \hlstd{= data_camper,}
+                    \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{sim_elas_ind}\hlstd{(}\hlkwc{params} \hlstd{= model_1a}\hlopt{$}\hlstd{par,}
+                                        \hlkwc{draws_ind} \hlstd{= .x,}
+                                        \hlkwc{data_ind} \hlstd{= .y))}
+\hlcom{## Combine list of data into one tibble}
+\hlstd{data_1b} \hlkwb{<-} \hlstd{data_1b_ind} \hlopt{%>%}
+  \hlkwd{bind_rows}\hlstd{()}
+\hlcom{## Calculate average elasticity with respect to cost of alternative 1}
+\hlstd{data_1b} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(park_id, park)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{elasticity} \hlstd{=} \hlkwd{mean}\hlstd{(elasticity),} \hlkwc{.groups} \hlstd{=} \hlstr{'drop'}\hlstd{)} \hlopt{%>%}
+  \hlkwd{arrange}\hlstd{(park_id)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 3
+##   park_id park             elasticity
+##     <dbl> <chr>                 <dbl>
+## 1       1 Mount Greylock      -0.655 
+## 2       2 October Mountain     0.602 
+## 3       3 Horseneck Beach      0.0893
+## 4       4 Salisbury Beach      0.0896
+## 5       5 Scusset Beach        0.0889
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+	The mean elasticity of camping at Mount Greylock with respect to its cost is -0.655; the mean elasticity of camping at October Mountain with respect to the cost of camping at Mount Greylock is 0.602; and the mean elasticity of camping at any of beach parks with respect to the cost of camping at Mount Greylock is approximately 0.089, as reported above. This model implies that campers will substitute to October Mountain in much greater proportion than to the beach parks.
+\end{enumerate}
+
+\section*{Problem 2: Individual-Level Coefficients}
+
+In problem set 3, we calculated the distribution of the dollar value that a camper places on each hour spent traveling and the distribution of the dollar value that a camper places on camping in the mountains (relative to camping at the beach). DCR is also interested in understanding these valuations for the campers who visit each of the five state parks in our dataset. 
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Use the model in problem 1(a) to calculate the mean coefficients for campers at each of the five parks. Use the same simulation draws as in problem 1 to simulate the mean coefficients for each camper, and then average over the campers who visit each park. The following steps can provide a rough guide to simulating mean coefficients:
+	\begin{enumerate}[label=\Roman*.]
+		\item Create a function to simulate mean coefficients for one camper:
+		\begin{enumerate}[label=\roman*.]
+			\item The function should take a set of parameters, the random draws for one camper, and the data for one camper as inputs: \texttt{function(parameters, draws, data)}.
+			\item Transform the standard normal draws into the correct distributions using the distribution parameters.
+			\item Calculate the representative utility for every alternative for each draw.
+			\item Calculate the conditional choice probability of the chosen alternative for each draw.
+			\item Calculate weights for each simulation draw using the conditional choice probability of the chosen alternative.
+			\item Calculate the weighted average for each coefficient using these simulation draw weights.
+		\end{enumerate}
+		\item Simulate mean coefficients for each camper---that is, call this function for each camper---using your parameter estimates from problem 1(a).
+		\item For each of the five parks, average the simulated mean coefficients for all campers at that park.
+	\end{enumerate}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Function to simulate individual coefficients for one individual}
+\hlstd{calc_mean_coefs} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{params}\hlstd{,} \hlkwc{draws_ind}\hlstd{,} \hlkwc{data_ind}\hlstd{)\{}
+  \hlcom{## Select relevant variables and convert into a matrix}
+  \hlstd{data_matrix} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost, time, mountain)} \hlopt{%>%}
+    \hlkwd{as.matrix}\hlstd{()}
+  \hlcom{## Transform random draws into coefficients based on parameters}
+  \hlstd{coef} \hlkwb{<-} \hlstd{draws_ind} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{cost_coef} \hlstd{= params[}\hlnum{1}\hlstd{],}
+           \hlkwc{time_coef} \hlstd{= params[}\hlnum{2}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{4}\hlstd{]} \hlopt{*} \hlstd{time_draw,}
+           \hlkwc{mountain_coef} \hlstd{= params[}\hlnum{3}\hlstd{]} \hlopt{+} \hlstd{params[}\hlnum{5}\hlstd{]} \hlopt{*} \hlstd{mountain_draw)} \hlopt{%>%}
+    \hlkwd{select}\hlstd{(cost_coef, time_coef, mountain_coef)}
+  \hlcom{## Convert coefficients tibble to a matrix}
+  \hlstd{coef_matrix} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(coef)}
+  \hlcom{## Calculate representative utility for each alternative in each draw}
+  \hlstd{utility} \hlkwb{<-} \hlstd{(coef_matrix} \hlopt{%*%} \hlkwd{t}\hlstd{(data_matrix))} \hlopt{%>%}
+    \hlkwd{pmin}\hlstd{(}\hlnum{700}\hlstd{)} \hlopt{%>%}
+    \hlkwd{pmax}\hlstd{(}\hlopt{-}\hlnum{700}\hlstd{)}
+  \hlcom{## Sum the exponential of utility over alternatives}
+  \hlstd{prob_denom} \hlkwb{<-} \hlstd{utility} \hlopt{%>%}
+    \hlkwd{exp}\hlstd{()} \hlopt{%>%}
+    \hlkwd{rowSums}\hlstd{()}
+  \hlcom{## Calculate the conditional probability for each alternative in each draw}
+  \hlstd{cond_prob} \hlkwb{<-} \hlkwd{exp}\hlstd{(utility)} \hlopt{/} \hlstd{prob_denom}
+  \hlcom{## Calculate the numerator of the draw weights as probability of chosen alt}
+  \hlstd{weights_num} \hlkwb{<-} \hlkwd{c}\hlstd{(cond_prob} \hlopt{%*%} \hlstd{data_ind}\hlopt{$}\hlstd{visit)}
+  \hlcom{## Calculate the draw weights}
+  \hlstd{weights} \hlkwb{<-} \hlstd{weights_num} \hlopt{/} \hlkwd{sum}\hlstd{(weights_num)}
+  \hlcom{## Add draw weights to dataset of coefficients}
+  \hlstd{coef} \hlkwb{<-} \hlstd{coef} \hlopt{%>%}
+    \hlkwd{mutate}\hlstd{(}\hlkwc{weight} \hlstd{= weights)}
+  \hlcom{## Calculate weighted mean for each coefficient}
+  \hlstd{coef_means} \hlkwb{<-} \hlstd{coef} \hlopt{%>%}
+    \hlkwd{summarize}\hlstd{(}\hlkwc{cost_coef} \hlstd{=} \hlkwd{sum}\hlstd{(cost_coef} \hlopt{*} \hlstd{weight),}
+              \hlkwc{time_coef_mean} \hlstd{=} \hlkwd{sum}\hlstd{(time_coef} \hlopt{*} \hlstd{weight),}
+              \hlkwc{mountain_coef_mean} \hlstd{=} \hlkwd{sum}\hlstd{(mountain_coef} \hlopt{*} \hlstd{weight))}
+  \hlcom{## Add individual coefficient means to initial dataset}
+  \hlstd{data_ind_out} \hlkwb{<-} \hlstd{data_ind} \hlopt{%>%}
+    \hlkwd{bind_cols}\hlstd{(coef_means)}
+  \hlcom{## Return initial dataset with simulated probability variable}
+  \hlkwd{return}\hlstd{(data_ind_out)}
+\hlstd{\}}
+\hlcom{## Calculate mean coefficients for each individual}
+\hlstd{data_2a_ind} \hlkwb{<-} \hlkwd{map2}\hlstd{(}\hlkwc{.x} \hlstd{= draws_camper,} \hlkwc{.y} \hlstd{= data_camper,}
+                    \hlkwc{.f} \hlstd{=} \hlopt{~} \hlkwd{calc_mean_coefs}\hlstd{(}\hlkwc{params} \hlstd{= model_1a}\hlopt{$}\hlstd{par,}
+                                           \hlkwc{draws_ind} \hlstd{= .x,}
+                                           \hlkwc{data_ind} \hlstd{= .y))}
+\hlcom{## Combine list of data into one tibble}
+\hlstd{data_2a} \hlkwb{<-} \hlstd{data_2a_ind} \hlopt{%>%}
+  \hlkwd{bind_rows}\hlstd{()}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	If you are not able to calculate these mean coefficients ``by hand,'' you can instead use the ``canned'' routine. First, estimate the model in problem 1(a) using the \texttt{mlogit()} function; this model is identical to problem 2(b) from problem set 3. Then use the \texttt{fitted()} function with argument \texttt{type = `parameters'} to calculate the mean coefficients for each camper.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load mlogit package}
+\hlkwd{library}\hlstd{(mlogit)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Loading required package: dfidx}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# \\\#\# Attaching package: 'dfidx'}}
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# The following object is masked from 'package:stats':\\\#\# \\\#\# \ \ \ \ filter}}\begin{alltt}
+\hlcom{## Convert dataset to dfidx format}
+\hlstd{data_dfidx} \hlkwb{<-} \hlkwd{dfidx}\hlstd{(}\hlkwc{data} \hlstd{= data_camping,} \hlkwc{shape} \hlstd{=} \hlstr{'long'}\hlstd{,}
+                    \hlkwc{choice} \hlstd{=} \hlstr{'visit'}\hlstd{,} \hlkwc{idx} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{'camper_id'}\hlstd{,} \hlstr{'park_id'}\hlstd{))}
+\hlcom{## Model camping park visit as a mixed logit with fixed cost coefficient}
+\hlstd{model_2a_alt} \hlkwb{<-} \hlkwd{mlogit}\hlstd{(}\hlkwc{formula} \hlstd{= visit} \hlopt{~} \hlstd{cost} \hlopt{+} \hlstd{time} \hlopt{+} \hlstd{mountain} \hlopt{|} \hlnum{0} \hlopt{|} \hlnum{0}\hlstd{,}
+                       \hlkwc{data} \hlstd{= data_dfidx,}
+                       \hlkwc{rpar} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwc{time} \hlstd{=} \hlstr{'n'}\hlstd{,} \hlkwc{mountain} \hlstd{=} \hlstr{'n'}\hlstd{),}
+                       \hlkwc{R} \hlstd{=} \hlnum{100}\hlstd{,} \hlkwc{seed} \hlstd{=} \hlnum{703}\hlstd{)}
+\hlcom{## Calculate mean coefficients for each individual}
+\hlstd{model_2a_alt_params_ind} \hlkwb{<-} \hlkwd{fitted}\hlstd{(model_2a_alt,} \hlkwc{type} \hlstd{=} \hlstr{'parameters'}\hlstd{)}
+\hlcom{## Add mean coefficients to dataset}
+\hlstd{data_2a_alt} \hlkwb{<-} \hlstd{data_camping} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(visit} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{cost_coef} \hlstd{=} \hlkwd{coef}\hlstd{(model_2a_alt)[}\hlnum{1}\hlstd{],}
+         \hlkwc{time_coef_mean} \hlstd{= model_2a_alt_params_ind[,} \hlnum{1}\hlstd{],}
+         \hlkwc{mountain_coef_mean} \hlstd{= model_2a_alt_params_ind[,} \hlnum{2}\hlstd{])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the mean coefficients for each park; that is, 3 variables $\times$ 5 alternatives $=$ 15 coefficients.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate average coefficients for each camping park}
+\hlstd{coef_park_2a} \hlkwb{<-} \hlstd{data_2a} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(visit} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(park_id, park)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{cost_coef} \hlstd{=} \hlkwd{mean}\hlstd{(cost_coef),}
+            \hlkwc{time_coef_mean} \hlstd{=} \hlkwd{mean}\hlstd{(time_coef_mean),}
+            \hlkwc{mountain_coef_mean} \hlstd{=} \hlkwd{mean}\hlstd{(mountain_coef_mean),}
+            \hlkwc{.groups} \hlstd{=} \hlstr{'drop'}\hlstd{)}
+\hlstd{coef_park_2a}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 5
+##   park_id park             cost_coef time_coef_mean mountain_coef_mean
+##     <dbl> <chr>                <dbl>          <dbl>              <dbl>
+## 1       1 Mount Greylock     -0.0215       -0.00608               3.56
+## 2       2 October Mountain   -0.0215       -0.00634               3.51
+## 3       3 Horseneck Beach    -0.0215       -0.00620              -4.99
+## 4       4 Salisbury Beach    -0.0215       -0.00626              -4.85
+## 5       5 Scusset Beach      -0.0215       -0.00616              -4.88
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The cost coefficient, $\beta_1$, is fixed and, hence, it is the same for campers at all parks. The time coefficient, $\beta_2$, is random, but it is approximately equal on average for campers at all parks. The mountain coefficient, $\beta_3$, however, varies substantially across parks. This coefficient is positive on average at each of the mountain parks and negative on average at each of the beach parks.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate average coefficients for each camping park}
+\hlstd{coef_park_2a_alt} \hlkwb{<-} \hlstd{data_2a_alt} \hlopt{%>%}
+  \hlkwd{group_by}\hlstd{(park_id, park)} \hlopt{%>%}
+  \hlkwd{summarize}\hlstd{(}\hlkwc{cost_coef} \hlstd{=} \hlkwd{mean}\hlstd{(cost_coef),}
+            \hlkwc{time_coef_mean} \hlstd{=} \hlkwd{mean}\hlstd{(time_coef_mean),}
+            \hlkwc{mountain_coef_mean} \hlstd{=} \hlkwd{mean}\hlstd{(mountain_coef_mean),}
+            \hlkwc{.groups} \hlstd{=} \hlstr{'drop'}\hlstd{)}
+\hlstd{coef_park_2a_alt}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 5
+##   park_id park             cost_coef time_coef_mean mountain_coef_mean
+##     <dbl> <chr>                <dbl>          <dbl>              <dbl>
+## 1       1 Mount Greylock     -0.0187       -0.00486               2.77
+## 2       2 October Mountain   -0.0187       -0.00493               2.71
+## 3       3 Horseneck Beach    -0.0187       -0.00485              -3.99
+## 4       4 Salisbury Beach    -0.0187       -0.00487              -3.95
+## 5       5 Scusset Beach      -0.0187       -0.00487              -3.88
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Using the ``canned'' routine, the patterns observed in the mean coefficients are the same.
+
+		\item Calculate the mean dollar value that a camper at each park places on each hour spent traveling and the mean dollar value that a camper at each park places on camping in the mountains (relative to camping at the beach); that is, 2 variables $\times$ 5 alternatives $=$ 10 dollar values. Briefly interpret these results.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate mean values for each camping park}
+\hlstd{coef_park_2a} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{time_value} \hlstd{= time_coef_mean} \hlopt{/} \hlstd{cost_coef} \hlopt{*} \hlnum{60}\hlstd{,}
+         \hlkwc{mountain_value} \hlstd{= mountain_coef_mean} \hlopt{/ -}\hlstd{cost_coef)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(park_id, park, time_value, mountain_value)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 4
+##   park_id park             time_value mountain_value
+##     <dbl> <chr>                 <dbl>          <dbl>
+## 1       1 Mount Greylock         17.0           166.
+## 2       2 October Mountain       17.7           164.
+## 3       3 Horseneck Beach        17.3          -232.
+## 4       4 Salisbury Beach        17.5          -226.
+## 5       5 Scusset Beach          17.2          -227.
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The mean dollar value that a camper places on each hour spent traveling is approximately equal at all five parks. The mean dollar value that a camper at each park places on camping in the mountains (relative to camping at the beach) differs substantially when comparing the mountain parks and the beach parks. These results indicate that the campers who choose to camp in the mountains tend to place a positive value on camping in the mountains. Conversely, the campers who choose to camp at the beach tend to place a negative value on camping in the mountains, or tend to place a positive value on camping at the beach. In other words, the campers who choose a particular state park prefer the attributes of that park, which is intuitive.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate mean values for each camping park}
+\hlstd{coef_park_2a_alt} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{time_value} \hlstd{= time_coef_mean} \hlopt{/} \hlstd{cost_coef} \hlopt{*} \hlnum{60}\hlstd{,}
+         \hlkwc{mountain_value} \hlstd{= mountain_coef_mean} \hlopt{/ -}\hlstd{cost_coef)} \hlopt{%>%}
+  \hlkwd{select}\hlstd{(park_id, park, time_value, mountain_value)}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 5 x 4
+##   park_id park             time_value mountain_value
+##     <dbl> <chr>                 <dbl>          <dbl>
+## 1       1 Mount Greylock         15.6           148.
+## 2       2 October Mountain       15.8           145.
+## 3       3 Horseneck Beach        15.5          -213.
+## 4       4 Salisbury Beach        15.6          -211.
+## 5       5 Scusset Beach          15.6          -207.
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Using the ``canned'' routine, the patterns observed in the mean dollar values are the same.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
