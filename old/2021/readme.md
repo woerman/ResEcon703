@@ -2,9 +2,7 @@
 
 Welcome to **Topics in Advanced Econometrics** (ResEcon 703) at the University of Massachusetts Amherst, taught by [Matt Woerman](https://sites.google.com/site/mattwoerman/).
 
-More information for the Fall 2022 semester is coming soon.
-
-<!-- For detailed information on this course, please see the [syllabus](https://raw.githack.com/woerman/ResEcon703/master/syllabus/syllabus.pdf).
+For detailed information on this course, please see the [syllabus](https://raw.githack.com/woerman/ResEcon703/master/syllabus/syllabus.pdf).
 
 Enrolled students can access videos of in-person classes on [Echo360](https://echo360.org/section/709335f7-9af8-416d-a199-97204223036d/home).
 
@@ -81,4 +79,4 @@ Week 13: **Dynamics and Endogeneity**
 ## Final Project
 
 **Final Project**
-* [Final project](https://raw.githack.com/woerman/ResEcon703/master/project/project.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/project/project_dataset.zip) | [Paper](https://doi.org/10.1257/aer.100.3.837) -->
+* [Final project](https://raw.githack.com/woerman/ResEcon703/master/project/project.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/project/project_dataset.zip) | [Paper](https://doi.org/10.1257/aer.100.3.837)
