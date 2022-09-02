@@ -1,0 +1,73 @@
+[0] Config.pm:304> INFO - This is Biber 2.13
+[0] Config.pm:307> INFO - Logfile is '.tmp\syllabus.blg'
+[25] biber-MSWIN32:315> INFO - === 
+[45] Biber.pm:375> INFO - Reading '.tmp\syllabus.bcf'
+[205] Biber.pm:905> INFO - Found 0 citekeys in bib section 0
+[206] Biber.pm:905> INFO - Found 1 citekeys in bib section 1
+[206] Biber.pm:905> INFO - Found 0 citekeys in bib section 0
+[206] Biber.pm:905> INFO - Found 1 citekeys in bib section 2
+[206] Biber.pm:905> INFO - Found 0 citekeys in bib section 0
+[207] Biber.pm:905> INFO - Found 1 citekeys in bib section 3
+[207] Biber.pm:905> INFO - Found 0 citekeys in bib section 0
+[207] Biber.pm:905> INFO - Found 1 citekeys in bib section 4
+[207] Biber.pm:905> INFO - Found 0 citekeys in bib section 0
+[207] Biber.pm:905> INFO - Found 1 citekeys in bib section 5
+[208] Biber.pm:905> INFO - Found 2 citekeys in bib section 0
+[263] Biber.pm:4196> INFO - Processing section 0
+[265] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[273] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[283] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 0
+[293] bibtex.pm:1462> INFO - LaTeX decoding ...
+[324] bibtex.pm:1281> INFO - Found BibTeX data source 'refs.bib'
+[386] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[386] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[386] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[386] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[386] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[397] Biber.pm:4196> INFO - Processing section 1
+[397] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[397] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[398] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 1
+[412] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[412] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[412] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[412] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[412] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[414] Biber.pm:4196> INFO - Processing section 2
+[414] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[414] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[414] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 2
+[428] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[428] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[428] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[428] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[428] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[429] Biber.pm:4196> INFO - Processing section 3
+[430] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[430] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[430] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 3
+[442] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[442] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[442] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[442] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[442] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[444] Biber.pm:4196> INFO - Processing section 4
+[444] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[444] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[444] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 4
+[456] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[456] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[456] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[456] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[456] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[458] Biber.pm:4196> INFO - Processing section 5
+[458] Utils.pm:75> INFO - Globbing data source 'refs.bib'
+[458] Utils.pm:91> INFO - Globbed data source 'refs.bib' to refs.bib
+[458] Biber.pm:4373> INFO - Looking for bibtex format file 'refs.bib' for section 5
+[470] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[470] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[470] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'level = 4' with 'level = 2'
+[471] Biber.pm:4024> INFO - Sorting list 'cms/global//global/global' of type 'entry' with template 'cms' and locale 'en-US'
+[471] Biber.pm:4030> INFO - No sort tailoring available for locale 'en-US'
+[472] bbl.pm:648> INFO - Writing '.tmp\syllabus.bbl' with encoding 'UTF-8'
+[476] bbl.pm:751> INFO - Output to .tmp\syllabus.bbl

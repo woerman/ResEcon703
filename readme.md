@@ -2,15 +2,13 @@
 
 Welcome to **Topics in Advanced Econometrics** (ResEcon 703) at the University of Massachusetts Amherst, taught by [Matt Woerman](https://sites.google.com/site/mattwoerman/).
 
-More information for the Fall 2022 semester is coming soon.
+For detailed information on this course, please see the [syllabus](https://raw.githack.com/woerman/ResEcon703/master/syllabus/syllabus.pdf).
 
-<!-- For detailed information on this course, please see the [syllabus](https://raw.githack.com/woerman/ResEcon703/master/syllabus/syllabus.pdf).
+Enrolled students can access additional course links on [Moodle](https://umass.moonami.com/course/view.php?id=32681).
 
-Enrolled students can access videos of in-person classes on [Echo360](https://echo360.org/section/709335f7-9af8-416d-a199-97204223036d/home).
+<!-- ## Course Materials
 
-## Course Materials
-
-Week 0: **Course Overview**
+**Course Overview**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_00/week_00.pdf)
 
 Week 1: **Structural Estimation**

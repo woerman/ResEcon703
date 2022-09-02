@@ -1,0 +1,293 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.1 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{cms/global//global/global}
+    \entry{nevoTakingDogmaOut2010}{article}{}
+      \name{author}{2}{}{%
+        {{hash=13512110224d21f56fcb1a42944614d5}{%
+           family={Nevo},
+           familyi={N\bibinitperiod},
+           given={Aviv},
+           giveni={A\bibinitperiod}}}%
+        {{hash=05b1805ba14dd00cec1e7274204394c3}{%
+           family={Whinston},
+           familyi={W\bibinitperiod},
+           given={Michael\bibnamedelima D.},
+           giveni={M\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+      }
+      \strng{namehash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \strng{fullhash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \strng{bibnamehash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \strng{authorbibnamehash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \strng{authornamehash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \strng{authorfullhash}{d1c73a806dd58202fcae77fa1468ea3e}
+      \field{sortinit}{N}
+      \field{sortinithash}{98cf339a479c0454fe09153a08675a15}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Without a doubt, there has been a "credibility revolution" in applied econometrics. One contributing development has been in the improvement and increased use in data analysis of "structural methods"; that is, the use of models based in economic theory. Structural modeling attempts to use data to identify the parameters of an underlying economic model, based on models of individual choice or aggregate relations derived from them. Structural estimation has a long tradition in economics, but better and larger data sets, more powerful computers, improved modeling methods, faster computational techniques, and new econometric methods such as those mentioned above have allowed researchers to make significant improvements. While Angrist and Pischke extol the successes of empirical work that estimates "treatment effects" based on actual or quasi-experiments, they are much less sanguine about structural analysis and hold industrial organization up as an example where "progress is less dramatic." Indeed, reading their article one comes away with the impression that there is only a single way to conduct credible empirical analysis. This seems to us a very narrow and dogmatic approach to empirical work; credible analysis can come in many guises, both structural and nonstructural, and for some questions structural analysis offers important advantages. In this comment, we address the criticism of structural analysis and its use in industrial organization, and consider why empirical analysis in industrial organization differs in such striking ways from that in fields such as labor, which have recently emphasized the methods favored by Angrist and Pischke.}
+      \field{issn}{0895-3309}
+      \field{journaltitle}{Journal of Economic Perspectives}
+      \field{langid}{english}
+      \field{number}{2}
+      \field{shorttitle}{Taking the {{Dogma}} out of {{Econometrics}}}
+      \field{title}{Taking the {{Dogma}} out of {{Econometrics}}: {{Structural Modeling}} and {{Credible Inference}}}
+      \field{urlday}{30}
+      \field{urlmonth}{8}
+      \field{urlyear}{2019}
+      \field{volume}{24}
+      \field{year}{2010}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{69\bibrangedash 82}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1257/jep.24.2.69
+      \endverb
+      \verb{file}
+      \verb C\:\\Users\\mattw\\Zotero\\storage\\MXSG96MS\\Nevo and Whinston - 2010 - Taking the Dogma out of Econometrics Structural M.pdf;C\:\\Users\\mattw\\Zotero\\storage\\RAA2M6R3\\login.html
+      \endverb
+      \verb{urlraw}
+      \verb http://www.aeaweb.org/articles?id=10.1257/jep.24.2.69
+      \endverb
+      \verb{url}
+      \verb http://www.aeaweb.org/articles?id=10.1257/jep.24.2.69
+      \endverb
+      \keyw{Econometrics,Economic Methodology}
+    \endentry
+    \entry{trainDiscreteChoiceMethods2009}{book}{}
+      \name{author}{1}{}{%
+        {{hash=bb49649475647614b53241e5cdccd584}{%
+           family={Train},
+           familyi={T\bibinitperiod},
+           given={Kenneth\bibnamedelima E.},
+           giveni={K\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{bb49649475647614b53241e5cdccd584}
+      \strng{fullhash}{bb49649475647614b53241e5cdccd584}
+      \strng{bibnamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authorbibnamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authornamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authorfullhash}{bb49649475647614b53241e5cdccd584}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Second Edition}
+      \field{title}{Discrete {{Choice Methods}} with {{Simulation}}}
+      \field{year}{2009}
+      \field{dateera}{ce}
+      \verb{urlraw}
+      \verb https://eml.berkeley.edu/books/choice2.html
+      \endverb
+      \verb{url}
+      \verb https://eml.berkeley.edu/books/choice2.html
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+
+\refsection{1}
+  \datalist[entry]{cms/global//global/global}
+    \entry{trainDiscreteChoiceMethods2009}{book}{}
+      \name{author}{1}{}{%
+        {{hash=bb49649475647614b53241e5cdccd584}{%
+           family={Train},
+           familyi={T\bibinitperiod},
+           given={Kenneth\bibnamedelima E.},
+           giveni={K\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{bb49649475647614b53241e5cdccd584}
+      \strng{fullhash}{bb49649475647614b53241e5cdccd584}
+      \strng{bibnamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authorbibnamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authornamehash}{bb49649475647614b53241e5cdccd584}
+      \strng{authorfullhash}{bb49649475647614b53241e5cdccd584}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Second Edition}
+      \field{title}{Discrete {{Choice Methods}} with {{Simulation}}}
+      \field{year}{2009}
+      \field{dateera}{ce}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://eml.berkeley.edu/books/choice2.html
+      \endverb
+      \verb{url}
+      \verb https://eml.berkeley.edu/books/choice2.html
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+
+\refsection{2}
+  \datalist[entry]{cms/global//global/global}
+    \entry{cameronMicroeconometricsMethodsApplications2005}{book}{}
+      \name{author}{2}{}{%
+        {{hash=dab37900e0b3d1bbd6b945d99fef4b06}{%
+           family={Cameron},
+           familyi={C\bibinitperiod},
+           given={A.\bibnamedelimi Colin},
+           giveni={A\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=1828613c534b16d7b5a650c96a8c2595}{%
+           family={Trivedi},
+           familyi={T\bibinitperiod},
+           given={Pravin\bibnamedelima K.},
+           giveni={P\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Cambridge University Press}%
+      }
+      \strng{namehash}{c9ed462534b8f45616884f53043295aa}
+      \strng{fullhash}{c9ed462534b8f45616884f53043295aa}
+      \strng{bibnamehash}{c9ed462534b8f45616884f53043295aa}
+      \strng{authorbibnamehash}{c9ed462534b8f45616884f53043295aa}
+      \strng{authornamehash}{c9ed462534b8f45616884f53043295aa}
+      \strng{authorfullhash}{c9ed462534b8f45616884f53043295aa}
+      \field{sortinit}{C}
+      \field{sortinithash}{4c244ceae61406cdc0cc2ce1cb1ff703}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Microeconometrics: {{Methods}} and {{Applications}}}
+      \field{year}{2005}
+      \field{dateera}{ce}
+      \true{nocite}
+    \endentry
+  \enddatalist
+\endrefsection
+
+\refsection{3}
+  \datalist[entry]{cms/global//global/global}
+    \entry{greeneEconometricAnalysis2018}{book}{}
+      \name{author}{1}{}{%
+        {{hash=6aeaa164d917d0657b4f141378594e78}{%
+           family={Greene},
+           familyi={G\bibinitperiod},
+           given={William\bibnamedelima H.},
+           giveni={W\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson}%
+      }
+      \strng{namehash}{6aeaa164d917d0657b4f141378594e78}
+      \strng{fullhash}{6aeaa164d917d0657b4f141378594e78}
+      \strng{bibnamehash}{6aeaa164d917d0657b4f141378594e78}
+      \strng{authorbibnamehash}{6aeaa164d917d0657b4f141378594e78}
+      \strng{authornamehash}{6aeaa164d917d0657b4f141378594e78}
+      \strng{authorfullhash}{6aeaa164d917d0657b4f141378594e78}
+      \field{sortinit}{G}
+      \field{sortinithash}{62eb2aa29549e4fdbd3cb154ec5711cb}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Eighth Edition}
+      \field{title}{Econometric {{Analysis}}}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \true{nocite}
+    \endentry
+  \enddatalist
+\endrefsection
+
+\refsection{4}
+  \datalist[entry]{cms/global//global/global}
+    \entry{hayashiEconometrics2000}{book}{}
+      \name{author}{1}{}{%
+        {{hash=3e8f39031776366701c90bced3d28cfa}{%
+           family={Hayashi},
+           familyi={H\bibinitperiod},
+           given={Fumio},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Princeton University Press}%
+      }
+      \strng{namehash}{3e8f39031776366701c90bced3d28cfa}
+      \strng{fullhash}{3e8f39031776366701c90bced3d28cfa}
+      \strng{bibnamehash}{3e8f39031776366701c90bced3d28cfa}
+      \strng{authorbibnamehash}{3e8f39031776366701c90bced3d28cfa}
+      \strng{authornamehash}{3e8f39031776366701c90bced3d28cfa}
+      \strng{authorfullhash}{3e8f39031776366701c90bced3d28cfa}
+      \field{sortinit}{H}
+      \field{sortinithash}{6db6145dae8dc9e1271a8d556090b50a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Econometrics}
+      \field{year}{2000}
+      \field{dateera}{ce}
+      \true{nocite}
+    \endentry
+  \enddatalist
+\endrefsection
+
+\refsection{5}
+  \datalist[entry]{cms/global//global/global}
+    \entry{wooldridgeEconomtericAnalysisCross2010}{book}{}
+      \name{author}{1}{}{%
+        {{hash=c93aeef4998e670d5343b7e632c431dc}{%
+           family={Wooldridge},
+           familyi={W\bibinitperiod},
+           given={Jeffrey\bibnamedelima M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {The MIT Press}%
+      }
+      \strng{namehash}{c93aeef4998e670d5343b7e632c431dc}
+      \strng{fullhash}{c93aeef4998e670d5343b7e632c431dc}
+      \strng{bibnamehash}{c93aeef4998e670d5343b7e632c431dc}
+      \strng{authorbibnamehash}{c93aeef4998e670d5343b7e632c431dc}
+      \strng{authornamehash}{c93aeef4998e670d5343b7e632c431dc}
+      \strng{authorfullhash}{c93aeef4998e670d5343b7e632c431dc}
+      \field{sortinit}{W}
+      \field{sortinithash}{1af34bd8c148ffb32de1494636b49713}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{Second Editon}
+      \field{title}{Economteric {{Analysis}} of {{Cross Section}} and {{Panel Data}}}
+      \field{year}{2010}
+      \field{dateera}{ce}
+      \true{nocite}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

@@ -1,0 +1,5 @@
+PWD D:/Users/mwoerman/Dropbox/courses/umass/ResEcon 703/current/syllabus
+INPUT c:/texlive/2019/texmf.cnf
+INPUT c:/texlive/2019/texmf-dist/web2c/texmf.cnf
+INPUT c:/texlive/2019/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT syllabus.tex
