@@ -1,0 +1,1228 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\Cov}{Cov}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 2:\ R Tutorial]{Week 2:\ R Tutorial}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Structural estimation
+    \end{itemize}
+    \vspace{2ex}
+    This week's topics
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{resources}}{R resources}
+        \item \hyperlink{page.\getpagerefnumber{objects}}{Objects in R}
+        \item \hyperlink{page.\getpagerefnumber{functions}}{Functions and packages in R}
+        \item \hyperlink{page.\getpagerefnumber{math}}{Math and statistics in R}
+        \item \hyperlink{page.\getpagerefnumber{data}}{Data in R}
+        \item \hyperlink{page.\getpagerefnumber{examples}}{R examples}
+    \end{itemize}
+    \vspace{2ex}
+    This week's ``reading''
+    \begin{itemize}
+        \item R \texttt{swirl} interactive tutorials
+    \end{itemize}
+\end{frame}
+
+\section{R Resources}
+\label{resources}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large R Resources
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Hat Tips}
+    This lecture is inspired heavily by notes and slides created by
+    \begin{itemize}
+        \item \href{https://www.fionaburlig.com/}{Fiona Burlig, University of Chicago}
+        \item \href{https://grantmcdermott.com/}{Grant McDermott, University of Oregon}
+        \item \href{http://edrub.in/}{Ed Rubin, University of Oregon}
+    \end{itemize}
+    \vspace{3ex}
+    Many thanks to them for generously making their course materials available online for all!
+\end{frame}
+
+\begin{frame}\frametitle{Installing R}
+    Installing R is \emph{usually} straightforward \\
+    \vspace{1ex}
+    \begin{tabular}{@{\extracolsep{-2ex}} c l}
+        \begin{tabular}{c}
+            \includegraphics[width=0.05\linewidth]{r}
+        \end{tabular} & 
+        \begin{tabular}{l}
+            \parbox{0.9\linewidth}{
+            \href{https://cran.r-project.org/}{Download (\texttt{cran.r-project.org})} and install R
+            }
+        \end{tabular}
+    \end{tabular} \\
+    \vspace{1ex}
+    \begin{tabular}{@{\extracolsep{-2ex}} c l}
+        \begin{tabular}{c}
+            \includegraphics[width=0.05\linewidth]{rstudio}
+        \end{tabular} & 
+        \begin{tabular}{l}
+            \parbox{0.9\linewidth}{
+            \href{https://www.rstudio.com/products/rstudio/download/}{Download (\texttt{www.rstudio.com/products/rstudio/download})}\\ and install RStudio Desktop (Open Source License)
+            }
+        \end{tabular}
+    \end{tabular} \\
+    \vspace{3ex}
+    What is the difference between R and RStudio? \\
+    \vspace{1ex}
+    \begin{tabular}{@{\extracolsep{-2ex}} c l}
+        \begin{tabular}{c}
+            \includegraphics[width=0.25\linewidth]{engine}
+        \end{tabular} & 
+        \begin{tabular}{l}
+            \parbox{0.65\linewidth}{
+            R is like a car's engine. It is the program that powers your data analysis.
+            }
+        \end{tabular}
+    \end{tabular} \\
+    \vspace{1ex}
+    \begin{tabular}{@{\extracolsep{-2ex}} c l}
+        \begin{tabular}{c}
+            \includegraphics[width=0.25\linewidth]{dashboard}
+        \end{tabular} & 
+        \begin{tabular}{l}
+            \parbox{0.65\linewidth}{
+            RStudio is like a car's dashboard. It is the program you interact with to harness the power of your ``engine.''
+            }
+        \end{tabular}
+    \end{tabular}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{R \texttt{swirl} Interactive Tutorials}
+    \texttt{swirl} is an R package that interactively teaches you how to use R
+    \begin{itemize}
+    	\item Information available here: \href{https://swirlstats.com/}{\texttt{swirlstats.com}}
+    \end{itemize}
+    \vspace{2ex}
+    <<eval = FALSE>>=
+    ## Install swirl package
+    install.packages('swirl')
+    ## Load swirl package
+    library(swirl)
+    ## Install swirl tutorials
+    install_course('R Programming')
+    install_course('Getting and Cleaning Data')
+    install_course('Advanced R Programming')
+    ## Start swirl tutorials
+    swirl()
+    @
+    \vspace{2ex}
+    These three \texttt{swirl} tutorials (R Programming, Getting and Cleaning Data, and Advanced R Programming) introduce the main R concepts we will use in this course
+\end{frame}
+
+\begin{frame}\frametitle{More R Resources}
+    These links provide a variety of perspectives and topics related to using R for statistical analysis, all of which may be useful as you learn to use R for structural estimation in this course
+    \begin{itemize}
+        \item \href{https://www.datacamp.com/courses/free-introduction-to-r}{DataCamp's Introduction to R}
+        \item \href{https://r4ds.had.co.nz/}{R for Data Science book}
+        \item \href{https://adv-r.hadley.nz/}{Advanced R book}
+        \item \href{https://github.com/edrubin/EC525S19}{Ed Rubin's Econometrics lab slides}
+        \item \href{http://edrub.in/ARE212/notes.html}{Ed Rubin's Econometrics section notes}
+        \item \href{https://www.fionaburlig.com/teaching/are212}{Fiona Burlig's Econometrics section notes} (warning: puns ahead)
+        \item \href{https://github.com/uo-ec607/lectures}{Grant McDermott's Data Science for Economists lecture slides}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Some Complements to R}
+    \LaTeX\ and \texttt{knitr}
+    \begin{itemize}
+        \item \href{https://www.latex-project.org/}{\LaTeX\ (\texttt{www.latex-project.org})}: Typesetting system with great functionality for technical and scientific documents
+        \item \href{https://yihui.name/knitr/}{\texttt{knitr} (\texttt{yihui.name/knitr})}: R package that integrates R code and output into \LaTeX\ documents (or HTML, Markdown, etc.)
+    \end{itemize}
+    \vspace{3ex}
+    Git, GitHub, and SmartGit
+    \begin{itemize}
+        \item \href{https://git-scm.com/}{Git (\texttt{git-scm.com})}: Version control system
+        \item \href{https://github.com/}{GitHub (\texttt{github.com})}: Hosting platform for Git
+        \begin{itemize}
+            \item Some alternatives exist: BitBucket, SourceForge, GitLab
+        \end{itemize}
+        \item \href{https://www.syntevo.com/smartgit/}{SmartGit (\texttt{www.syntevo.com/smartgit})}: GUI client for Git
+        \begin{itemize}
+            \item Many alternatives exist: GitHub Desktop, GitKraken, SourceTree
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Objects in R}
+\label{objects}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Objects in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Object Basics}
+    Everything is an object, and every object has a name and value
+    <<>>=
+    ## Assign a value of 1 to an object called a
+    a <- 1
+    ## Assign a value of 2 to an object called b
+    b <- 2
+    ## You use these objects in operations and functions
+    a + b
+    ## Assign object c to have a value equal to a + b
+    c <- a + b
+    c
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Classes, Types, and Structures}
+    Every object has a type
+    \begin{itemize}
+        \item Numeric: \texttt{1}, \texttt{0.5}, \texttt{2/3}, \texttt{pi}
+        \item Character: \texttt{"Hello"}, \texttt{"cruel world"}, \texttt{"Metrics is fun!"}
+        \item Logical: \texttt{TRUE}, \texttt{FALSE}, \texttt{T}, \texttt{F}
+    \end{itemize}
+    \vspace{2ex}
+    Every object has a structure
+    \begin{itemize}
+        \item Vector
+        \item Matrix
+        \item List
+        \item Data frame
+    \end{itemize}
+    \vspace{2ex}
+    \texttt{class()}, \texttt{typeof()}, \texttt{str()} give information about an object
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Vectors}
+    A vector is a collection of elements of the same type
+    \begin{itemize}
+        \item \texttt{c()} combines elements into a vector
+        \item \texttt{seq()} and \texttt{:} create sequential vectors of numeric elements
+    \end{itemize}
+    <<>>=
+    ## Create a numeric vector
+    c(1, 1, 2, 3, 5, 8, 13)
+    ## Create a sequential vector
+    0:9
+    ## Create a character vector
+    c('Hello', 'world')
+    @
+    \vspace{2ex} 
+    If you combine elements of different types, R will convert some
+    <<>>=
+    ## Create a vector with numeric, character, and logical elements
+    c(1, 'Hello', 3, 'world', TRUE)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Matrices}
+    A matrix is a collection of elements of the same type arranged in two dimensions \\
+    \vspace{3ex}
+    \texttt{matrix()} arranges a vector of data into a matrix
+    \begin{itemize}
+        \item \texttt{data}: Vector of data to create matrix
+        \item \texttt{nrow} or \texttt{ncol}: Number of rows or columns in the matrix
+        \item \texttt{byrow}: Logical indicating how to arrange data
+    \end{itemize}
+    <<>>=
+    ## Create a 2 (rows) x 5 (columns) matrix of 1:10 arranged by row
+    matrix(data = 1:10, nrow = 2, byrow = TRUE)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Lists}
+    A list is a collection of elements that can have different types and different structures \\
+    \vspace{3ex}
+    \texttt{list()} combines elements into a list
+    <<>>=
+    ## Create a list with a numeric vector, matrix, and character vector
+    list(c(2, 4, 6, 8), matrix(1:4, 2), c('a', 'b', 'c'))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Data Frames}
+    A data frame is a structured table of data arranged in two dimensions
+    \begin{itemize}
+        \item Each column is a ``variable'' and each row is an ``observation''
+        \item Technically, a data frame is a list of named vectors of the same length
+        \begin{itemize}
+            \item Each vector is a ``variable''
+            \item The length of each vector equals the number of ``observations''
+        \end{itemize}
+    \end{itemize}
+    \vspace{3ex}
+    \texttt{data.frame()} combines vectors into a data frame
+    <<>>=
+    ## Create a date frame with 4 variables and 3 observations
+    data.frame(x = 0:2, y = c(2, 4, 8), z = c(1, 5, 7), w = c('a', 'b', 'c'))
+    @
+\end{frame}
+
+\section{Functions and Packages in R}
+\label{functions}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Functions and Packages in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Functions}
+    A function in R
+    \begin{enumerate}
+        \item Takes some inputs
+        \item Performs some internal tasks
+        \item Returns some output
+    \end{enumerate}
+    \vspace{2ex}
+    We have already seen some examples of functions
+    \begin{itemize}
+        \item \texttt{matrix()}
+        \begin{enumerate}
+            \item Takes a vector of data, information about the size of the matrix, and information about the arrangement of the matrix
+            \item Arranges the data in the way specified by the other inputs
+            \item Returns a matrix object
+        \end{enumerate}
+    \end{itemize}
+    \vspace{2ex}
+    Use \texttt{?} (e.g., \texttt{?matrix}) to get the help file for a function
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function Inputs}
+    Many functions have default inputs so you do not have to specify all the arguments
+    \begin{itemize}
+        \item These defaults are shown when you look at the function help file
+    \end{itemize}
+    \vspace{2ex}
+    Use \texttt{?matrix} to see the set of default inputs for the \texttt{matrix()} function
+    <<eval = FALSE>>=
+    ## Matrix function default inputs
+    matrix(data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL)
+    @
+    \vspace{2ex}
+    So the default inputs would create a 1 $\times$ 1 matrix of \texttt{NA}
+    <<>>=
+    ## Create matrix with default inputs
+    matrix()
+    @
+    \vspace{2ex}
+    Inputs can also be highly flexible
+    \begin{itemize}
+        \item \texttt{c()} allows for any number of arguments (as long as you have the memory to create a vector of the specified length)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{User-Defined Functions}
+    R makes it easy to define your own functions \\
+    \vspace{2ex}
+    Why create your own functions?
+    \begin{itemize}
+        \item You are performing the same task more than once
+        \item You want to make it easier to parallelize your code
+        \item You want to make your code more readable
+    \end{itemize}
+    \vspace{2ex}
+    How to create your own functions using \texttt{function()\char '173 \char '175}
+    \begin{enumerate}
+        \item Specify the inputs in the \texttt{()}
+        \item Write the code for the function tasks in the \texttt{\char '173 \char '175}
+        \item Specify the output using \texttt{return()} in the \texttt{\char '173 \char '175}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Function Example}
+    Make a function that calculates the mean sum of squares of three numbers \\
+    <<>>=
+    ## Define a function that calculates the MSS from three inputs
+    mean_sum_squares <- function(num1, num2, num3){
+      ## Calculate the mean sum of squares
+      mss <- (num1^2 + num2^2 + num3^2) / 3
+      ## Return the answer
+      return(mss)
+    }
+    @
+    \vspace{1ex}
+    Try it out
+    <<>>=
+    ## Calculate the mean sum of squares of 1, 2, and 3
+    mean_sum_squares(1, 2, 3)
+    @
+    \vspace{1ex}
+    What if we want a default argument?
+    <<eval = FALSE>>=
+    ## Make 3 the default input for the third argument
+    mean_sum_squares <- function(num1, num2, num3 = 3)
+    @
+    \vspace{1ex}
+    What if we want a flexible number of inputs?
+    \begin{itemize}
+        \item That is a little more complicated and context-specific\ldots
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Packages}
+    A package is a bundle of code, documentation, and data that has been created and distributed by another R user
+    \begin{itemize}
+        \item More than 18,000 packages are available on CRAN, the official repository of R packages 
+    \end{itemize}
+    \vspace{2ex}
+    What is so great about packages?
+    \begin{itemize}
+        \item Packages greatly increase the functionality available to you through ``canned'' routines
+        \item Packages are open source
+        \begin{itemize}
+            \item A package can be created by anyone, even you!
+            \item You can see the source code in any package
+        \end{itemize}
+        \item Some packages have vignettes that provide detailed examples for using the package's functionality
+    \end{itemize}
+    \vspace{2ex}
+    Any problems to be aware of?
+    \begin{itemize}
+        \item A package can be created by anyone, so \emph{caveat utilitor} (user beware)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Using Packages}
+    First download a package from CRAN using \texttt{install.packages()}
+    <<eval = FALSE>>=
+    ## Install a few packages we will use in this course
+    install.packages(c('tidyverse', 'mlogit', 'gmm'))
+    @
+    \vspace{3ex}
+    Then load the package into your R session using \texttt{library()}
+    <<message = FALSE>>=
+    ## Load those packages
+    library(tidyverse)
+    library(mlogit)
+    library(gmm)
+    @
+    \vspace{3ex}
+    Update packages occasionally using \texttt{update.packages()}
+\end{frame}
+
+\begin{frame}\frametitle{Recommended Packages}
+    Packages we will use in this course
+    \begin{itemize}
+        \item \texttt{tidyverse}
+        \begin{itemize}
+            \item Collection of packages that improve data analysis and visualization
+        \end{itemize}
+        \item \texttt{mlogit}
+        \begin{itemize}
+            \item Estimating multinomial logit models
+        \end{itemize}
+        \item \texttt{gmm}
+        \begin{itemize}
+            \item Generalized method of moments estimation
+        \end{itemize}
+    \end{itemize}
+    \vspace{0.5ex}
+    Other good packages
+    \begin{itemize}
+        \item \texttt{glue}
+        \begin{itemize}
+            \item Character functions
+        \end{itemize}
+        \item \texttt{lubridate}
+        \begin{itemize}
+            \item Date and time functions
+        \end{itemize}
+        \item \texttt{fixest}
+        \begin{itemize}
+            \item Fixed effects models
+        \end{itemize}
+        \item \texttt{furrr}
+        \begin{itemize}
+            \item Parallelization
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Math and Statistics in R}
+\label{math}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Math and Statistics in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Math Operations}
+    <<>>=
+    ## Addition
+    a + b
+    ## Subtraction
+    a - b
+    ## Multiplication
+    a * b
+    ## Division
+    a / b
+    ## Exponents
+    a^b
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Math Functions}
+    <<>>=
+    ## Absolute value
+    abs(a - b)
+    ## Exponential
+    exp(a)
+    ## Square root
+    sqrt(b)
+    ## Natural log
+    log(b)
+    ## Log base 10
+    log(b, base = 10)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Statistics Functions}
+    <<>>=
+    ## Create a vector 0 to 4
+    v <- 0:4
+    v
+    ## Mean
+    mean(v)
+    ## Median
+    median(v)
+    ## Standard deviation
+    sd(v)
+    @   
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Sampling Functions}
+    <<>>=
+    ## Set the seed for randomization
+    set.seed(703)
+    ## Draw from a random normal N(3, 2)
+    rnorm(n = 5, mean = 3, sd = sqrt(2))
+    ## Draw with replacement from v
+    sample(v, size = 10, replace = TRUE)
+    # CDF of a standard normal at z = 1.96
+    pnorm(q = 1.96, mean = 0, sd = 1)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Vectorization}
+    Many operations and functions are applied to each element of a vector
+    <<>>=
+    ## Addition with each element
+    v + a
+    ## Multiplication with each element
+    v * b
+    ## Exponential of each element
+    exp(v)
+    ## Natural log of each element
+    log(v)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Vector Math}
+    You can also operate on vectors elementwise
+    <<>>=
+    ## Elementwise addition
+    v + 1:5
+    ## Elementwise multiplication
+    v * 1:5
+    @
+    \vspace{3ex}
+    But weird things can happen if the vectors are different lengths
+    <<>>=
+    ## Elementwise addition with different lengths
+    v + 1:4
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Indexing Vectors}
+    Access elements within a vector using \texttt{[]}
+    <<>>=
+    ## Access the second element of v
+    v[2]
+    ## Access the second and fourth elements of v
+    v[c(2, 4)]
+    ## Access all but the first element of v
+    v[-1]
+    ## Replace the first element of v with 5
+    v[1] <- 5
+    v
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Matrices as Vectors}
+    Matrices (usually) work like vectors
+    <<>>=
+    ## Create a matrix
+    m <- matrix(1:4, nrow = 2)
+    m
+    ## Mean
+    mean(m)
+    ## Natural log of each element
+    log(m)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Matrix Addition}
+    Matrix addition and subtraction is performed elementwise
+    <<>>=
+    ## Create a second matrix
+    n <- matrix(c(2, 4, 6, 8), nrow = 2)
+    n
+    ## Matrix addition
+    m + n
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Matrix Multiplication}
+    Using \texttt{*} to multiply matrices performs elementwise multiplication
+    <<>>=
+    ## Elementwise matrix multiplication
+    m * n
+    @
+    \vspace{3ex}
+    You must use \texttt{\%*\%} to get the matrix product
+    <<>>=
+    ## Matrix product
+    m %*% n
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Matrix Functions}
+    R has many other functions for use with matrices
+    <<>>=
+    ## Transpose
+    t(m)
+    ## Inverse
+    solve(m)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Indexing Matrices}
+    Access elements within a matrix using \texttt{[]}
+    <<>>=
+    ## Access the element in the second row and first column of m
+    m[2, 1]
+    ## Access the first row of m
+    m[1, ]
+    ## Access the second column of m
+    m[, 2]
+    @
+\end{frame}
+
+\section{Data in R}
+\label{data}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Data in R
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Example Data Frame}
+    You will mostly interact with datasets in the form of data frames
+    \begin{itemize}
+        \item R includes several example data frames
+    \end{itemize}
+    <<>>=
+    ## Show an example data frame, mtcars
+    head(mtcars)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Indexing Data Frames}
+    Access elements within a data frame using \texttt{[]}
+    <<>>=
+    ## Access the third observation of mtcars
+    mtcars[3, ]
+    ## Access the second variable of mtcars
+    mtcars[, 2]
+    @
+    \vspace{2ex}
+    Access a variable of a data frame using \texttt{\$}
+    <<>>=
+    ## Access the cyl variable of mtcars
+    mtcars$cyl
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Adding New Variables}
+    You may want to add new variables to a data frame
+    <<>>=
+    ## Add an id variable to mtcars
+    mtcars$id <- 1:nrow(mtcars)
+    ## Add a variable that is the power-to-weight ratio (hp / wt)
+    mtcars$ptw <- mtcars$hp / mtcars$wt
+    head(mtcars)
+    @
+    But that can get a little clunky. Is there a better way?
+\end{frame}
+
+\begin{frame}\frametitle{\texttt{dplyr}}
+    \texttt{dplyr} is a package that greatly improves data manipulation in R
+    \begin{itemize}
+        \item Part of the \texttt{tidyverse} so it is already installed and loaded from earlier code
+    \end{itemize}
+    \vspace{3ex}
+    \texttt{dplyr} is a ``grammar of data manipulation''
+    \begin{itemize}
+        \item Data compose the subjects of your analysis
+        \item \texttt{dplyr} provides the the verbs
+        \begin{itemize}
+            \item \texttt{mutate()}: Adds new variables
+            \item \texttt{select()}: Picks variables
+            \item \texttt{filter()}: Picks observations
+            \item \texttt{arrange()}: Changes the order of observations
+            \item \texttt{summarize()} or \texttt{summarise()}: Summarizes multiple observations
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Adding New Variables with \texttt{dplyr}}
+    \texttt{mutate(.data, \ldots)}
+    \begin{itemize}
+        \item \texttt{.data}: Existing data frame
+        \item \texttt{\ldots}: Names and values of new variables
+    \end{itemize}
+    <<>>=
+    ## Add id and power-to-weight ratio variables
+    mtcars <- mutate(mtcars, id = 1:n(), ptw = hp / wt)
+    head(mtcars)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Tibbles}
+    \texttt{tidyverse} also introduces a new kind of data frame, the tibble
+    \begin{itemize}
+        \item Actually, \texttt{tibble} is the name of the package that has the code to create and manipulate objects of class \texttt{tbl\_df}
+        \item But it is easier to say ``tibble,'' so that is what users call both the package and the object
+        \item I will probably use ``tibble'' and  ``data frame'' interchangeably to mean ``tibble''
+    \end{itemize}
+    \vspace{2ex}
+    Why are tibbles better than data frames?
+    \begin{itemize}
+        \item Data frames sometimes exhibit weird behaviors related to naming variables or trying to convert variable types
+        \item Tibbles are smarter about how much data they show you when you call them
+        \begin{itemize}
+            \item You do not have to use \texttt{head()} to supress output
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Example Tibble}
+    \texttt{dplyr} comes with several examples tibbles
+    <<>>=
+    ## Show an example tibble, starwars
+    starwars
+    @
+    Let's play around with the \texttt{dplyr} verbs on this tibble
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{select()} Example}
+    <<>>=
+    ## Select name, homeworld, and species in starwars
+    select(starwars, name, homeworld, species)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{filter()} Example}
+    <<>>=
+    ## Filter to show only droids in starwars
+    filter(starwars, species == 'Droid')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{arrange()} Example}
+    <<>>=
+    ## Arrange alphabetically by name in starwars
+    arrange(starwars, name)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multiple \texttt{dplyr} Functions}
+    Nest functions inside one another to perform multiple functions
+    <<>>=
+    ## Select, filter, and arrange
+    arrange(filter(select(starwars, name, homeworld, species), species == 'Droid'), name)
+    @
+    <<results = 'hide'>>=
+    ## Alternative code for those functions
+    arrange(
+      filter(
+        select(starwars, name, homeworld, species),
+        species == 'Droid'
+      ),
+      name
+    )
+    @
+    But either option can get very difficult to read and understand
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Pipes}
+    Pipes make a sequence of functions or operations much more readable
+    \begin{itemize}
+        \item Put each new step on its own line rather than all together
+        \item Start with the first step rather than working inside-out
+    \end{itemize}
+    \vspace{2ex}
+    \texttt{x \%>\% f(y)} is the same as \texttt{f(x, y)}
+    <<>>=
+    ## Filter with pipes
+    starwars %>%
+      filter(species == 'Droid')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multiple \texttt{dplyr} Functions Using Pipes}
+    Let's do the same sequence of three functions but using pipes
+    <<>>=
+    ## Select, filter, and arrange using pipes
+    starwars %>%
+      select(name, homeworld, species) %>%
+      filter(species == 'Droid') %>%
+      arrange(name)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{summarize()} Example}
+    \texttt{summarize()} applies a function to a group of observations
+    \begin{itemize}
+        \item \texttt{group\_by()} specifies the grouping to use
+    \end{itemize}
+    <<message = FALSE>>=
+    ## Calculate mean height and mass by species
+    starwars %>%
+      group_by(species) %>%
+      summarize(mean_height = mean(height), mean_mass = mean(mass))
+    @
+\end{frame}
+
+\begin{frame}\frametitle{\texttt{NA} and Other Special Values}
+    R has several special values to indicate non-standard objects or elements
+    \begin{itemize}
+        \item \texttt{NA}: Missing value
+        \item \texttt{NaN}: Not a number
+        \item \texttt{NULL}: ``Undefined''
+        \item \texttt{Inf} and \texttt{-Inf}: $\infty$ and $-\infty$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Skipping \texttt{NA}s}
+    The argument \texttt{na.rm = TRUE} skips missing values
+    <<message = FALSE>>=
+    ## Calculate non-missing mean height and mass by species
+    starwars %>% 
+      group_by(species) %>% 
+      summarize(mean_height = mean(height, na.rm = TRUE), 
+                mean_mass = mean(mass, na.rm = TRUE))
+    @
+\end{frame}
+
+\section{R Examples}
+\label{examples}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large R Examples
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{OLS Regression in R}
+    Using the \texttt{mtcars} dataset, regress \texttt{mpg} on \texttt{hp}
+    $$\texttt{mpg}_i = \beta_0 + \beta_1 \texttt{hp}_i + \varepsilon_i$$ \\
+    \vspace{2ex}
+    Perform this simple linear OLS regression three ways:
+    \begin{enumerate}
+        \item ``Canned'' \texttt{lm()} function
+        \item ``Hand-coded'' OLS estimators
+        \item User-defined OLS function 
+    \end{enumerate}
+    \vspace{2ex}
+    Report parameter estimates, standard errors, t stats, and p values \\
+    \vspace{2ex}
+    But before running a regression...
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Look at the \texttt{mtcars} Dataset}
+    You should always double-check the structure of your dataset
+    <<>>=
+    ## Look at the mtcars data
+    tibble(mtcars)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Summarize the \texttt{mtcars} Dataset}
+    It can be helpful to generate basic summary statistics for your dataset to get a sense for the scale and variation of each variable
+    <<>>=
+    ## Summarize the mtcars dataset
+    mtcars %>% 
+      select(mpg, disp, hp, wt, qsec) %>% 
+      summary()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Plot the \texttt{mtcars} Dataset}
+    Plotting the data can give an idea of what to expect from your regression
+    <<fig.dim = c(2.5, 2.5), fig.align = 'center'>>=
+    ## Plot the mtcars dataset
+    ggplot(data = mtcars, mapping = aes(x = hp, y = mpg)) +
+      geom_point()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using \texttt{lm()} Function}
+    The \texttt{lm()} function fits a linear model to a dataset
+    \begin{itemize}
+        \item To see how to use the \texttt{lm()} function, type \texttt{?lm}
+    \end{itemize}
+    <<eval = FALSE>>=
+    ## See the help file for lm()
+    ?lm
+    lm(formula, data, subset, weights, na.action,
+       method = "qr", model = TRUE, x = FALSE, y = FALSE, qr = TRUE,
+       singular.ok = TRUE, contrasts = NULL, offset, ...)
+    @
+    \vspace{2ex}
+    The \texttt{lm()} function requires a \texttt{formula} object
+    \begin{itemize}
+        \item \texttt{y} {\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}} $\mathtt{x1 + x2 + x3}$ regresses variable \texttt{y} on variables \texttt{x1}, \texttt{x2}, and \texttt{x3}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using \texttt{lm()} Function}
+    \vspace{-3ex}
+    $$\texttt{mpg}_i = \beta_0 + \beta_1 \texttt{hp}_i + \varepsilon_i$$
+    \vspace{-2ex}
+    <<size = 'scriptsize'>>=
+    ## Run OLS regression
+    reg_lm <- lm(formula = mpg ~ hp, data = mtcars)
+    ## Summarize OLS regression results
+    summary(reg_lm)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Regression Using Hand-Coded Estimators}
+    \vspace{-1ex}
+    $$\texttt{mpg}_i = \beta_0 + \beta_1 \texttt{hp}_i + \varepsilon_i$$ \\
+    \vspace{2ex}
+    How do we estimate the $\beta$ parameters and their standard errors?
+    \begin{itemize}
+        \item Reminder: OLS has simple closed-form formulas!
+    \end{itemize}
+    \vspace{2ex}
+    \begin{align*}
+        \intertext{For the general regression equation}
+        \bm{y} & = \bm{X} \bm{\beta} + \bm{\varepsilon}
+        \intertext{we can estimate $\widehat{\bm{\beta}}$ and $\widehat{\Cov}(\widehat{\bm{\beta}})$ using}
+        \widehat{\bm{\beta}} & = (\bm{X}' \bm{X})^{-1} \bm{X}' \bm{y} \\
+        \widehat{\Cov}(\widehat{\bm{\beta}}) & = s^2 (\bm{X}' \bm{X})^{-1}
+        \intertext{where}
+        s^2 & = \frac{\bm{e}' \bm{e}}{n - k} \\
+        \bm{e} & = \bm{y} - \widehat{\bm{y}}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Regression Using Hand-Coded Estimators}
+    \vspace{-3ex}
+    \begin{align*}
+        \widehat{\bm{\beta}} & = (\bm{X}' \bm{X})^{-1} \bm{X}' \bm{y} \\
+        \widehat{\Cov}(\widehat{\bm{\beta}}) & = s^2 (\bm{X}' \bm{X})^{-1}
+    \end{align*}
+    Steps to code these estimators
+    \begin{enumerate}
+        \item Construct matrices $\bm{X}$ and $\bm{y}$
+        \item Estimate parameters $\widehat{\bm{\beta}}$ using above equation
+        \item Calculate fitted values of $\bm{y}$, $\widehat{\bm{y}}$ 
+        \item Calculate residuals, $\bm{e}$
+        \item Estimate the variance of error terms, $s^2$
+        \item Estimate variance-covariance matrix $\widehat{\Cov}(\widehat{\bm{\beta}})$ using above equation
+        \item Calculate standard errors
+        \item Calculate t stats
+        \item Calculate p values
+        \item Organize results table
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 1: Construct matrices $\bm{X}$ and $\bm{y}$
+    <<>>=
+    ## Add column of ones for the constant term
+    reg_data <- mtcars %>% 
+      mutate(constant = 1)
+    ## Select data for X and convert to a matrix
+    X <- reg_data %>% 
+      select(constant, hp) %>% 
+      as.matrix()
+    ## Select data for y and convert to a matrix
+    y <- reg_data %>% 
+      select(mpg) %>% 
+      as.matrix()
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 1b: Make sure matrices look correct
+    <<>>=
+    ## Make sure matrices look correct
+    head(X)
+    head(y)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 2: Estimate parameters $\widehat{\bm{\beta}}$ using
+    $$\widehat{\bm{\beta}} = (\bm{X}' \bm{X})^{-1} \bm{X}' \bm{y}$$
+    <<>>=
+    ## Estimate beta parameters
+    beta_hat <- solve(t(X) %*% X) %*% t(X) %*% y
+    beta_hat
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 3: Calculate fitted values of $\bm{y}$, $\widehat{\bm{y}}$, using
+    $$\widehat{\bm{y}} = \bm{X} \widehat{\bm{\beta}}$$
+    <<>>=
+    ## Calculate fitted y values
+    y_hat <- X %*% beta_hat
+    head(y_hat)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 4: Calculate residuals, $\bm{e}$, using
+    $$\bm{e} = \bm{y} - \widehat{\bm{y}}$$
+    <<>>=
+    ## Calculate residuals
+    resid <- y - y_hat
+    head(resid)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 5: Estimate the variance of error terms, $s^2$, using
+    $$s^2 = \frac{\bm{e}' \bm{e}}{n - k}$$
+    <<>>=
+    ## Estimate variance of error term
+    sigma2_hat <- t(resid) %*% resid / (nrow(X) - ncol(X))
+    sigma2_hat
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 6: Estimate variance-covariance matrix $\widehat{\Cov}(\widehat{\bm{\beta}})$ using 
+    $$\widehat{\Cov}(\widehat{\bm{\beta}}) = s^2 (\bm{X}' \bm{X})^{-1}$$
+    <<>>=
+    ## Estimate variance-covariance matrix of beta estimates
+    vcov_hat <- c(sigma2_hat) * solve(t(X) %*% X)
+    vcov_hat
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Steps 7--9: Calculate standard errors, t stats, and p values
+    <<>>=
+    ## Calculate standard errors of beta estimates
+    std_err <- sqrt(diag(vcov_hat))
+    std_err
+    ## Calculate t stats of beta estimates
+    t_stat <- beta_hat / std_err
+    t_stat
+    ## Calculate p values of beta estimates
+    p_value <- 2 * pt(q = -abs(t_stat), df = nrow(X) - ncol(X))
+    p_value
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Step 10: Organize results table
+    <<>>=
+    ## Organize regression results into matrix
+    results <- cbind(beta_hat, std_err, t_stat, p_value)
+    results
+    ## Name columns of results matrix
+    colnames(results) <- c('Estimate', 'Std. Error', 't stat', 'p value')
+    results
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using Hand-Coded Estimators}
+    Compare our hand-coded estimates to the canned \texttt{lm()} estimates
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Compare to lm() results
+    summary(reg_lm)
+    results
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using User-Defined OLS Function}
+    We want to define a new function that does the same 10 steps we just worked through \\
+    \vspace{3ex}
+    Why would we want to put these steps inside a function?
+    \begin{itemize}
+        \item We might want to run more than one regression
+        \item If we define the function to take variable arguments, then we can use the same basic coding framework to run many different OLS regressions
+    \end{itemize}
+    \vspace{3ex}
+    What do we want to be the variable arguments?
+    \begin{itemize}
+        \item Dataset
+        \item \texttt{y} variable
+        \item \texttt{x} variables
+        \item Anything else?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using User-Defined OLS Function}
+    \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Function to perform OLS regression
+    ols <- function(data, y_var, x_vars){
+      ## Add column of ones for the constant term
+      reg_data <- data %>% 
+        mutate(constant = 1)
+      ## Select data for X and convert to a matrix
+      X <- reg_data %>% 
+        select(all_of(c('constant', x_vars))) %>% 
+        as.matrix()
+      ## Select data for y and convert to a matrix
+      y <- reg_data %>% 
+        select(all_of(y_var)) %>% 
+        as.matrix()
+      ## Estimate beta parameters
+      beta_hat <- solve(t(X) %*% X) %*% t(X) %*% y
+      ## Calculate fitted y values
+      y_hat <- X %*% beta_hat
+      ## Calculate residuals
+      resid <- y - y_hat
+      ## Estimate variance of error term
+      sigma2_hat <- t(resid) %*% resid / (nrow(X) - ncol(X))
+      ## Estimate variance-covariance matrix of beta estimates
+      vcov_hat <- c(sigma2_hat) * solve(t(X) %*% X)
+      ## Calculate standard errors of beta estimates
+      std_err <- sqrt(diag(vcov_hat))
+      ## Calculate t stats of beta estimates
+      t_stat <- beta_hat / std_err
+      ## Calculate p values of beta estimates
+      p_value <- 2 * pt(q = -abs(t_stat), df = nrow(X) - ncol(X))
+      ## Organize regression results into matrix
+      results <- cbind(beta_hat, std_err, t_stat, p_value)
+      ## Name columns of results matrix
+      colnames(results) <- c('Estimate', 'Std. Error', 't stat', 'p value')
+      return(results)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using User-Defined OLS Function}
+    \vspace{-1ex}
+    $$\texttt{mpg}_i = \beta_0 + \beta_1 \texttt{hp}_i + \varepsilon_i$$ \\
+    \vspace{2ex}
+    What arguments do we need to specify?
+    \begin{itemize}
+        \item \texttt{data}, \texttt{y\_var}, and \texttt{x\_vars}
+    \end{itemize}
+    <<>>=
+    ## Regress mpg on hp in mtcars dataset
+    ols(data = mtcars, y_var = 'mpg', x_vars = 'hp')
+    @
+    \vspace{2ex}
+    We have replicated the results from \texttt{lm()} and the earlier hand-coded estimators \\
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using User-Defined OLS Function}
+    Now use the same function for a different regression
+    \begin{itemize}
+        \item Regress \texttt{mpg} on \texttt{hp}, \texttt{disp}, \texttt{wt}, \texttt{qsec}
+    \end{itemize}
+    <<>>=
+    ## Regress mpg on disp, hp, wt, and qsec in mtcars dataset
+    ols(data = mtcars, 
+        y_var = 'mpg', 
+        x_vars = c('hp', 'disp', 'wt', 'qsec'))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Regression Using User-Defined OLS Function}
+    Try a different dataset in our OLS function
+    \begin{itemize}
+        \item R includes a built-in dataset \texttt{iris} that includes measurements from 50 iris flowers
+        \item Regress \texttt{Petal.Length} on \texttt{Petal.Width}, \texttt{Sepal.Length}, and \texttt{Sepal.Width}
+    \end{itemize}
+    <<>>=
+    ## Regress Petal.Length on Sepal.Length, Sepal.Width, and Petal.Width 
+    ## in iris dataset
+    ols(data = iris, 
+        y_var = 'Petal.Length', 
+        x_vars = c('Petal.Width', 'Sepal.Length', 'Sepal.Width'))
+    @
+\end{frame}
+
+\end{document}
