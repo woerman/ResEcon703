@@ -27,10 +27,10 @@ Week 4: **Logit Model**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/week_04.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/week_04.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/week_04/ac_renters.csv)
 * Videos: [1](https://www.youtube.com/watch?v=YNZsyOqnpXw&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [2](https://www.youtube.com/watch?v=kzA1IiutSEo&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [3](https://www.youtube.com/watch?v=9LJBhvnbeSM&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [4](https://www.youtube.com/watch?v=tIYjpmBtPq4&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [5](https://www.youtube.com/watch?v=U-hVuo-Tm6w&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [6](https://www.youtube.com/watch?v=vv6zLPkkxD4&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [7](https://www.youtube.com/watch?v=QudrDHALuBc&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [8](https://www.youtube.com/watch?v=QudrDHALuBc&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf) | [9](https://www.youtube.com/watch?v=NZXLAndubbg&list=PLnC0w4gG7um1PZsdmbUQMJ3izrdjlLZgf)
 
-<!-- Week 5: **Logit Model**
+Week 5: **Logit Model**
 * *No new materials*
 
-Week 6: **Maximum Likelihood Estimation**
+<!-- Week 6: **Maximum Likelihood Estimation**
 * [Notes](https://raw.githack.com/woerman/ResEcon703/master/notes/mle/mle.pdf) | [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_06/week_06.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_06/week_06.R)
 * Videos: [1](https://www.youtube.com/watch?v=12M8wJT3GR8&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [2](https://www.youtube.com/watch?v=H0EPloe8qhs&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [3](https://www.youtube.com/watch?v=fF9yhX2Q8CQ&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [4](https://www.youtube.com/watch?v=kKYY_OXGHxY&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [5](https://www.youtube.com/watch?v=esY21bNZEEg&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [6](https://www.youtube.com/watch?v=E0B-vSIT0Nc&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal) | [7](https://www.youtube.com/watch?v=Y9WgOTwQYXw&list=PLnC0w4gG7um3AyoNikU8t9vtkyYPlfTal)
 
