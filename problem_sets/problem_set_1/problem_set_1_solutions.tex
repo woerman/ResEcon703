@@ -1,0 +1,308 @@
+\documentclass[11pt,letterpaper]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+\title{Problem Set 1}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{lm()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_1/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---but you will only use the dataset \texttt{commute\_binary.csv} for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Load packages for problem set}
+\hlkwd{library}\hlstd{(tidyverse)}
+\hlkwd{library}\hlstd{(lmtest)}
+\hlkwd{library}\hlstd{(sandwich)}
+\hlkwd{library}\hlstd{(car)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\section*{Problem 1: Summary Statistics}
+
+We are studying how UMass graduate students choose how to commute to campus during winter when only driving a car or taking a bus are feasible options---assume the weather is too severe for even the heartiest graduate students to ride a bike or walk. This information will help the university to plan for parking and bus needs during the winter months. Use the \texttt{commute\_binary.csv} dataset for this problem. (Reminder: the \texttt{read\_csv()} function from the \texttt{tidyverse} package reads a .csv file into memory.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Load dataset}
+\hlstd{data_binary} \hlkwb{<-} \hlkwd{read_csv}\hlstd{(}\hlstr{'commute_binary.csv'}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\itshape\color{messagecolor}{\#\# Rows: 1000 Columns: 13\\\#\# -- Column specification ------------------------------------------------\\\#\# Delimiter: "{},"{}\\\#\# chr \ (2): mode, marital\_status\\\#\# dbl (11): id, time.car, cost.car, time.bus, cost.bus, price\_gas, sno...\\\#\# \\\#\# i Use `spec()` to retrieve the full column specification for this data.\\\#\# i Specify the column types or set `show\_col\_types = FALSE` to quiet this message.}}\end{kframe}
+\end{knitrout}
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item The three factors that are mostly likely to influence the choice to drive or take the bus are the cost of driving (\texttt{cost.car}), the time to drive (\texttt{time.car}), and the time to take the bus (\texttt{time.bus}); the bus is free for all students. For each of these three important variables, calculate the mean and median for the full sample. (Reminder: the \texttt{summarize()} function is helpful when calculating these kinds of summary statistics.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+  \hlcom{## Calculate means and medians of time and cost variables for full sample}
+  \hlstd{summ_stats_1a} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+    \hlkwd{summarize}\hlstd{(}\hlkwc{mn_cost_c} \hlstd{=} \hlkwd{mean}\hlstd{(cost.car),}
+              \hlkwc{md_cost_c} \hlstd{=} \hlkwd{median}\hlstd{(cost.car),}
+              \hlkwc{mn_time_c} \hlstd{=} \hlkwd{mean}\hlstd{(time.car),}
+              \hlkwc{md_time_c} \hlstd{=} \hlkwd{median}\hlstd{(time.car),}
+              \hlkwc{mn_time_b} \hlstd{=} \hlkwd{mean}\hlstd{(time.bus),}
+              \hlkwc{md_time_b} \hlstd{=} \hlkwd{median}\hlstd{(time.bus))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report these means and medians for the full sample.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+    \hlcom{## Report summary stats for full sample}
+    \hlstd{summ_stats_1a}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 1 x 6
+##   mn_cost_c md_cost_c mn_time_c md_time_c mn_time_b md_time_b
+##       <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+## 1     0.411      0.35      10.9        10      14.2        13
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		\item Do you see any patterns in these summary statistics that might be useful to keep in mind when conducting your analysis? If so, briefly describe these patterns.
+
+		For the average student, the time to drive is shorter than the time to take the bus. If students value their time, then these shorter commute times would cause them to prefer driving. Of course, driving also incurs a monetary cost that does not occur when taking the bus, so students will trade off this shorter commute time against the monetary cost when choosing how to commute. Additionally, for all three variables, the mean is greater than the median, suggesting there is a long right tail of students who commute from far away and, hence, have especially long costs and times for commuting.
+	\end{enumerate}
+
+	\item The students who choose to drive and the students who choose to take the bus might face different choice settings---that is, different times and costs. Calculate the same summary statistics separately for the students who drive and for the students who take the bus. (Reminder: the \texttt{group\_by()} function allows you to perform the same calculations on different subsamples of the data.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+  \hlcom{## Calculate means and medians of time and cost variable by commute mode}
+  \hlstd{summ_stats_1b} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+    \hlkwd{group_by}\hlstd{(mode)} \hlopt{%>%}
+    \hlkwd{summarize}\hlstd{(}\hlkwc{mn_cost_c} \hlstd{=} \hlkwd{mean}\hlstd{(cost.car),}
+              \hlkwc{md_cost_c} \hlstd{=} \hlkwd{median}\hlstd{(cost.car),}
+              \hlkwc{mn_time_c} \hlstd{=} \hlkwd{mean}\hlstd{(time.car),}
+              \hlkwc{md_time_c} \hlstd{=} \hlkwd{median}\hlstd{(time.car),}
+              \hlkwc{mn_time_b} \hlstd{=} \hlkwd{mean}\hlstd{(time.bus),}
+              \hlkwc{md_time_b} \hlstd{=} \hlkwd{median}\hlstd{(time.bus))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report these means and medians for each group of students.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+    \hlcom{## Report summary stats for subsamples}
+    \hlstd{summ_stats_1b}
+\end{alltt}
+\begin{verbatim}
+## # A tibble: 2 x 7
+##   mode  mn_cost_c md_cost_c mn_time_c md_time_c mn_time_b md_time_b
+##   <chr>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>     <dbl>
+## 1 bus       0.449      0.38     11.9         11      14.7        13
+## 2 car       0.361      0.32      9.70         9      13.5        13
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		\item Do you see any patterns that might begin to explain why some students drive and some students take the bus? If so, briefly describe these patterns.
+
+		The students who drive, on average, have lower costs to drive and shorter driving commute times, compared to students who take the bus. This result is intuitive because, \emph{ceteris paribus}, having a cheaper and shorter drive would make a student more likely to drive. Interestingly, the median time to take the bus is identical in both groups, and the mean time to take the bus is greater for that group that does take the bus. This result is less intuitive, but a more rigorous analysis might reveal an explanation.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Linear Probability Model}
+
+The summary statistics can provide some initial suggestive evidence for how UMass graduate students choose how to commute to campus during winter, but estimating a model of decision making can yield more robust conclusions. Again use the \texttt{commute\_binary.csv} dataset for this problem.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a linear probability model. Include the cost of driving and the time of each alternative as independent variables in your model:
+	$$Y_n = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb} + \varepsilon_{n}$$
+	where $Y_n$ is a binary indicator if student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{lm()} function estimates an OLS regression model.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Clean choice variable}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{car} \hlstd{= (mode} \hlopt{==} \hlstr{'car'}\hlstd{))}
+\hlcom{## Model choice as a linear probability model}
+\hlstd{reg_2a} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwc{formula} \hlstd{= car} \hlopt{~} \hlstd{cost.car} \hlopt{+} \hlstd{time.car} \hlopt{+} \hlstd{time.bus,}
+             \hlkwc{data} \hlstd{= data_binary)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and heteroskedastic-robust standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{coeftest()} function from the \texttt{lmtest} package tests the statistical significance of your coefficient estimates, and the \texttt{vcovHC()} function from the \texttt{sandwich} package estimates the heteroskedastic-robust covariance matrix of coefficient estimates.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate heteroskedastic-robust standard errors}
+\hlkwd{coeftest}\hlstd{(reg_2a,} \hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_2a))}
+\end{alltt}
+\begin{verbatim}
+## 
+## t test of coefficients:
+## 
+##               Estimate Std. Error  t value  Pr(>|t|)    
+## (Intercept)  0.9205109  0.0737943  12.4740 < 2.2e-16 ***
+## cost.car    -0.4375642  0.1392888  -3.1414  0.001731 ** 
+## time.car    -0.0652505  0.0058747 -11.1070 < 2.2e-16 ***
+## time.bus     0.0283670  0.0065722   4.3162 1.746e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		All three independent variables have statistically significant and economically meaningful effects on the choice to drive or take a bus to campus. An additional 10 cents of driving cost reduces the probability of driving by 4.4\%, an additional minute of driving reduces the probability of driving by 6.5\%, and an additional minute riding the bus increases the probability of driving by 2.8\%. Because there are only two alternatives, the marginal effects on the choice to ride the bus are the negatives of the driving marginal effects.
+
+		\item One potential problem with a linear probability model is that predicted probabilities can fall outside the $[0, 1]$ range. How many students have infeasible choice probabilities? Given these results, are you worried about using a linear probability model in this case? (Reminder: the \texttt{predict()} function calculates fitted values of an \texttt{lm} regression.)
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Calculate estimated probability of car for each individual}
+\hlstd{data_binary} \hlkwb{<-} \hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{mutate}\hlstd{(}\hlkwc{prob_car_2a} \hlstd{=} \hlkwd{predict}\hlstd{(reg_2a))}
+\hlcom{## Count number of individuals with probabilities outside [0, 1]}
+\hlstd{data_binary} \hlopt{%>%}
+  \hlkwd{filter}\hlstd{(prob_car_2a} \hlopt{<} \hlnum{0} \hlopt{|} \hlstd{prob_car_2a} \hlopt{>} \hlnum{1}\hlstd{)} \hlopt{%>%}
+  \hlkwd{nrow}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] 22
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		Only 22 students, or 2.2\% of the sample, have estimated probabilities outside the $[0, 1]$ range. This result suggests that our estimated marginal effects are not likely to be inconsistent and our interpretation of the results is sound.
+
+		\item Test if the two time coefficients are equal in absolute value. Interpret the result of this test and briefly explain why it could make intuitive sense. If a delay were to increase equally the time to drive and the time to take the bus, would you expect the proportion of drivers to increase, decrease, or stay the same? (Hint: There are many ways to conduct this Wald test. I like the \texttt{linearHypothesis()} function from the \texttt{car} (companion to applied regression) package. You may need to use the help file or a Google search to learn how to use this function.) 
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Conduct a Wald test on time coefficients}
+\hlkwd{linearHypothesis}\hlstd{(reg_2a,} \hlstr{'time.car = -time.bus'}\hlstd{,} \hlkwc{vcov} \hlstd{=} \hlkwd{vcovHC}\hlstd{(reg_2a))}
+\end{alltt}
+\begin{verbatim}
+## Linear hypothesis test
+## 
+## Hypothesis:
+## time.car  + time.bus = 0
+## 
+## Model 1: restricted model
+## Model 2: car ~ cost.car + time.car + time.bus
+## 
+## Note: Coefficient covariance matrix supplied.
+## 
+##   Res.Df Df      F    Pr(>F)    
+## 1    997                        
+## 2    996  1 17.203 3.646e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+		The result of Wald test indicates that the time coefficients are statistically different from one another. This result is intuitive because the experience of driving and riding a bus are different; for example, a student can read or catch up on email while riding the bus, but not while driving. So a minute of each mode might differently affect the decision to drive or ride the bus. The marginal effect of driving time is larger in absolute, so an equal increase in the time of both modes would decrease the utility of driving and cause some drivers to substitute to the bus.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
