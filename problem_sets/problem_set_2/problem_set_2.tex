@@ -1,0 +1,107 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+\title{Problem Set 2}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Due: October 20, 8:30 am ET}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{glm()} and \texttt{mlogit()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_2/commute_datasets.zip}{\texttt{commute\_datasets.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains two datasets---\texttt{commute\_binary.csv} and \texttt{commute\_multinomial.csv}---that you will use for this problem set. Both datasets contain simulated data on the travel mode choice of 1000 UMass graduate students who commute to campus from more than one mile away. The \texttt{commute\_binary.csv} dataset corresponds to commuting in the middle of winter when only driving a car or taking a bus are feasible options. The \texttt{commute\_multinomial.csv} dataset corresponds to commuting in the spring when riding a bike and walking are feasible alternatives. See the file \texttt{commute\_descriptions.txt} for descriptions of the variables in each dataset.
+
+\section*{Problem 1: Binary Logit Model}
+
+We are again studying how UMass graduate students choose how to commute to campus during winter when only driving a car or taking a bus are feasible options---as in problem set 1---but we will use a different model of student decision making. The model in problem 2 of problem set 1 assumed the probability of driving is a linear function of the data. In reality, however, a different functional form may provide a better fit for the data. Use the \texttt{commute\_binary.csv} dataset for this problem.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the choice to drive to campus during winter as a binary logit model. Include the cost of driving and the time of each alternative as independent variables in your model:
+	$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \beta_1 C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+	where $P_n$ is the probability that student $n$ drives, $C_{nc}$ is the cost to student $n$ of driving, $T_{nc}$ is the time for student $n$ to drive, $T_{nb}$ is the time for student $n$ to take the bus, and the $\beta$ coefficients are to be estimated. (Reminder: the \texttt{glm()} function with argument \texttt{family = `binomial'} estimates a binary logit model.)
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean? (Reminder: the \texttt{summary()} function summarize the results of a \texttt{glm} model.)
+
+		\item Calculate the marginal effect of each independent variable for each student; that is, 3 variables $\times$ 1000 students $=$ 3000 marginal effects. For each of these three variables, report the mean, minimum, maximum, and quartiles of its marginal effects. Compare these marginal effects to your estimates in problem 2 of problem set 1. (Reminder: the \texttt{predict()} function calculates fitted values of a \texttt{glm} model, and the \texttt{summary()} function reports these summary statistics for a vector or data frame.)
+
+		\item Use your coefficient estimates to calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus. (Hint: think about how to use your coefficient estimates to convert a student's time to money.)
+	\end{enumerate}
+
+	\item Demographic information might affect a student's commute decision or underlying preferences. For example, students with different incomes might have different sensitivities to cost. Again model the choice to drive to campus during winter as a binary logit model, but now allow the parameter on cost to vary inversely with income:
+	$$\ln \left( \frac{P_n}{1 - P_n} \right) = \beta_0 + \frac{\beta_1}{I_n} C_{nc} + \beta_2 T_{nc} + \beta_3 T_{nb}$$
+	where $I_n$ is the income of student $n$. (Reminder: the \texttt{I()} function allows you to include math inside a \texttt{formula} object.)
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated coefficients and standard errors from this model. Briefly interpret these results. For example, what does each coefficient mean?
+
+		\item Use your coefficient estimates to calculate the marginal utility of income for a student at three different income levels: \$15,000, \$25,000, and \$35,000. For each of these three income levels, also calculate the dollar value that a student places on each hour spent driving and on each hour spent on the bus.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Multinomial Logit Model}
+
+We are again studying how UMass graduate students choose how to commute to campus, but we are now interested in this choice in the spring when riding a bike and walking are feasible alternatives. This information will help the university to plan for car parking, bike racks, and bus needs during this time of year. Additionally, the university is considering a change to bus routes, and they want to know how this change will affect commute choices. Use the \texttt{commute\_multinomial.csv} dataset for this problem.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the commute choice during spring as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost and time. Include an alternative-specific intercept, assume cost has a common parameter that does not vary with income, and allow the parameter on time to be alternative-specific. That is, the representative utility to student $n$ from alternative $j$ is
+	$$V_{nj} = \alpha_j + \beta_1 C_{nj} + \beta_j T_{nj}$$
+	where $V_{nj}$ is the representative utility to student $n$ from alternative $j$, $C_{nj}$ is the cost to student $n$ of alternative $j$, $T_{nj}$ is the time for student $n$ of alternative $j$, and the $\alpha$ and $\beta$ parameters are to be estimated. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a multinomial logit model, but the data must first be converted to an indexed data frame using the \texttt{dfidx()} function from the \texttt{dfidx} package. The \texttt{dfidx()} function sometimes does not work on a \texttt{tibble}, so you may need to use the \texttt{as.data.frame()} function to ensure your data are in a \texttt{data.frame} format. See the Week 4 slides or the \texttt{mlogit} vignettes at \href{https://cran.r-project.org/web/packages/mlogit/index.html}{\texttt{cran.r-project.org/web/packages/mlogit/index.html}} for information on specifying a \texttt{formula} for the \texttt{mlogit()} function.)
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameter and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		\item Calculate the elasticity of each commute alternative with respect to the cost of driving for each student; that is, 4 alternatives $\times$ 1000 students $=$ 4000 elasticities. For each alternative, report the mean, minimum, maximum, and quartiles of its elasticity with respect to the cost of driving. Describe how these elasticities and substitution patterns relate to an important property of the logit model. (Reminder: the \texttt{fitted()} function with argument \texttt{type = `probabilities'} calculates the choice probabilities of each alternative for each decision maker.)
+	\end{enumerate}
+
+	\item A student's family status might also affect their commute decision or underlying preferences. Estimate the model from part (a) on two subsets of the data based on student marital status; that is, estimate one model using only single students, and estimate a second model using only married students.
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from both models. Briefly interpret these results. For example, what does each parameter mean?
+
+		\item Can you use your estimated parameters to compare the marginal utility of income for single students to the marginal utility of income for married students? If so, describe the similarity or difference in these values. If not, explain why you cannot make this comparison using your estimated parameters. (Hint: think about what component of the random utility model is assumed to be the same in both models.)
+
+		\item For each marital status, use the corresponding parameter estimates to calculate the dollar value that a student places on one hour of commute time for each of the four commute alternatives. Can you compare these dollar values for single students to those for married students? If so, describe the similarity or difference in these values. If not, explain why you cannot make this comparison.
+	\end{enumerate}
+
+	\item The university has a strong commitment to environmental sustainability and would like to convince graduate students to take the bus rather than drive to campus. One proposal is to introduce more buses on the existing bus routes, which would reduce bus commute time by 20\%. Use your parameter estimates from part (a) to simulate this counterfactual.
+
+	\begin{enumerate}[label=\roman*.]
+		\item How many additional students---of the 1000 students in this dataset---do you expect will commute by bus because of this reduction in bus commute time? How many fewer students do you expect will choose each of the three other commute alternatives?
+
+		\item How much additional economic surplus do you expect this reduction in bus commute time will generate for the 1000 students in this dataset?
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
