@@ -243,9 +243,9 @@
     \begin{align*}
     	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln P_{ni}(\bm{x}_n, \bm{\theta})
     	\intertext{Under the logit assumption, this likelihood function is}
-    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]
+    	\ln L(\bm{\theta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln \left[ \frac{e^{V_{ni}(\bm{x}_{ni}, \bm{\theta})}}{\sum_j e^{V_{nj}(\bm{x}_{nj}, \bm{\theta})}} \right]
     	\intertext{If we further assume that representative utility is liner, $V_{ni} = \bm{\beta}' \bm{x}_{ni}$, then this log-likelihood function is}
-    	\ln L(\bm{\beta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \left[ \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_j e^{\bm{\beta}' \bm{x}_{nj}}} \right]
+    	\ln L(\bm{\beta} \mid \bm{y}, \bm{X}) & = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln \left[ \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_j e^{\bm{\beta}' \bm{x}_{nj}}} \right]
     \end{align*} \\
     \vspace{-2ex}
 \end{frame}
