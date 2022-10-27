@@ -42,11 +42,11 @@ Week 8: **Generalized Method of Moments**
 * [Notes](https://raw.githack.com/woerman/ResEcon703/master/notes/gmm/gmm.pdf) | [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/week_08.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/week_08.R) | [Data](https://raw.githack.com/woerman/ResEcon703/master/slides/week_08/ac_renters.csv)
 * Videos: [1](https://www.youtube.com/watch?v=Sojxnp8FDA4&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [2](https://www.youtube.com/watch?v=t9yMmHe4ZQo&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [3](https://www.youtube.com/watch?v=boasqgl8c1w&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [4](https://www.youtube.com/watch?v=btxCRXHZtnM&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [5](https://www.youtube.com/watch?v=QemT3BcjQ1E&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [6](https://www.youtube.com/watch?v=yNTZHWOz9pw&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [7](https://www.youtube.com/watch?v=roLIflLHy28&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [8](https://www.youtube.com/watch?v=UoejaQgTLZA&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n) | [9](https://www.youtube.com/watch?v=VhjqSrCVZKc&list=PLnC0w4gG7um20D4BAkv4BiUCOnWyj392n)
 
-<!-- Week 9: **Generalized Extreme Value Models**
+Week 9: **Generalized Extreme Value Models**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_09/week_09.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_09/week_09.R)
 * Videos: [1](https://www.youtube.com/watch?&v=_DRGJIcLlOA&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [2](https://www.youtube.com/watch?&v=wvTUDDzeQEc&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [3](https://www.youtube.com/watch?&v=Yq9I-G3KBHI&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [4](https://www.youtube.com/watch?&v=u-rLEugvoJs&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [5](https://www.youtube.com/watch?&v=pEMjXYihJ7E&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj)
 
-Week 10: **Mixed Logit Model**
+<!-- Week 10: **Mixed Logit Model**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_10/week_10.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_10/week_10.R)
 * Videos: [1](https://www.youtube.com/watch?v=-raC7YyMouA&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [2](https://www.youtube.com/watch?v=xxEup06TRaI&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [3](https://www.youtube.com/watch?v=U0k4Q-7S7c4&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [4](https://www.youtube.com/watch?v=nZWvBJRuYBQ&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [5](https://www.youtube.com/watch?v=nqdy6Lt-OuI&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [6](https://www.youtube.com/watch?v=TMCyZxLHmXQ&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB)
 
