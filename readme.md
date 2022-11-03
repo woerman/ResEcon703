@@ -46,11 +46,11 @@ Week 9: **Generalized Extreme Value Models**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_09/week_09.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_09/week_09.R)
 * Videos: [1](https://www.youtube.com/watch?&v=_DRGJIcLlOA&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [2](https://www.youtube.com/watch?&v=wvTUDDzeQEc&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [3](https://www.youtube.com/watch?&v=Yq9I-G3KBHI&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [4](https://www.youtube.com/watch?&v=u-rLEugvoJs&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj) | [5](https://www.youtube.com/watch?&v=pEMjXYihJ7E&list=PLnC0w4gG7um2ko9Ex8gdTb9GelEhZW-Cj)
 
-<!-- Week 10: **Mixed Logit Model**
+Week 10: **Mixed Logit Model**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_10/week_10.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_10/week_10.R)
 * Videos: [1](https://www.youtube.com/watch?v=-raC7YyMouA&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [2](https://www.youtube.com/watch?v=xxEup06TRaI&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [3](https://www.youtube.com/watch?v=U0k4Q-7S7c4&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [4](https://www.youtube.com/watch?v=nZWvBJRuYBQ&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [5](https://www.youtube.com/watch?v=nqdy6Lt-OuI&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB) | [6](https://www.youtube.com/watch?v=TMCyZxLHmXQ&list=PLnC0w4gG7um1lgAkhb1TywgbxiZUJlfyB)
 
-Week 11: **Simulation-Based Estimation**
+<!-- Week 11: **Simulation-Based Estimation**
 * [Slides](https://raw.githack.com/woerman/ResEcon703/master/slides/week_11/week_11.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/slides/week_11/week_11.R)
 * Videos: [1](https://www.youtube.com/watch?v=pupOLyR-Df8&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [2](https://www.youtube.com/watch?v=6cgaHBoKH9E&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [3](https://www.youtube.com/watch?v=yj0hQGYCmSo&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq) | [4](https://www.youtube.com/watch?v=8B7ijH3D5p4&list=PLnC0w4gG7um3MUFfwtnJxCeQXlTozN-Oq)
 

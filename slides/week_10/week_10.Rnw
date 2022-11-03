@@ -1,0 +1,866 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 10:\ Mixed Logit Model]{Week 10:\ Mixed Logit Model}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Generalized extreme value models
+    \end{itemize}
+    \vspace{2ex}
+    This week
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{overview}}{Mixed logit model overview}
+    	\item \hyperlink{page.\getpagerefnumber{prob}}{Mixed logit choice probabilities}
+        \item \hyperlink{page.\getpagerefnumber{random}}{Random coefficients}
+        \item \hyperlink{page.\getpagerefnumber{subs}}{Substitution patterns}
+        \item \hyperlink{page.\getpagerefnumber{panel}}{Panel data}
+        \item \hyperlink{page.\getpagerefnumber{empirical}}{Empirical considerations}
+        \item \hyperlink{page.\getpagerefnumber{example}}{Mixed logit R example}
+    \end{itemize}
+    \vspace{2ex}
+    This week's reading
+    \begin{itemize}
+    	\item Train textbook, chapter 6
+    \end{itemize}
+\end{frame}
+
+\section{Mixed Logit Model Overview}
+\label{overview}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Model Overview
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Discrete Choice Models Recap}
+    Logit model
+    \begin{itemize}
+        \item Strong assumption that unobserved components of utility are i.i.d.
+        \item Simple closed-form expressions for choice probabilities
+        \item Preference variation can only be represented by observed data
+        \item Panel data applications are limited by the i.i.d. assumption
+    \end{itemize}
+    \vspace{2ex}
+    Nested logit model (and other generalized extreme value models)
+    \begin{itemize}
+        \item Correlation between unobserved components of utility can be modeled
+        \item Choice probabilities are more complex but still closed-form
+        \item Preference variation can only be represented by observed data
+        \item Panel data applications are limited by an i.i.d. assumption
+    \end{itemize}
+    \vspace{2ex}
+    What if we want a richer representation of preference variation, more flexible substitution patterns, and an ability to use panel data?
+    \begin{itemize}
+        \item Mixed logit model!
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}\frametitle{Mixed Logit Model}
+    The mixed logit model overcomes three limitations of the logit model
+    \begin{itemize}
+        \item Unobserved (or random) preference variation
+        \item Unrestricted substitution patterns
+        \item Correlations in unobserved factors over time
+    \end{itemize}
+    \vspace{3ex}
+    What is the catch?
+    \begin{itemize}
+        \item Mixed logit choice probabilities are not closed-form
+        \item Estimation requires numerical simulation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Coefficients}
+    How does the mixed logit model achieves this level of flexibility?
+    \begin{itemize}
+        \item It does not use a set of fixed coefficients for the entire population, $\bm{\beta}$
+        \item It assumes there is a distribution of coefficients throughout the population, $f(\bm{\beta} \mid \bm{\theta})$
+    \end{itemize}
+    \vspace{3ex}
+    Distributions of coefficients overcome the three main limitations of the logit model
+    \begin{itemize}
+        \item Model distributions of unobserved preferences among the sample of decision makers
+        \item Impose correlations in unobserved utility among alternatives
+        \item Represent individual preferences over time
+    \end{itemize}
+\end{frame}
+
+\section{Mixed Logit Choice Probabilities}
+\label{prob}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit Choice Probabilities
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Choice Probabilities}
+	Unlike the logit and nested logit models, the mixed logit model is not defined by an assumption about the joint density of unobserved utility, $\bm{\varepsilon}_n$ \\
+	\vspace{3ex}
+    A mixed logit model is any discrete choice model with choice probabilities of the form
+    \begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        \intertext{where $L_{ni}(\bm{\beta})$ is the logit probability at a given set of coefficients, $\bm{\beta}$}
+        L_{ni}(\bm{\beta}) & = \frac{e^{V_{ni}(\bm{\beta})}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta})}}
+    \end{align*}
+    and $f(\bm{\beta} \mid \bm{\theta})$ is a density function of coefficients $\bm{\beta}$, which depends on a vector of parameters, $\bm{\theta}$
+    \begin{itemize}
+    	\item The mixed logit choice probability is not a closed-form expression
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Choice Probabilities Intuition}
+	\begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        L_{ni}(\bm{\beta}) & = \frac{e^{V_{ni}(\bm{\beta})}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta})}}
+    \end{align*} \\
+	\vspace{3ex}
+	The mixed logit choice probability is a weighted average of logit choice probabilities
+	\begin{itemize}
+		\item The logit choice probabilities are evaluated at different values of $\bm{\beta}$
+		\item Each logit choice probability is weighted by the density $f(\bm{\beta} \mid \bm{\theta})$
+	\end{itemize}
+	\vspace{3ex}
+	The mixed logit choice probability is a mixed function of logit choice probabilities, $L_{ni}(\bm{\beta})$, with the mixing distribution $f(\bm{\beta} \mid \bm{\theta})$
+\end{frame}
+
+\begin{frame}\frametitle{Distributions of Coefficients}
+    We previously used the terms ``parameter'' and ``coefficient'' interchangeably, but we will use them to mean different things in the mixed logit model
+    \begin{itemize}
+        \item $\bm{\beta}$: Coefficients that appear in the utility expression
+        \begin{itemize}
+            \item We will not estimate these coefficients in the mixed logit model
+            \item These coefficients are integrated out of the choice probability
+        \end{itemize}
+        \item $\bm{\theta}$: Parameters that define the density of random coefficients
+        \begin{itemize}
+            \item We will estimate these parameters in the mixed logit model
+        \end{itemize}
+    \end{itemize}
+    \vspace{2ex}
+    Some examples of distributions of coefficients that we can model
+    \begin{itemize}
+        \item Normal: $\bm{\beta} \sim \mathcal{N}(\bm{\mu}, \bm{\Sigma})$, we estimate $\bm{\theta} = \{\bm{\mu}, \bm{\Sigma}\}$
+        \item Log-normal: $\ln \bm{\beta} \sim \mathcal{N}(\bm{\mu}, \bm{\Sigma})$, we estimate $\bm{\theta} = \{\bm{\mu}, \bm{\Sigma}\}$
+        \item Uniform: $\bm{\beta} \sim \mathcal{U}(\bm{a}, \bm{b})$, we estimate $\bm{\theta} = \{\bm{a}, \bm{b}\}$
+        \item Triangular: $\bm{\beta} \sim Tri(\bm{a}, \bm{b}, \bm{c})$, we estimate $\bm{\theta} = \{\bm{a}, \bm{b}, \bm{c}\}$
+        \item Many other distributions to choose from
+    \end{itemize}
+\end{frame}
+
+\section{Random Coefficients}
+\label{random}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Random Coefficients
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model with Individual-Specific Coefficients}
+	A common way to rationalize the mixed logit model is the random utility model with individual-specific coefficients \\
+	\vspace{3ex}
+    The utility that decision maker $n$ obtains from alternative $j$ is
+    $$U_{nj} = \bm{\beta}_n' \bm{x}_{nj} + \varepsilon_{nj}$$ \\
+    \begin{itemize}
+        \item $\bm{x}_{nj}$: data for alternative $j$ and decision maker $n$
+        \item $\bm{\beta}_n$: individual-specific vector of coefficients
+        \item $\varepsilon_{nj}$: i.i.d.\ extreme value error term
+    \end{itemize}
+    \vspace{3ex}
+    Each decision maker knows their own $\bm{\beta}_n$ and $\varepsilon_{nj}$, so the choice is deterministic from their perspective
+    \begin{itemize}
+        \item $n$ chooses $i$ if and only if $U_{ni} > U_{nj} ~\forall j \neq i$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model with Random Coefficients}
+	The utility that decision maker $n$ obtains from alternative $j$ is
+    $$U_{nj} = \bm{\beta}_n' \bm{x}_{nj} + \varepsilon_{nj}$$
+    But we (the researchers) do not observe $\bm{\beta}_n$ for any individual
+    \begin{itemize}
+    	\item We model $\bm{\beta}_n$ as a random variable with density $f(\bm{\beta} \mid \bm{\theta})$
+    \end{itemize}
+    \vspace{2ex}
+    If we did know $\bm{\beta}_n$, then the model would be a standard logit with the \emph{conditional} choice probability
+    $$L_{ni}(\bm{\beta}_n) = \frac{e^{\bm{\beta}_n' \bm{x}_{ni}}}{\sum_{j = 1}^J e^{\bm{\beta}_n' \bm{x}_{nj}}}$$
+    But we do not know $\bm{\beta}_n$, so we have to integrate over the density of the random coefficients to obtain the \emph{unconditional} choice probability
+    $$P_{ni} = \int \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{nj}}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}$$
+\end{frame}
+
+\section{Substitution Patterns}
+\label{subs}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Substitution Patterns
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model with Flexible Random Utility}
+    Another common way to rationalize the mixed logit model is the random utility model with fully flexible correlations in random utilities \\
+    \vspace{3ex}
+    The utility that decision maker $n$ obtains from alternative $j$ is
+    $$U_{nj} = \bm{\alpha}' \bm{x}_{nj} + \bm{\mu}_n' \bm{z}_{nj} + \varepsilon_{nj}$$ \\
+    \begin{itemize}
+        \item $\bm{x}_{nj}$, $\bm{z}_{nj}$: data for alternative $j$ and decision maker $n$
+        \item $\bm{\alpha}$: vector of fixed coefficients
+        \item $\bm{\mu}_n$: vector of random coefficients with mean zero
+        \item $\varepsilon_{nj}$: i.i.d.\ extreme value error term
+    \end{itemize}
+    \vspace{3ex}
+    We can combine the random components of utility into a single composite random utility term, $\eta_{nj}$
+    $$\eta_{nj} = \bm{\mu}_n' \bm{z}_{nj} + \varepsilon_{nj}$$
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model with Correlated Random Utility}
+	The utility that decision maker $n$ obtains from alternative $j$ is
+	\begin{align*}
+		U_{nj} & = \bm{\alpha}' \bm{x}_{nj} + \eta_{nj}
+		\intertext{where the random utility term, $\eta_{nj}$, is given by}
+		\eta_{nj} & = \bm{\mu}_n' \bm{z}_{nj} + \varepsilon_{nj}
+	\end{align*} \\
+	\vspace{2ex}
+	These flexible random utility terms can be correlated over alternatives
+	$$Cov(\eta_{ni}, \eta_{nj}) = \bm{z}_{ni}' \bm{\Sigma} \bm{z}_{nj}$$
+	where $\bm{\Sigma}$ is the variance-covariance matrix of $\bm{\mu}$ \\
+	\vspace{2ex}
+	The flexible specification of random utility yields flexible correlations between alternatives, which we can estimate
+\end{frame}
+
+\begin{frame}\frametitle{Special Cases of Correlated Random Utility}
+    This representation of random utility correlations generalizes all of the previous discrete choice models we have discussed
+    $$Cov(\eta_{ni}, \eta_{nj}) = \bm{z}_{ni}' \bm{\Sigma} \bm{z}_{nj}$$ \\
+    \vspace{2ex}
+    Logit model
+    \begin{itemize}
+    	\item When $z_{nj} = 0 ~\forall j$, the random utility of alternatives is uncorrelated
+    \end{itemize}
+    \vspace{2ex}
+    Nested logit model
+    \begin{itemize}
+    	\item $\bm{z}_{nj}$ is a set of indicator variables for each nest
+    	\begin{itemize}
+    		\item $K$ variables that equal 1 for the alternatives in that nest
+    	\end{itemize}
+    	\item $\mu_k \sim \mathcal{N}(0, \sigma_k)$ and independent across nests
+    	\item Covariance between alternatives in nest $k$ is $\sigma_k$, which we estimate
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Equivalence of Random Utility Models}
+    We have motivated the mixed logit model from two random utility models
+    \begin{itemize}
+    	\item These random utility models are mathematically equivalent
+    \end{itemize}
+    \vspace{2ex}
+    Starting from the random coefficients expression
+    \begin{align*}
+        U_{nj} & = \bm{\beta}_n' \bm{x}_{nj} + \varepsilon_{nj} \\
+        \intertext{Express $\bm{\beta}_n$ as $\bm{\beta}_n = \bm{\alpha} + \bm{\mu}_n$ by decomposing $\bm{\beta}_n$ into the means, $\bm{\alpha}$, and the deviations from the means, $\bm{\mu}_n$}
+        U_{nj} & = \bm{\alpha}' \bm{x}_{nj} + \bm{\mu}_n' \bm{z}_{nj} + \varepsilon_{nj}
+    \end{align*}
+    where $\bm{z}_{nj}$ is the subset of data, $\bm{x}_{nj}$, with random coefficients
+    \begin{itemize}
+    	\item If all variables have random coefficients, then $\bm{z}_{nj} = \bm{x}_{nj}$
+    \end{itemize}
+    \vspace{2ex}
+    Your motivation will affect which coefficients you model as random and whether to allow correlations between the coefficients
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Substitution Patterns}
+    If representative utility is linear, $V_{nj} = \bm{\beta}_n' \bm{x}_{nj}$, then the ratio of the choice probabilities of alternative $i$ and alternative $m$ is 
+    $$\frac{P_{ni}}{P_{nm}} = \frac{\displaystyle \int \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{nj}}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}}{\displaystyle \int \frac{e^{\bm{\beta}' \bm{x}_{nm}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{nj}}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}}$$ \\
+    \begin{itemize}
+    	\item Choice probability denominators are inside the integrals, so they cannot cancel as they did in previous models
+    \end{itemize}
+    \vspace{3ex}
+    The ratio of any two choice probabilities depends on all alternatives
+    \begin{itemize}
+    	\item The mixed logit model does not exhibit independence of irrelevant alternatives (IIA)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Elasticities}
+    The own elasticity of alternative $i$ with respect to its attribute $z_{ni}$ (where $z_{ni}$ is any element of $\bm{x}_{ni}$) is
+    \begin{align*}
+    	E_{iz_{ni}} & = \frac{z_{ni}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) [1 - L_{ni}(\bm{\beta})] f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    	\intertext{The cross elasticity of alternative $i$ with respect to attribute $z_{nj}$ of alternative $j$ (where $z_{nj}$ is any element of $\bm{x}_{nj}$) is}
+    	E_{iz_{nj}} & = - \frac{z_{nj}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) L_{nj}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*}
+    As with the mixed logit choice probabilities, mixed logit elasticities do not have closed-form expressions \\
+    \vspace{3ex}
+    These expressions depend on how $L_{ni}(\bm{\beta})$ varies and how $L_{ni}(\bm{\beta})$ and $L_{nj}(\bm{\beta})$ covary as you integrate over the density of $\bm{\beta}$, which is determined by which parameters you specify as random and whether they covary
+\end{frame}
+
+\section{Panel Data}
+\label{panel}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Panel Data
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit and Panel Data}
+    The structure of the mixed logit model allows for more flexibility in representing how a single decision maker makes multiple choices over time periods, so it provides a better model for most panel data settings
+    \begin{itemize}
+        \item In the logit and nested logit models, all unobserved factors that influence utility are represented by $\bm{\varepsilon}_{nt}$, which is i.i.d., so those models cannot accommodate correlations over time
+        \item But the mixed logit model allows for unobserved preference variation through random coefficients, which yields correlations in utility over time for the same decision maker
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model with Panel Data}
+    We add a time index, $t$, to our random utility model but assume the random coefficients, $\bm{\beta}_n$, are constant for an individual
+    $$U_{njt} = \bm{\beta}_n' \bm{x}_{njt} + \varepsilon_{njt}$$
+    and we consider the vector of alternatives that decision maker $n$ chooses over the $T$ time periods
+    $$\bm{i} = (i_1, \ldots, i_T)$$
+    Then the conditional logit probability for a sequence of choices is
+    \begin{align*}
+        L_{n\bm{i}}(\bm{\beta}) & = \prod_{t = 1}^T \frac{e^{\bm{\beta}' \bm{x}_{ni_{t}t}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{njt}}} \\
+        \intertext{and integrating over the density of coefficients gives the choice probability}
+        P_{n\bm{i}} & = \int L_{n\bm{i}}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Dynamics in a Mixed Logit Model}
+    Some ``dynamics'' can be represented in a mixed logit model using panel data
+    \begin{itemize}
+        \item Past and future exogenous variables can be included to model lagged or anticipatory behavior
+        \item Lagged dependent variables can be included to represent state dependence 
+    \end{itemize}
+    \vspace{3ex}
+    This approach is a relatively naive way of incorporating dynamics into a discrete choice model
+    \begin{itemize}
+        \item We are essentially modeling a sequence of static choices
+        \item A fully ``dynamic discrete choice model'' would model how every choice affects all subsequent choices
+        \item We will talk about dynamic discrete choice models in the final week of the semester
+    \end{itemize}
+\end{frame}
+
+\section{Empirical Considerations}
+\label{empirical}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering 
+    \begin{beamercolorbox}[center]{title}
+        \Large Empirical Considerations
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Estimation}
+    Mixed logit choice probabilities do not have a closed-form expression
+    $$P_{ni} = \int \frac{e^{\bm{\beta}' \bm{x}_{ni}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{nj}}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}$$ \\
+    \begin{itemize}
+        \item We cannot estimate a mixed logit model using maximum likelihood because we cannot calculate the log-likelihood function
+    \end{itemize}
+    \vspace{2ex}
+    Instead, we can approximate choice probabilities through numerical simulation, calculate the simulated log-likelihood function, and estimate using maximum simulated likelihood 
+    \begin{itemize}
+        \item More on other simulation-based estimation methods next week
+    \end{itemize}
+    \vspace{2ex}
+    We can use the \texttt{mlogit()} function in R to estimate mixed logit models
+    \begin{itemize}
+        \item We specify our random coefficients using the \texttt{rpar} argument in the \texttt{mlogit()} function
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit with Market-Level Data}
+    The mixed logit model can also be estimated from market-level data
+    \begin{itemize}
+        \item You observe the price, market share, and characteristics of every cereal brand at the grocery store, and you want to estimate the structural parameters of consumer decision making that explain those purchases
+    \end{itemize}
+    \vspace{2ex}
+    When aggregated over many consumers, choice probabilities become market shares
+    $$S_i = \int \frac{e^{\bm{\beta}' \bm{x}_i}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_j}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}$$
+    \begin{itemize}
+        \item Because of the integral, mixed logit market shares do not reduce to a linear model as they did for logit and nested logit
+        \item Demand estimation using random coefficients logit often uses the ``BLP'' method of Berry, Levinsohn, and Pakes (1995)
+        \item We will talk about BLP in the final week of the semester
+    \end{itemize}
+\end{frame}
+
+\section{Mixed Logit R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Mixed Logit R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes
+    \begin{itemize}
+    	\item We have (real) data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item \texttt{ec}: electric central
+		    	\item \texttt{ecc}: electric central with AC
+		    	\item \texttt{er}: electric room
+		    	\item \texttt{erc}: electric room with AC
+		    	\item \texttt{gc}: gas central
+		    	\item \texttt{gcc}: gas central with AC
+		    	\item \texttt{hpc}: heat pump with AC
+		    \end{itemize}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item \texttt{ich}: installation cost for heat
+		    	\item \texttt{icca}: installation cost for AC
+		    	\item \texttt{och}: operating cost for heat
+		    	\item \texttt{occa}: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item \texttt{income}: annual income
+		    \end{itemize}
+		    \vspace{1ex}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model of HVAC System Choice}
+    We model the utility to household $n$ of installing HVAC system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{3ex}
+    The probability that household $n$ installs HVAC system $i$ is
+ 	$$P_{ni} = \int_{\bm{\varepsilon}} \mathbbm{1}(\varepsilon_{nj} - \varepsilon_{ni} < V_{ni} - V_{nj} \; \forall j \neq i) f(\bm{\varepsilon}_n) d\bm{\varepsilon}_n$$ \\
+ 	\vspace{2ex}
+  	Under the logit assumption, these choice probabilities simplify to
+    $$P_{ni} = \frac{e^{V_{ni}}}{\sum_j e^{V_{nj}}}$$
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of HVAC System Choice}
+	What might affect the utility of the different HVAC systems?
+	\begin{itemize}
+		\item Installation cost
+		\item Annual operating cost
+		\item HVAC system technology
+		\begin{itemize}
+			\item Systems with cooling might be preferred to heating-only systems
+			\item Gas systems might be preferred to electric systems
+			\item Central systems might be preferred to room systems
+		\end{itemize}
+		\item Anything else?
+	\end{itemize}
+    \vspace{3ex}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset from mlogit package
+    data('HC', package = 'mlogit')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    tibble(HC)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<>>=
+    ## Combine heating and cooling costs into one variable
+    hvac_clean <- HC %>% 
+      mutate(id = 1:n(),
+             ic.gcc = ich.gcc + icca, ic.ecc = ich.ecc + icca,
+             ic.erc = ich.erc + icca, ic.hpc = ich.hpc + icca,
+             ic.gc = ich.gc, ic.ec = ich.ec, ic.er = ich.er,
+             oc.gcc = och.gcc + occa, oc.ecc = och.ecc + occa,
+             oc.erc = och.erc + occa, oc.hpc = och.hpc + occa,
+             oc.gc = och.gc, oc.ec = och.ec, oc.er = och.er) %>%
+      select(id, depvar, starts_with('ic.'), starts_with('oc.'), income)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<>>=
+    ## Look at cleaned dataset
+    tibble(hvac_clean)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{dfidx} Format}
+    <<>>=
+    ## Convert cleaned dataset to dfidx format
+    hvac_dfidx <- dfidx(hvac_clean, shape = 'wide', 
+                        choice = 'depvar', varying = 3:16)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{dfidx} Format}
+    <<>>=
+    ## Look at data in dfidx format
+    tibble(hvac_dfidx)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multinomial Logit Model}
+    We model the representative utility of HVAC system $j$ to household $n$ as
+    $$V_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}$$
+    <<>>=
+    ## Model choice using alternative intercepts and cost data
+    model_1 <- mlogit(formula = depvar ~ ic + oc | 1 | 0,
+                      data = hvac_dfidx,
+                      reflevel = 'hpc')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Multinomial Logit Model Summary}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_1)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model of HVAC System Choice}
+    We modeled the utility to household $n$ of installing HVAC system $j$ as
+    $$U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj} + \varepsilon_{nj}$$ \\
+    \begin{itemize}
+    	\item But what if the marginal utilities of current and future costs (or income) vary throughout the population?
+    \end{itemize}
+	\vspace{3ex}
+	Using the mixed logit model, we can allow for unobserved variation in these coefficients
+	$$U_{nj} = \alpha_j + \beta_{1n} IC_{nj} + \beta_{2n} OC_{nj} + \varepsilon_{nj}$$
+	where the random coefficients are normally distributed
+	\begin{align*}
+		\beta_{1n} & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+		\beta_{2n} & \sim \mathcal{N}(\mu_2, \sigma_2^2)
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Choice Probabilities for HVAC System Choice}
+    The mixed logit choice probabilities are integrals over the densities of our random coefficients
+    $$P_{ni} = \int \frac{e^{\alpha_i + \beta_1 IC_{ni} + \beta_2 OC_{ni}}}{\sum_{j = 1}^J e^{\alpha_j + \beta_1 IC_{nj} + \beta_2 OC_{nj}}} f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}$$ \\
+    \vspace{2ex}
+    We will use maximum simulated likelihood to find the set of parameters---$\alpha_j$, $\mu_1$, $\sigma_1^2$, $\mu_2$, and $\sigma_2^2$---that maximize the simulated likelihood of generating the choices that we observe \\
+    \vspace{2ex}
+    We can use the \texttt{mlogit} function in R to estimate mixed logit models
+    \begin{itemize}
+        \item We specify our random coefficients using the \texttt{rpar} argument in the \texttt{mlogit()} function
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Models in R}
+    <<eval = FALSE>>=
+    ## Help file for the mlogit function
+    ?mlogit
+    ## Arguments for mlogit mixed logit functionality
+    mlogit(formula, data, reflevel, rpar, correlation, R, seed, ...)
+    @
+    \vspace{2ex}
+    \texttt{mlogit()} arguments for mixed logit
+    \begin{enumerate}
+        \item \texttt{formula, data, reflevel}: same as a multinomial logit model
+        \item \texttt{rpar}: named vector of random coefficients and their distributions
+        \item \texttt{correlation}: \texttt{TRUE} models random coefficient correlations
+        \item \texttt{R}: number of random draws in numerical simulation
+        \item \texttt{seed}: seed for random draws in simulation
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model with Random Coefficients}
+    We model the utility of HVAC system $j$ to household $n$ as
+    $$U_{nj} = \alpha_j + \beta_{1n} IC_{nj} + \beta_{2n} OC_{nj} + \varepsilon_{nj}$$
+	where the random coefficients are normally distributed
+	\begin{align*}
+		\beta_{1n} & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+		\beta_{2n} & \sim \mathcal{N}(\mu_2, \sigma_2^2)
+	\end{align*}
+    <<>>=
+    ## Model choice using alt intercepts and cost data with normal coefs
+    model_2 <- mlogit(formula = depvar ~ ic + oc | 1 | 0, 
+                      data = hvac_dfidx, 
+                      reflevel = 'hpc',
+                      rpar = c(ic = 'n', oc = 'n'), 
+                      R = 1000, seed = 703)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Summary}
+	\vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_2)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    <<>>=
+    ## Display model coefficients
+    coef(model_2)
+    @
+    \vspace{2ex}
+    How do we interpret these coefficients?
+    \begin{itemize}
+    	\item Alternative-specific intercepts
+    	\begin{itemize}
+    		\item \texttt{ecc} and \texttt{gcc} provide more utility, \emph{ceteris paribus}, than \texttt{hpc}
+	        \item \texttt{erc} provides the same utility, \emph{ceteris paribus}, as \texttt{hpc}
+	        \item \texttt{ec}, \texttt{er}, and \texttt{gc} provide less utility, \emph{ceteris paribus}, than \texttt{hpc}
+    	\end{itemize}
+        \item An additional \$100 of installation cost reduces utility by 0.57 on average with a standard deviation of 0.36
+        \item An additional \$100 of annual operating cost reduces utility by 3.97 on average with a standard deviation of 1.31
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Test of Random Coefficient Variances}
+    We can test if the random coefficient variances are statistically different from those implied by the multinomial logit model
+    \begin{itemize}
+    	\item The multinomial logit model assumes all coefficients are fixed, or $\sigma_k^2 = 0 ~\forall k$
+    \end{itemize}
+    \vspace{3ex}
+    We will test the null hypothesis
+    $$H_0 \text{: } \sigma_1^2 = \sigma_2^2 = 0$$ \\
+    \vspace{3ex}
+    We are using maximum simulated likelihood to estimate this model, so we can use the same tests that apply to maximum likelihood
+    \begin{itemize}
+    	\item We will use a (simulated) likelihood ratio test
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Likelihood Ratio Test}
+    \texttt{lrtest()} conducts a (simulated) likelihood ratio test on the two models we specify as arguments \\
+    <<>>=
+    ## Conduct likelihood ratio test of models 1 and 2
+    lrtest(model_1, model_2)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Plot of Random Coefficients}
+    <<eval = FALSE>>=
+    ## Plot distributions of random coefficients
+    ggplot(data = data.frame(x = c(-8, 1)), aes(x)) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean = coef(model_2)[7], 
+                                sd = abs(coef(model_2)[9]))) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean =coef(model_2)[8], 
+                                sd = abs(coef(model_2)[10])), 
+                    linetype = 'dashed') +
+      xlab(NULL) +
+      ylab(NULL)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Plot of Random Coefficients}
+    <<echo = FALSE, fig.dim = c(5, 3.25), fig.align = 'center'>>=
+    ## Plot distributions of random coefficients
+    ggplot(data = data.frame(x = c(-8, 1)), aes(x)) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean = coef(model_2)[7], 
+                                sd = abs(coef(model_2)[9]))) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean =coef(model_2)[8], 
+                                sd = abs(coef(model_2)[10])), 
+                    linetype = 'dashed') +
+      xlab(NULL) +
+      ylab(NULL)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Cost Trade-Offs}
+    How do consumers trade off the installation cost and the annual operating cost when choosing an HVAC system?
+    \begin{itemize}
+        \item What reduction in installation cost offsets a \$1 increase in the annual operating cost?
+    \end{itemize}
+    \begin{align*}
+        U_{ni} & = \alpha_i + \beta_{1n} IC_{ni} + \beta_{2n} OC_{ni} + \varepsilon_{ni} \\
+        dU_{ni} & = \beta_{1n} dIC_{ni} + \beta_{2n} dOC_{ni} \\
+        dU_{ni} & = 0 ~~ \Rightarrow ~~ \frac{dIC_{ni}}{dOC_{ni}} = -\frac{\beta_{2n}}{\beta_{1n}}
+    \end{align*}
+    We do not know each decision maker's coefficients, but we do know the distribution of these individual-specific coefficients
+    \begin{itemize}
+    	\item We could find the distribution that corresponds to this ratio of distributions, but the ratio of normal distributions is challenging
+    \end{itemize}
+    \vspace{2ex}
+    To make this question easier, we can estimate a model with a fixed $\beta_1$
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model with Random OC Coefficient}
+    We model the utility of HVAC system $j$ to household $n$ as
+    $$U_{nj} = \alpha_j + \beta_1 IC_{nj} + \beta_{2n} OC_{nj} + \varepsilon_{nj}$$
+	  where the random coefficient is normally distributed
+	  \begin{align*}
+		  \beta_{2n} & \sim \mathcal{N}(\mu_2, \sigma_2^2)
+	  \end{align*}
+    <<>>=
+    ## Model choice using alt intercepts and cost data with normal oc coef
+    model_3 <- mlogit(formula = depvar ~ ic + oc | 1 | 0, 
+                      data = hvac_dfidx, 
+                      reflevel = 'hpc',
+                      rpar = c(oc = 'n'), 
+                      R = 1000, seed = 703)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Summary}
+	  \vspace{1ex}
+    <<size = 'tiny'>>=
+    ## Summarize model results
+    summary(model_3)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Interpreting Parameters}
+    <<>>=
+    ## Display model coefficients
+    coef(model_3)
+    @
+    \vspace{2ex}
+    How do we interpret these coefficients?
+    \begin{itemize}
+    	\item Alternative-specific intercepts
+    	\begin{itemize}
+    		\item \texttt{ecc} and \texttt{gcc} provide more utility, \emph{ceteris paribus}, than \texttt{hpc}
+	        \item \texttt{erc} provides the same utility, \emph{ceteris paribus}, as \texttt{hpc}
+	        \item \texttt{ec}, \texttt{er}, and \texttt{gc} provide less utility, \emph{ceteris paribus}, than \texttt{hpc}
+    	\end{itemize}
+        \item An additional \$100 of installation cost reduces utility by 0.27
+        \item An additional \$100 of annual operating cost reduces utility by 2.06 on average with a standard deviation of 0.54
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Test of Random Coefficient Variance}
+	We just estimated a model that restricted $\beta_1$ to be fixed, which is equivalent to saying $\beta_1$ is random with zero variance, or $\sigma_1^2 = 0$
+	\begin{itemize}
+		\item We can test if this imposed restriction is correct
+	\end{itemize}
+    \vspace{3ex}
+    We will test the null hypothesis
+    $$H_0 \text{: } \sigma_1^2 = 0$$ \\
+    <<>>=
+    ## Conduct likelihood ratio test of models 2 and 3
+    lrtest(model_2, model_3)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cost Trade-Offs}
+    How do consumers trade off the installation cost and the annual operating cost when choosing an HVAC system?
+    \begin{itemize}
+        \item What reduction in installation cost offsets a \$1 increase in the annual operating cost?
+    \end{itemize}
+    $$\frac{dIC_{ni}}{dOC_{ni}} = -\frac{\beta_{2n}}{\beta_1}$$ \\
+    Because $\beta_{2n}$ is normally distributed and  $\beta_1$ is fixed, the ratio is also a normal distribution
+    $$\frac{dIC_{ni}}{dOC_{ni}} \sim \mathcal{N} \left( \frac{\mu_2}{\beta_1}, \frac{\sigma_2^2}{\beta_1^2} \right)$$
+    \begin{itemize}
+    	\item What are the mean and standard deviation of this distribution?
+    \end{itemize}
+    <<>>=
+    ## Calculate ic equivalence of an increase in oc
+    c(-coef(model_3)[8] / coef(model_3)[7], 
+      abs(coef(model_3)[9] / coef(model_3)[7]))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Plot of Cost Trade-offs}
+    <<eval = FALSE>>=
+    ## Plot distributions of random coefficients
+    ggplot(data = data.frame(x = c(-18, 2)), aes(x)) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean = -coef(model_3)[8] / coef(model_3)[7], 
+                                sd = abs(coef(model_3)[9] / 
+                                           coef(model_3)[7]))) +
+      xlab(NULL) +
+      ylab(NULL)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Plot of Cost Trade-offs}
+    <<echo = FALSE, fig.dim = c(5, 3.25), fig.align = 'center'>>=
+    ## Plot distributions of random coefficients
+    ggplot(data = data.frame(x = c(-18, 2)), aes(x)) +
+      stat_function(fun = dnorm, n = 1001, 
+                    args = list(mean = -coef(model_3)[8] / coef(model_3)[7], 
+                                sd = abs(coef(model_3)[9] / 
+                                           coef(model_3)[7]))) +
+      xlab(NULL) +
+      ylab(NULL)
+    @
+\end{frame}
+
+\end{document}
