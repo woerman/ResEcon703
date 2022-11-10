@@ -1,0 +1,892 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+\setlength{\OuterFrameSep}{-2pt}
+\makeatletter
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+\makeatother
+
+\title[Week 11:\ Simulation-Based Estimation]{Week 11:\ Simulation-Based Estimation}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+<<include = FALSE>>=
+library(knitr)
+opts_chunk$set(size = 'footnotesize')
+options(width = 70)
+@
+
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Mixed logit model
+    \end{itemize}
+    \vspace{3ex}
+    This week
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{probs}}{Simulated choice probabilities}
+        \item \hyperlink{page.\getpagerefnumber{estimators}}{Simulation-based estimators}
+        \item \hyperlink{page.\getpagerefnumber{properties}}{Properties of simulation-based estimators}
+        \item \hyperlink{page.\getpagerefnumber{details}}{Simulation details}
+        \item \hyperlink{page.\getpagerefnumber{example}}{Simulation-based estimation R example}
+    \end{itemize}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Train textbook, chapter 10
+    \end{itemize}
+\end{frame}
+
+\section{Simulated Choice Probabilities}
+\label{probs}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulated Choice Probabilities
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Choice Probability}
+	\begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        L_{ni}(\bm{\beta}) & = \frac{e^{V_{ni}(\bm{\beta})}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta})}}
+    \end{align*} \\
+	\vspace{2ex}
+	The mixed logit choice probability is a weighted average of logit choice probabilities
+	\begin{itemize}
+		\item The logit choice probabilities are evaluated at different values of $\bm{\beta}$
+		\item Each logit choice probability is weighted by the density $f(\bm{\beta} \mid \bm{\theta})$
+	\end{itemize}
+	\vspace{2ex}
+	This choice probability does not have a closed-form solution, so we cannot calculate it directly
+	\begin{itemize}
+		\item But we can approximate it using numerical simulation
+	\end{itemize}
+	\vspace{3.5ex}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probability Intuition}
+	\begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        L_{ni}(\bm{\beta}) & = \frac{e^{V_{ni}(\bm{\beta})}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta})}}
+    \end{align*} \\
+	\vspace{2ex}
+	We effectively want to do the following:
+	\begin{enumerate}
+		\item Calculate the logit choice probability at every possible $\bm{\beta}$, $L_{ni}(\bm{\beta})$
+		\item Weight each of these values by the likelihood of observing that $\bm{\beta}$ in the population, $f(\bm{\beta} \mid \bm{\theta})$
+		\item Sum these weighted logit choice probabilities
+	\end{enumerate}
+	\vspace{2ex}
+	But $\bm{\beta}$ is usually continuous, so it takes on infinitely many values
+	\begin{itemize}
+		\item We will approximate this procedure by considering only a finite random sample of all possible values of $\bm{\beta}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probability}
+    \begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        L_{ni}(\bm{\beta}) & = \frac{e^{V_{ni}(\bm{\beta})}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta})}}
+    \end{align*} \\
+    \vspace{2ex}
+    Given a set of parameters, $\bm{\theta}$, that defines the random coefficient distributions, $f(\bm{\beta} \mid \bm{\theta})$, we can simulate this mixed logit choice probability
+    \begin{enumerate}
+    	\item Draw $R$ random vectors from $f(\bm{\beta} \mid \bm{\theta})$, denoted $\{ \bm{\beta}^1, \bm{\beta}^2, \ldots, \bm{\beta}^R \}$
+    	\item For each random vector, $\bm{\beta}^r$, calculate the conditional logit choice probability, $L_{ni}(\bm{\beta}^r)$
+    	\item Average over these $R$ conditional logit choice probabilities
+    \end{enumerate}
+    $$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\bm{\beta}^r)$$ \\
+    \vspace{0.5ex}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probability Details}
+    Step 1: Draw $R$ random vectors from $f(\bm{\beta} \mid \bm{\theta})$, denoted $\{ \bm{\beta}^1, \bm{\beta}^2, \ldots, \bm{\beta}^R \}$
+    \begin{itemize}
+    	\item If $\bm{\beta}$ contains $K$ random coefficients, then we need $R \times K$ total random variables
+    	\item We are incorporating the ``weighting'' into our simulation by drawing these coefficients from $f(\bm{\beta} \mid \bm{\theta})$
+    	\begin{itemize}
+    		\item We are more likely to draw coefficients with a greater probability density or ``weighting''
+    	\end{itemize}
+    	\item See chapter 9 of the Train textbook for more details on drawing random variables
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probability Details}
+    Step 2: For each random vector, $\bm{\beta}^r$, calculate the conditional logit choice probability, $L_{ni}(\bm{\beta}^r)$
+    $$L_{ni}(\bm{\beta}^r) = \frac{e^{V_{ni}(\bm{\beta}^r)}}{\sum_{j = 1}^J e^{V_{nj}(\bm{\beta}^r)}}$$ \\
+    \begin{itemize}
+    	\item We will have $R$ conditional logit choice probabilities for a single alternative for one decision maker
+    	\begin{itemize}
+    		\item We would have $R \times N \times J$ total conditional choice probabilities if we calculated a conditional choice probability for every random coefficient vector draw for each decision maker for every alternative
+    	\end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Simulated Choice Probability Details}
+    Step 3: Average over these $R$ conditional logit choice probabilities
+    $$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\bm{\beta}^r)$$ \\
+    \begin{itemize}
+    	\item This simulated integral converges almost surely to the actual integral with the number of random draws, $R$, so long as the random draws are from $f(\bm{\beta} \mid \bm{\theta})$
+    \end{itemize}
+    $$\frac{1}{R} \sum_{r = 1}^R L_{ni}(\bm{\beta}^r) \overset{a.s.}{\rightarrow} \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}$$
+\end{frame}
+
+\section{Simulation-Based Estimators}
+\label{estimators}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimators
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Simulation-Based Estimation}
+    Simulation-based estimators are roughly equivalent to their traditional analogs
+    \begin{itemize}
+        \item We replace terms that are difficult or impossible to calculate with their simulated counterparts
+        \begin{itemize}
+            \item Example: Mixed logit choice probabilities include an integral and do not have a closed-form expression, so we replace them with simulated choice probabilities
+        \end{itemize}
+        \item Simulation can potentially introduce bias or noise into the estimation, which we need to consider when using simulation-based estimators
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation}
+    Maximum simulated likelihood (MSL) estimation, or simulated maximum likelihood estimation, is the simulation analog of maximum likelihood estimation \\
+    \vspace{2ex}
+    The maximum simulated likelihood estimator is the set of parameters that maximizes the simulated log-likelihood
+    $$\widehat{\bm{\theta}} = \argmax_{\bm{\theta}} \ln \check{L}(\bm{\theta} \mid \bm{y}, \bm{X})$$
+    where $\ln \check{L}(\bm{\theta} \mid \bm{y}, \bm{X})$ is the log of the simulated likelihood
+    $$\ln \check{L}(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{n = 1}^N \ln \check{f}(y_n \mid \bm{x}_n, \bm{\theta})$$
+    and $\check{f}(y_n \mid \bm{x}_n, \bm{\theta})$ is a simulated density function
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood with Discrete Choice}
+    For discrete choice applications, the log of simulated likelihood is a function of simulated choice probabilities
+    $$\ln \check{L}(\bm{\theta} \mid \bm{y}, \bm{X}) = \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln \check{P}_{ni}(\bm{x}_n, \bm{\theta})$$
+    so the MSL estimator for a discrete choice model is
+    $$\widehat{\bm{\theta}} = \argmax_{\bm{\theta}} \sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \ln \check{P}_{ni}(\bm{x}_n, \bm{\theta})$$
+    which gives first-order conditions equivalent to
+    $$\sum_{n = 1}^N \sum_{i = 1}^J y_{ni} \frac{\partial \ln \check{P}_{ni}(\bm{x}_n, \widehat{\bm{\theta}})}{\partial \bm{\theta}} = \bm{0}$$
+\end{frame}
+
+\begin{frame}\frametitle{Method of Simulated Moments}
+    Method of simulated moments (MSM), or simulated method of moments, is the simulation analog of generalized method of moments \\
+    \vspace{2ex}
+    The method of simulated moments estimator is the set of parameters that ``solves'' a set of simulated moments
+    \begin{align*}
+        \frac{1}{N} \sum_{n = 1}^N \check{\bm{m}}(y_n, \bm{x}_n, \bm{z}_n, \widehat{\bm{\theta}}) & = \bm{0}
+        \intertext{where $\check{\bm{m}}(y_n, \bm{x}_n, \bm{z}_n, \widehat{\bm{\theta}})$ are the simulated sample moments that are the simulated empirical analogs of population moment conditions}
+        E[\bm{m}(y_n, \bm{x}_n, \bm{z}_n, \bm{\theta})] & = \bm{0}
+    \end{align*}
+    With more moments than parameters, we cannot solve this system of equations, so we instead minimize the weighted sum of squared simulated sample moments
+\end{frame}
+
+\begin{frame}\frametitle{Method of Simulated Moments with Discrete Choice}
+    For discrete choice applications, the population moments result from the econometric residuals being orthogonal to a set of exogenous instruments
+    \begin{align*}
+        E \left[ (y_{ni} - P_{ni}(\bm{x}_n, \bm{\theta})) \bm{z}_{ni} \right] & = \bm{0} \\
+        \intertext{so the MSM estimator for a discrete choice model ``solves'' the simulated sample moments}
+        \frac{1}{NJ} \sum_{n = 1}^N \sum_{i = 1}^J \left( y_{ni} - \check{P}_{ni}(\bm{x}_n, \widehat{\bm{\theta}}) \right) \bm{z}_{ni} & = \bm{0}
+    \end{align*}
+    or minimizes the weighted sum of squared simulated sample moments
+\end{frame}
+
+\section{Properties of Simulation-Based Estimators}
+\label{properties}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Properties of Simulation-Based Estimators
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Traditional Estimators}
+    Traditional estimators are the set of parameters that solves a specific system of functions that can be expressed as sample means
+    \begin{align*}
+        \bm{g}(\widehat{\bm{\theta}}) & = \frac{1}{N} \sum_{n = 1}^N \bm{g}_n(\widehat{\bm{\theta}}) = \bm{0}
+        \intertext{ML estimation of a discrete choice model uses the functions}
+        \bm{g}_n(\bm{\theta}) & = \sum_{i = 1}^J y_{ni} \frac{\partial \ln P_{ni}(\bm{x}_n, \bm{\theta})}{\partial \bm{\theta}}
+        \intertext{GMM estimation of a discrete choice model uses the functions}
+        \bm{g}_n(\bm{\theta}) & = \frac{1}{J} \sum_{i = 1}^J (y_{ni} - P_{ni}(\bm{x}_n, \bm{\theta})) \bm{z}_{ni}
+    \end{align*}
+    When certain assumptions are met, these estimators yield consistent estimates of the true set of parameters, $\bm{\theta}_0$
+\end{frame}
+
+\begin{frame}\frametitle{Simulation-Based Estimators}
+     Simulation-based estimators are the set of parameters that solves the simulation-based analog of these functions
+     $$\check{\bm{g}}(\widehat{\bm{\theta}}) = \frac{1}{N} \sum_{n = 1}^N \check{\bm{g}}_n(\widehat{\bm{\theta}}) = \bm{0}$$
+     where $\check{\bm{g}}_n(\bm{\theta})$ is the simulation-based analog of $\bm{g}_n(\bm{\theta})$ \\
+     \vspace{3ex}
+     We can express the simulation-based functions as
+     \begin{align*}
+     	\check{\bm{g}}(\bm{\theta}) & = \check{\bm{g}}(\bm{\theta}) + \left( \bm{g}(\bm{\theta}) - \bm{g}(\bm{\theta}) \right) + \left( E_r[\check{\bm{g}}(\bm{\theta})] - E_r[\check{\bm{g}}(\bm{\theta})] \right) \\
+     	& = \bm{g}(\bm{\theta}) + \left( E_r[\check{\bm{g}}(\bm{\theta})] - \bm{g}(\bm{\theta}) \right) + \left( \check{\bm{g}}(\bm{\theta}) - E_r[\check{\bm{g}}(\bm{\theta})] \right)
+     \end{align*}
+     where $E_r[\check{\bm{g}}(\bm{\theta})]$ is the expectation of $\check{\bm{g}}(\bm{\theta})$ over the simulation draws
+\end{frame}
+
+\begin{frame}\frametitle{Simulation Bias and Noise}
+	We can express the simulation-based sample mean functions as
+    $$\check{\bm{g}}(\bm{\theta}) = \bm{g}(\bm{\theta}) + \left( E_r[\check{\bm{g}}(\bm{\theta})] - \bm{g}(\bm{\theta}) \right) + \left( \check{\bm{g}}(\bm{\theta}) - E_r[\check{\bm{g}}(\bm{\theta})] \right)$$ \\
+    \vspace{3ex}
+    A simulation-based estimator can differ from a traditional estimator for two reasons
+    \begin{itemize}
+         \item Simulation bias: $E_r[\check{\bm{g}}(\bm{\theta})] - \bm{g}(\bm{\theta})$
+         \item Simulation noise: $\check{\bm{g}}(\bm{\theta}) - E_r[\check{\bm{g}}(\bm{\theta})]$
+     \end{itemize}
+    \vspace{3ex}
+    How do we reduce the simulation bias and noise in a simulation-based estimator?
+    \begin{itemize}
+    	\item To reduce simulation bias, increase the number of simulation draws, $R$
+        \item To reduce simulation noise, increase the sample size, $N$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Properties of Simulation-Based Estimators}
+    With a sufficient number of simulation draws and a sufficient sample size, a simulation-based estimator is:
+    \begin{itemize}
+        \item Consistent
+        \item Asymptotically normal
+        \item Sometimes equivalent to (or converging to) its traditional analog
+    \end{itemize}
+    \vspace{3ex}
+    The specifics depend on the estimator in question
+    \begin{itemize}
+        \item See the Train textbook for details of each simulation-based estimator
+    \end{itemize}
+\end{frame}
+
+\section{Simulation Details}
+\label{details}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation Details
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Dependence of Simulated Choice Probabilities}
+	The simulated choice probability that decision maker $n$ chooses alternative $i$ is
+	$$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\bm{\beta}^r)$$ \\
+	\vspace{2ex}
+    We need to simulate choice probabilities for every alternative for each decision maker
+    \begin{itemize}
+        \item For a given decision maker, use the same set of $\bm{\beta}^r$ random draws for every alternative in order to maintain dependence between the alternatives
+        \begin{itemize}
+            \item That is, we use a single set of $R$ draws to calculate all $J$ alternatives for a decision maker
+        \end{itemize}
+        \item Use a different set of $\bm{\beta}^r$ draws for each decision maker in order to maintain independence between decision makers
+        \begin{itemize}
+            \item That is, we need $N$ different sets of $R$ draws
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Numerical Optimization with Simulation}
+    We use these simulated choice probabilities within a numerical optimization procedure to find the estimator, $\widehat{\bm{\theta}}$
+    \begin{itemize}
+        \item We want to use the ``same'' set of $\bm{\beta}^r$ random draws for a given decision maker throughout the numerical optimization procedure
+        \item If we use different random draws for each iteration of the procedure, we introduce additional noise that impedes convergence
+    \end{itemize}
+    \vspace{3ex}
+     In order to avoid this additional noise
+    \begin{enumerate}
+        \item Draw many ($K \times N \times R$) random variables from a standard normal distribution before starting the numerical optimization
+        \item Transform this same set of standard normal random variables in each iteration of the optimization algorithm to represent $f(\bm{\beta} \mid \bm{\theta})$ for the set of parameters, $\bm{\theta}$, of that iteration
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Transforming a Standard Normal Random Variable}
+    We can transform a standard normal random variable (or a vector of standard normals) into many other distributions
+    \begin{enumerate}
+        \item Draw $K$ standard normal random variables, $\omega \sim \mathcal{N}(0, 1)$, where $K$ is the number of random parameters
+        \item Transform these standard normals into the desired distributions
+        \begin{itemize}
+            \item Normal: $\beta = \mu + \sigma \omega$ gives $\beta \sim \mathcal{N}(\mu, \sigma^2)$
+            \item Log-normal: $\beta = e^{\mu + \sigma \omega}$ gives $\ln \beta \sim \mathcal{N}(\mu, \sigma^2)$
+            \item Multivariate normal: $\bm{\beta} = \bm{\mu} + \bm{L} \bm{\omega}$ gives $\bm{\beta} \sim \mathcal{N}(\bm{\mu}, \bm{\Sigma})$ where $\bm{\beta}$, $\bm{\mu}$, and $\bm{\omega}$ are each a vector of length equal to the number of multivariate normal random variables, $\bm{\Sigma}$ is the variance-covariance matrix of these variables, and $\bm{L}$ is the Choleski factor of $\bm{\Sigma}$
+            \item Comparable transformations exist for most distributions
+        \end{itemize}
+    \end{enumerate}
+    \vspace{2ex}
+    See chapter 9 in the Train textbook for more on drawing and transforming random variables
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulation-Based Estimation}
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the set of parameters that maximizes or minimizes the objective function of a simulation-based estimator
+        \begin{enumerate}
+            \item Start with some set of parameters, $\bm{\theta}^0$
+            \item Simulate choice probabilities for the current set of parameters, $\check{P}_{ni}(\bm{\theta}^s)$
+            \begin{enumerate}
+                \item Transform each set of $K$ standard normals using $\bm{\theta}^s$ to get a set of $\bm{\beta}_n^r$
+                \item Calculate the choice probabilities for each individual and draw, $L_{ni}(\bm{\beta}_n^r)$
+                \item Average over all R simulation draws to get $\check{P}_{ni}(\bm{\theta}^s)$
+            \end{enumerate}
+            \item Use these simulated choice probabilities to calculate simulated log-likelihood, simulated moments, etc.
+            \item Step to a better set of parameters, $\bm{\theta}^{s + 1}$
+            \item Repeat steps (2)--(4) until the algorithm converges to a set of parameters that is your simulation-based estimator
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\section{Simulation-Based Estimation R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Simulation-Based Estimation R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes
+    \begin{itemize}
+    	\item We have (real) data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+    	\begin{column}{0.5\textwidth}
+		    Choice set
+		    \begin{itemize}
+		    	\item \texttt{ec}: electric central
+		    	\item \texttt{ecc}: electric central with AC
+		    	\item \texttt{er}: electric room
+		    	\item \texttt{erc}: electric room with AC
+		    	\item \texttt{gc}: gas central
+		    	\item \texttt{gcc}: gas central with AC
+		    	\item \texttt{hpc}: heat pump with AC
+		    \end{itemize}
+	    \end{column}
+	    \begin{column}{0.5\textwidth}
+		    Alternative-specific data
+		    \begin{itemize}
+		    	\item \texttt{ich}: installation cost for heat
+		    	\item \texttt{icca}: installation cost for AC
+		    	\item \texttt{och}: operating cost for heat
+		    	\item \texttt{occa}: operating cost for AC
+		    \end{itemize}
+		    \vspace{2ex}
+		    Household demographic data
+		    \begin{itemize}
+		    	\item \texttt{income}: annual income
+		    \end{itemize}
+		    \vspace{1ex}
+		\end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<message = FALSE>>=
+    ## Load tidyverse and mlogit
+    library(tidyverse)
+    library(mlogit)
+    ## Load dataset from mlogit package
+    data('HC', package = 'mlogit')
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<>>=
+    ## Look at dataset
+    tibble(HC)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+    <<>>=
+    ## Pivot into a long dataset
+    hvac_long <- HC %>% 
+      mutate(id = 1:n()) %>% 
+      pivot_longer(c(starts_with('ich.'), starts_with('och.')), 
+                   names_to = c('cost', 'alt'), names_sep = '[.]',
+                   values_to = 'value') %>% 
+      pivot_wider(names_from = cost, values_from = value) %>% 
+      mutate(choice = (depvar == alt)) %>% 
+      select(-depvar)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+    <<>>=
+    ## Look at long dataset
+    tibble(hvac_long)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<>>=
+    ## Combine heating and cooling costs into one variable
+    hvac_clean <- hvac_long %>% 
+      mutate(ac = 1 * (nchar(alt) == 3), 
+             ic = ich + ac * icca,
+             oc = och + ac * occa) %>% 
+      select(id, alt, choice, ac, ic, oc, income) %>% 
+      arrange(id, alt)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<>>=
+    ## Look at cleaned dataset
+    tibble(hvac_clean)
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model of HVAC System Choice}
+    We model the utility to household $n$ of installing HVAC system $j$ as
+    $$U_{nj} = V_{nj} + \varepsilon_{nj}$$
+    where $V_{nj}$ depends on the data about alternative $j$ and household $n$ \\
+    \vspace{2ex}
+    What might affect the utility of the different HVAC systems?
+	\begin{itemize}
+		\item Installation cost
+		\item Annual operating cost
+		\item HVAC system technology
+		\begin{itemize}
+			\item Does the system have air conditioning or not?
+		\end{itemize}
+		\item Anything else?
+	\end{itemize}
+	\vspace{2ex}
+	What if the effects of these attributes on utility vary throughout the population?
+	\begin{itemize}
+		\item We can use a mixed logit model with random coefficients
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Representative Utility of HVAC System Choice}
+	We model the representative utility to household $n$ of installing HVAC system $j$ as
+	$$V_{nj} = \beta_{1n} AC_j + \beta_{2n} IC_{nj} + \beta_{3n} OC_{nj}$$
+	where the random coefficients are normally distributed
+	\begin{align*}
+		\beta_{1n} & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+		\beta_{2n} & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_{3n} & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*} \\
+	\vspace{3ex}
+	We will estimate the six parameters that define the distributions of these random coefficients
+	$$\bm{\theta} = \{ \text{$\mu_1$, $\sigma_1^2$, $\mu_2$, $\sigma_2^2$, $\mu_3$, $\sigma_3^2$} \}$$
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities of HVAC System Choice}
+	The mixed logit choice probabilities for this model are
+    \begin{align*}
+        P_{ni} & = \int L_{ni}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+        \intertext{where $L_{ni}(\bm{\beta})$ is the logit probability at a given set of coefficients, $\bm{\beta}$}
+        L_{ni}(\bm{\beta}) & = \frac{e^{\beta_1 AC_i + \beta_2 IC_{ni} + \beta_3 OC_{nj}}}{\sum_{j = 1}^J e^{\beta_1 AC_j + \beta_2 IC_{nj} + \beta_3 OC_{nj}}}
+    \end{align*} \\
+    \vspace{3ex}
+    These choice probabilities do not have a closed-form expression, so we will simulate them
+    $$\check{P}_{ni} = \frac{1}{R} \sum_{r = 1}^R L_{ni}(\bm{\beta}^r)$$
+    and estimate the parameters of the model using maximum simulated likelihood
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulation-Based Estimation}
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the set of parameters that maximizes or minimizes the objective function of a simulation-based estimator
+        \begin{enumerate}
+            \item Start with some set of parameters, $\bm{\theta}^0$
+            \item Simulate choice probabilities for the current set of parameters, $\check{P}_{ni}(\bm{\theta}^s)$
+            \begin{enumerate}
+                \item Transform each set of $K$ standard normals using $\bm{\theta}^s$ to get a set of $\bm{\beta}_n^r$
+                \item Calculate the choice probabilities for each individual and draw, $L_{ni}(\bm{\beta}_n^r)$
+                \item Average over all R simulation draws to get $\check{P}_{ni}(\bm{\theta}^s)$
+            \end{enumerate}
+            \item Use these simulated choice probabilities to calculate simulated log-likelihood, simulated moments, etc.
+            \item Step to a better set of parameters, $\bm{\theta}^{s + 1}$
+            \item Repeat steps (2)--(4) until the algorithm converges to a set of parameters that is your simulation-based estimator
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{\texttt{map()} Function in R}
+    We will use the \texttt{map()} and \texttt{map2()} functions to help with our simulation
+    \begin{itemize}
+    	\item \texttt{map()} applies a function to each element of a vector or list
+    	\item \texttt{map2()} applies a function to elements from two vectors or lists
+    \end{itemize}
+    <<>>=
+    ## List to pass to the map function
+    list(1:5, 6:10)
+    ## Take mean of each list element
+    list(1:5, 6:10) %>% 
+      map(~ mean(.x))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 0: Set a Seed for Replication}
+	We first set a seed so we can replicate our random simulation draws 
+    \vspace{1ex}
+    <<>>=
+    ## Random draws without setting a seed
+    rnorm(5)
+    rnorm(5)
+    ## Random draws with the same seed
+    set.seed(703)
+    rnorm(5)
+    set.seed(703)
+    rnorm(5)
+    ## Set seed for replication
+    set.seed(703)
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables}
+	Draw $K \times N \times R$ standard normal random variables and organize into a list with each element corresponding to one household \\
+    \vspace{1ex}
+    <<size = 'scriptsize'>>=
+    ## Draw standard normal random variables for each household
+    draws_hh <- map(1:250, ~ tibble(ac_draw = rnorm(100),
+                                    ic_draw = rnorm(100),
+                                    oc_draw = rnorm(100)))
+    draws_hh[[1]]
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1.5: Organize Data}
+    Organize data into a list with each element corresponding to one household to be compatible with random draws \\
+    \vspace{1ex}
+    <<>>=
+    ## Split data into list by household
+    data_hh <- hvac_clean %>% 
+      group_by(id) %>% 
+      group_split()
+    data_hh[[1]]
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2: Find the MSL Estimator}
+    <<eval = FALSE>>=
+    ## Help file for the optimization function, optim
+    ?optim
+    ## Arguments for optim function
+    optim(par, fn, gr, ..., method, lower, upper, control, hessian)
+    @
+    \vspace{2ex}
+	\texttt{optim()} requires that you create a function, \texttt{fn}, that
+	\begin{enumerate}
+		\item Takes a set of parameters and other arguments as inputs
+		\item Calculates your objective function given those parameters
+		\item Returns this value of the objective function
+	\end{enumerate}
+	\vspace{2ex}
+	Some \texttt{control} arguments may be useful when doing optimization that takes longer to converge
+	\begin{itemize}
+		\item \texttt{trace}: \texttt{1} will report progress of convergence
+		\item \texttt{REPORT}: How often (number of iterations) to report on convergence
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Step 2.2--2.3: Choice Probabilities and Log-Likelihood}
+    To estimate a multinomial logit model using ML, we created a single function that calculated choice probabilities and then used them to calculate the log-likelihood \\
+    \vspace{2ex}
+    To estimate a mixed logit model using MSL, we will create two separate functions
+    \begin{itemize}
+    	\item Function 1: simulate choice probabilities for a single decision maker (household)
+    	\item Function 2: use simulated choice probabilities to calculate simulated log-likelihood
+    \end{itemize}
+    \vspace{2ex}
+    We do not have to split this process into two functions, but it makes the code more transparent (and probably slower\ldots)
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Choice Probabilities for One Household}
+    <<size = 'tiny'>>=
+    ## Function to simulate choice probabilities for an individual household
+    sim_probs_ind <- function(params, draws_ind, data_ind){
+      ## Select relevant variables and convert into a matrix [J x K]
+      data_matrix <- data_ind %>% 
+        select(ac, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R x K]
+      coef_matrix <- draws_ind %>% 
+        mutate(ac_coef = params[1] + params[4] * ac_draw,
+               ic_coef = params[2] + params[5] * ic_draw,
+               oc_coef = params[3] + params[6] * oc_draw) %>% 
+        select(ac_coef, ic_coef, oc_coef) %>% 
+        as.matrix()
+      ## Calculate representative utility for each alternative in each draw [R x J]
+      utility <- (coef_matrix %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R x 1]
+      prob_denom <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative and draw [R x J]
+      cond_prob <- exp(utility) / prob_denom
+      ## Calculate simulated choice probabilities as means over all draws [1 x J]
+      sim_prob <- colMeans(cond_prob)
+      ## Add simulated probability to initial dataset
+      data_ind_out <- data_ind %>% 
+        mutate(prob = sim_prob)
+      ## Return initial dataset with simulated probability variable
+      return(data_ind_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Calculate Simulated Log-Likelihood}
+    <<>>=
+    ## Function to calculate simulated log-likelihood
+    sim_ll_fn <- function(params, draws_list, data_list){
+      ## Simulate probabilities for each individual household
+      data_sim_ind <- map2(.x = draws_list, .y = data_list,
+                           .f = ~ sim_probs_ind(params = params, 
+                                                draws_ind = .x, 
+                                                data_ind = .y))
+      ## Combine individual datasets into one
+      data_sim <- data_sim_ind %>% 
+        bind_rows()
+      ## Calculate log of simulated probability for the chosen alternative
+      data_sim <- data_sim %>% 
+        filter(choice == TRUE) %>% 
+        mutate(log_prob = log(prob))
+      ## Calculate the simulated log-likelihood
+      sim_ll <- sum(data_sim$log_prob)
+      ## Return the negative of simulated log-likelihood
+      return(-sim_ll)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Maximize Simulated Log-Likelihood}
+    <<>>=
+    ## Maximize the log-likelihood function
+    model <- optim(par = c(6.53, -0.17, -1.04, 0, 0, 0), fn = sim_ll_fn,
+                   draws_list = draws_hh, data_list = data_hh, 
+                   method = 'BFGS', hessian = TRUE,
+                   control = list(trace = 1, REPORT = 5))
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSL Optimization Results}
+    <<include = FALSE>>=
+    options(width = 100)
+    @
+    <<size = 'tiny'>>=
+    ## Report model results
+    model
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{MSL Parameters and Standard Errors}
+    <<size = 'tiny'>>=
+    ## Show MSL parameters
+    model$par
+    ## Calculate MSL standard errors
+    model_se <- model$hessian %>% 
+      solve() %>% 
+      diag() %>% 
+      sqrt()
+    model_se
+    ## Calculate parameter z-stats
+    model_zstat <- model$par / model_se
+    model_zstat
+    ## Calculate parameter p-values
+    model_pvalue <- 2 * pnorm(q = -abs(model_zstat))
+    model_pvalue
+    @
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Elasticities}
+	The public utility commission is considering a subsidy on the installation cost (\texttt{ic}) of heat pump (\texttt{hpc}) systems to incentivize households to switch to this most efficient HVAC system
+	\begin{itemize}
+		\item What is the elasticity of each HVAC system with respect to the installation cost of a heat pump?
+	\end{itemize}
+	\vspace{3ex}
+    The elasticities from the mixed logit model are
+    \begin{align*}
+    	\text{Own: } E_{iz_{ni}} & = \frac{z_{ni}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) [1 - L_{ni}(\bm{\beta})] f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+    	\text{Cross: } E_{iz_{nj}} & = - \frac{z_{nj}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) L_{nj}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*} \\
+    \vspace{3ex}
+    These integrals do not have closed-form expressions, so we will have to simulate them
+\end{frame}
+
+\begin{frame}\frametitle{Steps to Simulate Mixed Logit Elasticities}
+	\vspace{-3ex}
+	\begin{align*}
+    	\text{Own: } E_{iz_{ni}} & = \frac{z_{ni}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) [1 - L_{ni}(\bm{\beta})] f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+    	\text{Cross: } E_{iz_{nj}} & = - \frac{z_{nj}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) L_{nj}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*} \\
+    \vspace{-1ex}
+    To simulate these elasticities at our MSL estimator, $\widehat{\bm{\theta}}$, for one household
+    \begin{enumerate}
+        \item Draw $R$ sets of coefficients, $\bm{\beta}^r$, from the density $f(\bm{\beta} \mid \widehat{\bm{\theta}})$
+        \begin{itemize}
+        	\item Or use our existing standard normal draws and transform them using $\widehat{\bm{\theta}}$
+        \end{itemize}
+        \item Calculate the representative utility for every alternative for each draw
+        \item Calculate the conditional choice probability, $L_{ni}(\bm{\beta}^r)$, for every alternative for each draw
+        \item Calculate the simulated choice probability, $\check{P}_{ni}$, for every alternative as the mean over all draws
+        \item Calculate the integrand for every alternative for each draw
+        \item Simulate the integral for every alternative
+        \item Calculate the elasticities using the simulated integrals
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\vspace{-3ex}
+	\begin{align*}
+    	\text{Own: } E_{iz_{ni}} & = \frac{z_{ni}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) [1 - L_{ni}(\bm{\beta})] f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+    	\text{Cross: } E_{iz_{nj}} & = - \frac{z_{nj}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) L_{nj}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*}
+    <<size = 'tiny'>>=
+    ## Function to simulate elasticities for one household
+    sim_elas_ind <- function(params, draws_ind, data_ind){
+      ## Select relevant variables and convert into a matrix [J x K]
+      data_matrix <- data_ind %>% 
+        select(ac, ic, oc) %>% 
+        as.matrix()
+      ## Transform random coefficients based on parameters [R x K]
+      coef_matrix <- draws_ind %>% 
+        mutate(ac_coef = params[1] + params[4] * ac_draw,
+               ic_coef = params[2] + params[5] * ic_draw,
+               oc_coef = params[3] + params[6] * oc_draw) %>% 
+        select(ac_coef, ic_coef, oc_coef) %>% 
+        as.matrix()
+      ## Calculate representative utility for each alternative in each draw [R x J]
+      utility <- (coef_matrix %*% t(data_matrix)) %>% 
+        pmin(700) %>% 
+        pmax(-700)
+      ## Sum the exponential of utility over alternatives [R x 1]
+      prob_denom <- utility %>% 
+        exp() %>% 
+        rowSums()
+      ## Calculate the conditional probability for each alternative and draw [R x J]
+      cond_prob <- exp(utility) / prob_denom
+      ## Calculate simulated choice probabilities as means over all draws [1 x J]
+      sim_prob <- colMeans(cond_prob)
+      ## Calculate simulated integral for own elasticity [1 x 1]
+      sim_int_own_elas <- mean(coef_matrix[, 2] * 
+                                 cond_prob[, 7] * (1 - cond_prob[, 7]))
+      ## Calculate simulated integral for cross elasticities [1 x (J - 1)]
+      sim_int_cross_elas <- colMeans(coef_matrix[, 2] * 
+                                       cond_prob[, 7] * cond_prob[, -7])
+      ## Combine elasticity simulated integrals into one vector [1 x J]
+      sim_int_elas <- c(sim_int_cross_elas, sim_int_own_elas)
+      ## Calculate cross-price and own-price simulated elasticities [1 x J]
+      sim_elas <- c(rep(-1, 6), 1) * data_ind$ic[7] / sim_prob * sim_int_elas
+      ## Add simulated elasticities to initial dataset
+      data_ind_out <- data_ind %>% 
+        mutate(elasticity = sim_elas)
+      ## Return initial dataset with simulated elasticity variable
+      return(data_ind_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulate Elasticities for One Household}
+	\vspace{-3ex}
+	\begin{align*}
+    	\text{Own: } E_{iz_{ni}} & = \frac{z_{ni}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) [1 - L_{ni}(\bm{\beta})] f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta} \\
+    	\text{Cross: } E_{iz_{nj}} & = - \frac{z_{nj}}{P_{ni}} \int \beta_z L_{ni}(\bm{\beta}) L_{nj}(\bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*}
+    <<eval = FALSE, size = 'tiny'>>=
+      ## Calculate the conditional probability for each alternative and draw [R x J]
+      cond_prob <- exp(utility) / prob_denom
+      ## Calculate simulated choice probabilities as means over all draws [1 x J]
+      sim_prob <- colMeans(cond_prob)
+      ## Calculate simulated integral for own elasticity [1 x 1]
+      sim_int_own_elas <- mean(coef_matrix[, 2] * 
+                                 cond_prob[, 7] * (1 - cond_prob[, 7]))
+      ## Calculate simulated integral for cross elasticities [1 x (J - 1)]
+      sim_int_cross_elas <- colMeans(coef_matrix[, 2] * 
+                                       cond_prob[, 7] * cond_prob[, -7])
+      ## Combine elasticity simulated integrals into one vector [1 x J]
+      sim_int_elas <- c(sim_int_cross_elas, sim_int_own_elas)
+      ## Calculate cross-price and own-price simulated elasticities [1 x J]
+      sim_elas <- c(rep(-1, 6), 1) * data_ind$ic[7] / sim_prob * sim_int_elas
+      ## Add simulated elasticities to initial dataset
+      data_ind_out <- data_ind %>% 
+        mutate(elasticity = sim_elas)
+      ## Return initial dataset with simulated elasticity variable
+      return(data_ind_out)
+    }
+    @
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Simulated Elasticities}
+    <<size = 'scriptsize'>>=
+    ## Simulate elasticities for each household
+    data_ind <- map2(.x = draws_hh, .y = data_hh,
+                     .f = ~ sim_elas_ind(params = model$par, 
+                                         draws_ind = .x, 
+                                         data_ind = .y))
+    ## Combine list of data into one tibble
+    data <- data_ind %>% 
+      bind_rows()
+    ## Calculate average elasticity with respect to ic of hpc
+    data %>% 
+      group_by(alt) %>% 
+      summarize(elasticity = mean(elasticity), .groups = 'drop')
+    @
+\end{frame}
+
+\end{document}
