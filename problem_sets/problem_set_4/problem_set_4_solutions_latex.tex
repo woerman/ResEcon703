@@ -1,0 +1,198 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[top=1in, 
+left=1in, 
+right=1in, 
+bottom=1in]{geometry}
+\usepackage{setspace}
+\usepackage{titling}
+\newcommand{\subtitle}[1]{%
+	\posttitle{%
+		\par\end{center}
+	\begin{center}\large#1\end{center}
+	\vskip0.5em}%
+}
+
+\usepackage[T1]{fontenc} 
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+
+\usepackage{booktabs,caption,threeparttable}
+
+\usepackage[hyperfootnotes=false, 
+colorlinks=true, 
+allcolors=black]{hyperref}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+\title{Problem Set 4}
+\subtitle{Topics in Advanced Econometrics (ResEcon 703)\\University of Massachusetts Amherst}
+\author{\textbf{Solutions}}
+\date{\vspace{-5ex}}
+
+\maketitle
+
+\section*{Rules}
+
+Email a single .pdf file of your problem set writeup, code, and output to \href{mailto:mwoerman@umass.edu}{\texttt{mwoerman@umass.edu}} by the date and time above. You may work in groups of up to three and submit one writeup for the group, and I strongly encourage you to do so. You can use any ``canned'' routine (e.g., \texttt{lm()}, \texttt{glm()}, and \texttt{mlogit()}) for this problem set.
+
+\section*{Data}
+
+Download the file \href{https://github.com/woerman/ResEcon703/blob/master/problem_sets/problem_set_4/camping_dataset.zip}{\texttt{camping\_dataset.zip}} from the \href{https://github.com/woerman/ResEcon703}{course website}. This zipped file contains the dataset \texttt{camping.csv}, which you will use for this problem set. This dataset contains simulated data on the state park choice of 1000 visitors who camped at one of five Massachusetts State Parks. See the file \texttt{camping\_description.txt} for a description of the variables in the dataset.
+
+<<R CODE HERE>>
+
+\section*{Problem 1: Generalized Extreme Value Models}
+
+We are studying how campers at Massachusetts State Parks choose the park where they camp, which will assist the Massachusetts Department of Conservation and Recreation (DCR) in their planning. In particular, they want to understand how campers value their time to travel to the park and the setting---mountain or beach---of the park. Additionally, DCR is considering an increase to the camping fee at Mount Greylock due to the cost of maintaining those camp sites, and they want to know how this change would affect park visitation patterns.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+	\item Model the camping park choice as a multinomial logit model. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with common parameters on each variable. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj} + \beta_3 M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains, and the $\beta$ parameters are to be estimated. Importantly, do not include alternative-specific intercepts because $\beta_3$ would not be identified. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a multinomial logit model, but the data must first be converted to an indexed data frame using the \texttt{dfidx()} function from the \texttt{dfidx} package. See the Week 4 slides or the \texttt{mlogit} vignettes at \href{https://cran.r-project.org/web/packages/mlogit/index.html}{\texttt{cran.r-project.org/web/packages/mlogit/index.html}} for information on specifying a \texttt{formula} for the \texttt{mlogit()} function.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		The cost and time parameters---$\beta_1$ and $\beta_2$, respectively---are statistically significant and can be interpreted as marginal utilities. The cost of camping at a park reduces the utility of camping there, and the time spent traveling to the park reduces the utility of camping there. The mountain parameter, $\beta_3$, is statistically significant at the 10\% level and is interpreted as the relative utility of camping in the mountains. The campers in our dataset obtain less utility, \emph{ceteris paribus}, from camping in the mountains than from camping at the beach.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains (relative to camping at the beach).
+
+		<<R CODE HERE>>
+
+		These campers value their time spent traveling to the park at \$6.62 per hour, and they value camping in the mountains at \$22.39 less than camping at the beach.
+
+		\item Calculate the elasticity of choosing each park with respect to the cost of camping at Mount Greylock (\texttt{park\_id == 1}) for each camper; that is, 5 alternatives $\times$ 1000 campers $=$ 5000 elasticities. For each park, report the mean of its elasticity with respect to the cost of camping at Mount Greylock. Describe how these elasticities and substitution patterns relate to an important property of the logit model. (Reminder: the \texttt{fitted()} function with argument \texttt{type = `probabilities'} calculates the choice probabilities of each alternative for each decision maker.)
+
+		<<R CODE HERE>>
+
+		The mean elasticity of camping at Mount Greylock with respect to its cost is -0.676, and the mean elasticity of camping at any of the other four parks with respect to the cost of camping at Mount Greylock is 0.223. This model implies that campers will substitute to the other park in proportion to their observed visits. In other words, campers will substitute to other parks with no consideration for whether those parks share attributes with Mount Greylock. This proportional substitution is an example of the rigid substitution patterns imposed by the logit model.
+	\end{enumerate}
+
+	\item The multinomial logit model of part (a) is not the best model for this setting if a camper's unobserved (and random) utility includes an individual preference for the mountains or the beach, which would create correlations among parks with the same setting. Model the camping park choice as a nested logit model with two nests, one for each park setting: mountains and beach. As in part (a), model the representative utility for park $j$ as
+	$$V_{nj} = \beta_1 C_{nj} + \beta_2 T_{nj} + \beta_3 M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains, and the $\beta$ parameters are to be estimated. (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a nested logit model if you use the \texttt{nests} argument to specify nests as a named list.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		The cost, time, and mountain parameters---$\beta_1$, $\beta_2$, and $\beta_3$, respectively---are interpreted as they were in part (a), although the mountain parameter is now statistically significant at the 5\% level. This model contains two additional parameters, the coefficients on the inclusive value for each nest, which are statistically significant. These parameters represent the independence of random utility within each nest, with a value of 1 indicating full independence and a value close to 0 indicating high dependence. Thus, we conclude there is some dependence within each of the nests. That is, the random utility that a camper obtains from camping at each of the parks in the mountains is correlated, as is the random utility from camping at each of the parks at the beach. This result is consistent with each camper having an individual preference for the mountains or the beach beyond the average preference represented by $\beta_3$, the common mountain parameter.
+
+		\item The model in part (a) is effectively imposing a restriction on the model in part (b). Write the null hypothesis that is imposed by the model in part (a) and describe this hypothesis in words. Conduct a likelihood ratio test to test this null hypothesis. Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test. (Reminder: the \texttt{lrtest()} function performs a likelihood ratio test.)
+
+		<<R CODE HERE>>
+
+		The null hypothesis is that the inclusive value coefficients equal 1 for both nests:
+		$$H_0 \text{: } \lambda_{mountain} = \lambda_{beach} = 1$$
+		In words, this null hypothesis imposes that there is no correlation among the random utility terms, or that the random utility of every alternative is i.i.d. But if a camper has an individual preference for camping in the mountains or at the beach beyond the average preference represented by $\beta_3$, this hypothesis would not hold. We reject this hypothesis with a p-value of approximately 0, indicating that we have strong statistical evidence to conclude there are correlations among the random utility terms within each nest.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains (relative to camping at the beach).
+
+		<<R CODE HERE>>
+
+		These campers value their time spent traveling to the park at \$14.49 per hour, and they value camping in the mountains at \$32.83 less than camping at the beach.
+
+		\item Calculate the elasticity of choosing each park with respect to the cost of camping at Mount Greylock (\texttt{park\_id == 1}) for each camper; that is, 5 alternatives $\times$ 1000 campers $=$ 5000 elasticities. For each park, report the mean of its elasticity with respect to the cost of camping at Mount Greylock. Compare these elasticities to those you found in part (a) and describe any important differences.
+
+		<<R CODE HERE>>
+
+		The mean elasticity of camping at Mount Greylock with respect to its cost is -0.709; the mean elasticity of camping at October Mountain with respect to the cost of camping at Mount Greylock is 0.649; and the mean elasticity of camping at any of beach parks with respect to the cost of camping at Mount Greylock is 0.095. This model implies that campers will substitute to October Mountain in much greater proportion than to the beach parks. These elasticities are more intuitive than the elasticities in part (a)---which imposed proportional substitution---if campers have individual preferences for camping in the mountains.
+	\end{enumerate}
+\end{enumerate}
+
+\section*{Problem 2: Mixed Logit Model}
+
+The models in problem 1 have common parameters for all campers in the dataset. In reality, however, some or all of these parameters are likely to vary by camper for unobserved reasons. DCR is interested in understanding this heterogeneity and how it could affect park visitation patterns.
+
+\begin{enumerate}[label=\alph*., leftmargin=*]
+
+	\item Model the camping park choice as a mixed logit model. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with random coefficients on each variable. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_{1n} C_{nj} + \beta_{2n} T_{nj} + \beta_{3n} M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains. Model all three $\beta$ coefficients as random with a normal distribution:
+	\begin{align*}
+		\beta_1 & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+		\beta_2 & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_3 & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*}
+	Estimate this model using 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}). (Reminder: the \texttt{mlogit()} function from the \texttt{mlogit} package estimates a mixed logit model if you use the \texttt{rpar} argument to specify the random coefficients as a named vector.)
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		The cost coefficient, $\beta_1$, is interpreted as the marginal utility of the cost of the camping trip, or the negative of the marginal utility of money. We model this coefficient as being random with a normal distribution, meaning that different campers can have a different marginal utility of money. We estimate that this coefficient has a mean of -0.021 and a standard deviation of 0.013. The standard deviation parameter is not statistically significant, however, so we cannot conclude that this coefficient has any variance, suggesting it may be better to model it as a fixed coefficient. The other parameters have similar interpretations, and all other parameters are statistically significant. The time coefficient parameters, $\mu_2$ and $\sigma_2^2$, indicate that the marginal utility of time traveling to camp is normally distributed with a mean of -0.0062 and a standard deviation of 0.0037. The mountain coefficient parameters, $\mu_3$ and $\sigma_3^2$, indicate that the utility obtained by camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -0.84 and a standard deviation of 5.6.
+	\end{enumerate}
+
+	\item It is easier to calculate how campers value their time to travel to the park and the setting---mountain or beach---of the park when cost has a fixed (not-random) coefficient. Model the camping park choice as a mixed logit model with a fixed coefficient on cost. Express the representative utility of each alternative as a linear function of its cost, time, and setting---mountain or beach---with random coefficients on time and mountain. That is, the representative utility to camper $n$ from park $j$ is
+	$$V_{nj} = \beta_1 C_{nj} + \beta_{2n} T_{nj} + \beta_{3n} M_j$$
+	where $C_{nj}$ is the cost to camper $n$ of traveling to and camping at park $j$, $T_{nj}$ is the time for camper $n$ to travel to park $j$, $M_j$ is a binary indicator if park $j$ is in the mountains. Model $\beta_1$ as a fixed coefficient and $\beta_2$ and $\beta_3$ as random with a normal distribution:
+	\begin{align*}
+		\beta_2 & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+		\beta_3 & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+	\end{align*}
+	Estimate this model using 100 draws for simulation (\texttt{R = 100}) and set a seed of 703 for replication (\texttt{seed = 703}).
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item Report the estimated parameters and standard errors from this model. Briefly interpret these results. For example, what does each parameter mean?
+
+		<<R CODE HERE>>
+
+		The cost coefficient, $\beta_1$, is now fixed at a value of -0.019, indicating this value is the marginal utility of cost for all campers. The interpretation of the other parameters is similar to that in part (a). The time coefficient parameters, $\mu_2$ and $\sigma_2^2$, indicate that the marginal utility of time traveling to camp is normally distributed with a mean of -0.0049 and a standard deviation of 0.0019. The mountain coefficient parameters, $\mu_3$ and $\sigma_3^2$, indicate that the utility obtained by camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -0.82 and a standard deviation of 4.7.
+
+		\item We can test if $\beta_1$ is a fixed or random coefficient. Write the null hypothesis of your test and describe this hypothesis in words. Conduct a likelihood ratio test to test this null hypothesis. Do you reject this null hypothesis? What is the p-value of the test? Briefly interpret the result of this test.
+
+		<<R CODE HERE>>
+
+		The null hypothesis is that the variance of the random $\beta_1$ coefficient equals 0:
+		$$H_0 \text{: } \sigma_1^2 = 0$$
+		In words, this null hypothesis imposes that there is no heterogeneity in this cost coefficient, so all campers have the same marginal utility of cost or income. We fail to reject this hypothesis with a p-value of 0.11, so we conclude that the cost coefficient, $\beta_1$, is fixed for all campers.
+
+		\item Calculate the dollar value that a camper places on each hour spent traveling and the dollar value that a camper places on camping in the mountains (relative to camping at the beach). Because we have distributions for $\beta_2$ and $\beta_3$, these dollar values will also be distributions. Report the mean and standard deviation of each of these dollar value distributions. Briefly interpret these results.
+
+		<<R CODE HERE>>
+
+		These campers have a heterogeneous valuation of their time spent traveling to the park. These time values are normally distributed with a mean of \$15.63 and a standard deviation of \$6.22. Similarly, the dollar value of camping in the mountains, relative to camping at the beach and \emph{ceteris paribus}, is normally distributed with a mean of -\$44.03 and a standard deviation of \$249.62.
+
+		\item Calculate the proportion of campers who have a positive value of camping in the mountains (relative to camping at the beach).
+
+		<<R CODE HERE>>
+
+		Of the 1000 campers in this dataset, 43\% have a positive valuation of camping in the mountains relative to camping at the beach. That is, \emph{ceteris paribus}, 43\% of these campers would prefer to camp in the mountains than at the beach.
+	\end{enumerate}
+
+	\item DCR is considering an increase to the camping fee at Mount Greylock, which would increase the cost by \$20 for each camper in our dataset. Use your parameter estimates from part (b) to simulate this counterfactual.
+
+	<<R CODE HERE>>
+
+	\begin{enumerate}[label=\roman*.]
+		\item How many fewer campers---of the 1000 campers in this dataset---do you expect will camp at Mount Greylock because of this fee increase? How many more campers do you expect will camp at each of the other four parks?
+
+		<<R CODE HERE>>
+
+		Due to this camping fee increase at Mount Greylock, we would expect 47.1 fewer campers at that park. We would also expect an additional 32.0 campers at the other mountain park, October Mountain, and approximately only 5 or 6 additional campers at each of the beach parks, as reported above.
+
+		\item How do you expect this increased camping fee at Mount Greylock will affect the economic surplus of the 1000 campers in this dataset?
+
+		<<R CODE HERE>>
+
+		This increased camping fee is expected to reduce the economic surplus of these 1000 campers by a total of roughly \$4303.
+	\end{enumerate}
+\end{enumerate}
+
+\end{document}
