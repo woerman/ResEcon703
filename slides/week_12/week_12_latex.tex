@@ -1,0 +1,533 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\makeatother
+\setbeamertemplate{footline}
+{
+    \leavevmode%
+    \hbox{%
+    \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+        \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.55\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+        \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.05\paperwidth,ht=2.25ex,dp=1ex,center]{date in head/foot}%
+        \insertframenumber{}
+    \end{beamercolorbox}}%
+    \vskip0pt%
+}
+\makeatletter
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath,bm,bbm}
+\renewcommand{\familydefault}{\sfdefault}
+
+\DeclareMathOperator*{\argmax}{argmax}
+
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\sisetup{parse-numbers=false}
+
+%\setlength{\OuterFrameSep}{-2pt}
+%\makeatletter
+%\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt }
+%\makeatother
+
+\title[Week 12:\ Individual-Level Coefficients]{Week 12:\ Individual-Level Coefficients}
+\author[ResEcon 703:\ Advanced Econometrics]{ResEcon 703:\ Topics in Advanced Econometrics}
+\date{Matt Woerman\\University of Massachusetts Amherst}
+
+\begin{document}
+
+{\setbeamertemplate{footline}{} 
+\begin{frame}[noframenumbering]
+    \titlepage
+\end{frame}
+}
+
+\begin{frame}\frametitle{Agenda}
+    Last week
+    \begin{itemize}
+        \item Simulation-based estimation
+    \end{itemize}
+    \vspace{3ex}
+    This week
+    \begin{itemize}
+    	\item \hyperlink{page.\getpagerefnumber{cond}}{Conditional distributions of coefficients}
+        \item \hyperlink{page.\getpagerefnumber{deriv}}{Derivation of conditional distributions}
+    	\item \hyperlink{page.\getpagerefnumber{app}}{Applications of conditional distributions}
+    	\item \hyperlink{page.\getpagerefnumber{example}}{Individual-level coefficients R example}
+    \end{itemize}
+    \vspace{3ex}
+    This week's reading
+    \begin{itemize}
+        \item Train textbook, chapter 11
+    \end{itemize}
+\end{frame}
+
+\section{Conditional Distributions of Coefficients}
+\label{cond}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Conditional Distributions of Coefficients
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Random Coefficients in Mixed Logit Model}
+    The mixed logit model allows for unobserved variation in preferences throughout the population with the use of random coefficients
+    \begin{itemize}
+        \item The distribution of these coefficients in the population is $f(\bm{\beta} \mid \bm{\theta})$
+        \item We estimate the parameters, $\bm{\theta}$, that define these population distributions
+        \item This population distribution and the parameters that define it tell us nothing about where any individual decision maker falls within that distribution of coefficients
+    \end{itemize}
+    \vspace{3ex}
+    What if we want a better idea of an individual's coefficients?
+    \begin{itemize}
+        \item We can combine the unconditional (or population) distribution of coefficients and the choices made by the individual to define a conditional distribution of coefficients
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Example of Conditional Distributions}
+    We are studying how commuters choose their travel mode
+    \begin{itemize}
+         \item $\beta$ tells us the utility of driving relative to other commute modes
+         \item We think there is heterogeneity in driving preferences, so we model $\beta$ as a random coefficient, and we estimate $\beta \sim \mathcal{N}(3, 4)$
+     \end{itemize} 
+     \begin{center}
+        \includegraphics[width=0.6\textwidth]{uncond_dist.pdf}
+    \end{center}
+    \vspace{-2ex}
+    What is the individual-specific coefficient $\beta_n$ for some specific individual?
+\end{frame}
+
+\begin{frame}\frametitle{Example of Conditional Distributions}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{uncond_dist.pdf}
+    \end{center}
+    \vspace{-2ex}
+    What is the individual-specific coefficient $\beta_n$ for:
+    \begin{itemize}
+        \item A person drawn randomly from the population?
+        \begin{itemize}
+            \item The unconditional distribution of $\beta$ in the population, $\beta_n \sim \mathcal{N}(3, 4)$
+        \end{itemize}
+        \item Someone who regularly drives to work?
+        \begin{itemize}
+            \item Drivers are more likely to have relatively large values of $\beta_n$
+        \end{itemize}
+        \item Someone who regularly does not drive to work?
+        \begin{itemize}
+            \item Non-drivers are more likely to have relative low or negative values of $\beta_n$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Example of Conditional Distributions}
+    We have described three different distributions for the coefficient $\beta$
+    \begin{itemize}
+        \item The unconditional distribution for the population (solid line)
+        \item The conditional distribution for drivers (dashed line)
+        \item The conditional distribution for non-drivers (dotted line)
+    \end{itemize}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{all_dist.pdf}
+    \end{center}
+    \vspace{-2ex}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Distribution of Coefficients}
+    Suppose that a population of individuals:
+    \begin{itemize}
+        \item Faces an identical choice setting
+        \begin{itemize}
+            \item The same choice set, $\{1, 2, \ldots, J\}$, and the same choice attributes, $\bm{x}$
+        \end{itemize}
+        \item Has heterogeneous preferences denoted by the distribution of coefficients, $f(\bm{\beta} \mid \bm{\theta})$
+        \begin{itemize}
+            \item This is the unconditional (or population) distribution that we have previously defined
+        \end{itemize}
+    \end{itemize}
+    \vspace{1ex}
+    Consider everyone in the population who chooses alternative $i$
+    \begin{itemize}
+        \item This group is a non-random subset of the population
+        \item These individuals also have a distribution of preferences, or $\bm{\beta}_n$ coefficients, but it is likely a different distribution from the population
+    \end{itemize}
+    \vspace{1ex}
+    The distribution of coefficients for this group is called a conditional distribution and is denoted by $h(\bm{\beta} \mid i, \bm{x}, \bm{\theta})$
+    \begin{itemize}
+        \item Distribution of $\bm{\beta}$ among the group---from a population with an unconditional distribution defined by $\bm{\theta}$---who choose alternative $i$ when faced with choice setting $\bm{x}$
+    \end{itemize}
+\end{frame}
+
+\section{Derivation of Conditional Distributions}
+\label{deriv}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Derivation of Conditional Distributions
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Random Utility Model with Random Coefficients}
+    The utility that decision maker $n$ obtains from alternative $j$ in choice situation $t$ is
+    $$U_{njt} = \bm{\beta}_n' \bm{x}_{njt} + \varepsilon_{njt}$$
+    \begin{itemize}
+    	\item $\bm{x}_{njt}$: data about decision maker $n$ and alternative $j$ in situation $t$
+    	\item $\bm{\beta}_n$: individual-specific coefficients with population density $f(\bm{\beta} \mid \bm{\theta})$
+    	\item $\varepsilon_{njt}$: i.i.d.\ extreme value random utility term
+    \end{itemize}
+    \vspace{2ex}
+    To simplify notation
+    \begin{itemize}
+    	\item $\bm{x}_n$: data collectively defined for all alternatives and choice situations
+    	\item $\bm{y}_n$: sequence of alternatives chosen by decision maker $n$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Choice Probabilities with Random Coefficients}
+    If we knew a decision maker's coefficients, $\bm{\beta}_n$, the probability of choosing sequence $\bm{y}_n$ when faced with choice settings $\bm{x}_n$ would be the product of conditional logit choice probabilities
+    \begin{align*}
+    	P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}_n) & = \prod_{t = 1}^T L_{nt}(y_{nt} \mid \bm{\beta}_n) \\
+    	\intertext{where $L_{nt}(y_{nt} \mid \bm{\beta}_n)$ is the conditional logit choice probability}
+    	L_{nt}(y_{nt} \mid \bm{\beta}_n) & = \frac{e^{\bm{\beta}_n' \bm{x}_{ny_{nt}t}}}{\sum_{j = 1}^J e^{\bm{\beta}_n' \bm{x}_{njt}}}
+    	\intertext{But we do not know each individual's coefficients, $\bm{\beta}_n$, so we have to consider the unconditional distribution of coefficients in the population and intergrate over this density}
+    	P(\bm{y}_n \mid \bm{x}_n, \bm{\theta}) & = \int P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Joint Density of Choices and Coefficients}
+    The integrand of this choice probability is the joint density of $\bm{y}_n$ and $\bm{\beta}$
+    $$P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) \times f(\bm{\beta} \mid \bm{\theta})$$ \\
+    \begin{itemize}
+        \item Conditional probability of $\bm{y}_n$ times the unconditional density of $\bm{\beta}$
+    \end{itemize}
+    \vspace{2ex}
+    If we reverse the conditioning, we instead get
+    $$h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) \times P(\bm{y}_n \mid \bm{x}_n, \bm{\theta})$$ \\
+    \begin{itemize}
+        \item Conditional density of $\bm{\beta}$ times the unconditional probability of $\bm{y}_n$
+    \end{itemize}
+    \vspace{2ex}
+    By Bayes' Rule, these two expressions are equal
+    $$h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) \times P(\bm{y}_n \mid \bm{x}_n, \bm{\theta}) = P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) \times f(\bm{\beta} \mid \bm{\theta})$$
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Distribution of Random Coefficients}
+    The joint density of $\bm{y}_n$ and $\bm{\beta}$ is either side of the expression
+    $$h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) \times P(\bm{y}_n \mid \bm{x}_n, \bm{\theta}) = P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) \times f(\bm{\beta} \mid \bm{\theta})$$ \\
+    \vspace{2ex}
+    Rearranging terms gives an expression for the conditional distribution of $\bm{\beta}$
+    $$h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) = \frac{P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) \times f(\bm{\beta} \mid \bm{\theta})}{P(\bm{y}_n \mid \bm{x}_n, \bm{\theta})}$$ \\
+    \begin{itemize}
+        \item The numerator is the integrand of the mixed logit choice probability
+        \item The denominator is the mixed logit choice probability
+    \end{itemize}
+    \vspace{2ex}
+    The conditional distribution, $h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta})$, is proportional to the product of
+    \begin{itemize}
+        \item The probability that an individual with coefficients $\bm{\beta}$ would choose $\bm{y}_n$
+    	\item The likelihood of observing $\bm{\beta}$ in the population
+    \end{itemize}
+\end{frame}
+
+\section{Applications of Conditional Distributions}
+\label{app}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Applications of Conditional Distributions
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Mean Coefficients}
+    It is often easier to calculate a statistic derived from the conditional distribution, rather than the conditional distribution itself
+    \begin{itemize}
+        \item One example is the mean of the conditional distribution, or the conditional mean coefficients
+    \end{itemize}
+    \vspace{2ex}
+    The mean of $h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta})$, or the mean of $\bm{\beta}$ among the group---from a population with an unconditional distribution defined by $\bm{\theta}$---who choose sequence $\bm{y}_n$ when faced with choice setting $\bm{x}_n$, is
+    \begin{align*}
+    	\bar{\bm{\beta}}_n & = \int \bm{\beta} h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) d \bm{\beta} \\
+    	& = \frac{\int \bm{\beta} P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}}{\int P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}) f(\bm{\beta} \mid \bm{\theta}) d \bm{\beta}}
+    \end{align*} \\
+    \vspace{2ex}
+    These integrals do not have closed-form expressions and must be simulated
+\end{frame}
+
+\begin{frame}\frametitle{Simulating Conditional Mean Coefficients}
+    The steps to simulate conditional mean coefficients are similar to the steps we used to simulate mixed logit choice probabilities
+    \begin{enumerate}
+        \item Draw $R$ random vectors from $f(\bm{\beta} \mid \bm{\theta})$, denoted $\{ \bm{\beta}^1, \bm{\beta}^2, \ldots, \bm{\beta}^R \}$
+        \item For each random vector, $\bm{\beta}^r$, calculate the conditional choice probability
+        $$P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r) = \prod_{t = 1}^T \frac{e^{{\bm{\beta}^r}' \bm{x}_{ny_{nt}t}}}{\sum_{j = 1}^J e^{{\bm{\beta}^r}' \bm{x}_{njt}}}$$
+        \item Simulate the conditional mean coefficients as the weighted average of the $R$ random vectors
+        \begin{align*}
+            \check{\bm{\beta}}_n & = \sum_{r = 1}^R w^r \bm{\beta}^r \\
+            \intertext{where the weight of each draw is proportional to $P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)$}
+            w^r & = \frac{P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)}
+        \end{align*}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Individual-Specific Coefficients}
+    As the number of observed choices ($T$) increases, the conditional mean coefficients for an individual, $\bar{\bm{\beta}}_n$, converges to the individual-specific coefficients, $\bm{\beta}_n$
+    \begin{itemize}
+        \item $\bar{\bm{\beta}}_n$ is a consistent estimate of $\bm{\beta}_n$
+        $$\bar{\bm{\beta}}_n \overset{p}{\rightarrow} \bm{\beta}_n$$
+    \end{itemize}
+    \vspace{3ex}
+    You must observe (and model) many choices for this convergence to become close
+    \begin{itemize}
+        \item Train conducts a Monte Carlo simulation exercise to find that even $T = 50$ yields a substantial difference between $\bar{\bm{\beta}}_n$ and $\bm{\beta}_n$
+        \item See the Train textbook for more details on this point and the Monte Carlo simulation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Future Choice Probabilities}
+    If we observe a decision maker's past choices, we can refine future choice probabilities by conditioning on those past choices
+    \begin{itemize}
+        \item We use the past choices to define a conditional distribution of coefficients for the decision maker
+        \item We use this conditional distribution, instead of the unconditional distribution, to calculate mixed logit choice probabilities
+    \end{itemize}
+    \vspace{2ex}
+    The probability that decision maker $n$ chooses alternative $i$ in choice situation $T + 1$ is
+    \begin{align*}
+    	P(i \mid \bm{x}_{nT+1}, \bm{y}_n, \bm{x}_n, \bm{\theta}) & = \int L_{nT+1} (i \mid \bm{\beta}) h(\bm{\beta} \mid \bm{y}_n, \bm{x}_n, \bm{\theta}) d \bm{\beta}
+    	\intertext{where $L_{nT+1} (i \mid \bm{\beta})$ is the conditional logit choice probability}
+    	L_{nT+1} (i \mid \bm{\beta}) & = \frac{e^{\bm{\beta}' \bm{x}_{niT+1}}}{\sum_{j = 1}^J e^{\bm{\beta}' \bm{x}_{njT+1}}}
+    \end{align*} \\
+    \vspace{2ex}
+    This is a mixed logit choice probability and must be simulated
+\end{frame}
+
+\begin{frame}\frametitle{Simulating Future Choice Probabilities}
+    The steps to simulate future choice probabilities are similar to the steps we used to simulate mixed logit choice probabilities
+    \begin{enumerate}
+        \item Draw $R$ random vectors from $f(\bm{\beta} \mid \bm{\theta})$, denoted $\{ \bm{\beta}^1, \bm{\beta}^2, \ldots, \bm{\beta}^R \}$
+        \item For each random vector, $\bm{\beta}^r$, calculate the conditional choice probability for the first $T$ situations, $P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)$, and the conditional logit choice probabilities for situation $T + 1$, $L_{nT+1} (i \mid \bm{\beta}^r)$
+        \item Simulate the future mixed logit choice probabilities as the weighted average of $L_{nT+1} (i \mid \bm{\beta}^r)$
+        \begin{align*}
+            & \check{P}_{niT+1}(\bm{y}_n, \bm{x}_n, \bm{\theta}) = \sum_{r = 1}^R w^r L_{nT+1}(i \mid \bm{\beta}^r)\\
+            \intertext{where the weight of each draw is proportional to $P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)$}
+            & w^r = \frac{P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(\bm{y}_n \mid \bm{x}_n, \bm{\beta}^r)}
+        \end{align*}
+    \end{enumerate}
+\end{frame}
+
+\section{Individual-Level Coefficients R Example}
+\label{example}
+\begin{frame}\frametitle{}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[center]{title}
+        \Large Individual-Level Coefficients R Example
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}\frametitle{Maximum Simulated Likelihood Estimation Example}
+    We are again studying how consumers make choices about expensive and highly energy-consuming systems in their homes
+    \begin{itemize}
+        \item We have (real) data on 250 households in California and the type of HVAC (heating, ventilation, and air conditioning) system in their home. Each household has the following choice set, and we observe the following data
+    \end{itemize}
+    \vspace{2ex}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            Choice set
+            \begin{itemize}
+                \item \texttt{ec}: electric central
+                \item \texttt{ecc}: electric central with AC
+                \item \texttt{er}: electric room
+                \item \texttt{erc}: electric room with AC
+                \item \texttt{gc}: gas central
+                \item \texttt{gcc}: gas central with AC
+                \item \texttt{hpc}: heat pump with AC
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            Alternative-specific data
+            \begin{itemize}
+                \item \texttt{ich}: installation cost for heat
+                \item \texttt{icca}: installation cost for AC
+                \item \texttt{och}: operating cost for heat
+                \item \texttt{occa}: operating cost for AC
+            \end{itemize}
+            \vspace{2ex}
+            Household demographic data
+            \begin{itemize}
+                \item \texttt{income}: annual income
+            \end{itemize}
+            \vspace{1ex}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Load Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Format Dataset in a Long Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in a Long Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Clean Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Cleaned Dataset}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Convert Dataset to \texttt{dfidx} Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Dataset in \texttt{dfidx} Format}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Mixed Logit Model of HVAC System Choice}
+    We previously estimated a mixed logit model with representative utility
+    $$V_{nj} = \beta_{1n} AC_j + \beta_{2n} IC_{nj} + \beta_{3n} OC_{nj}$$
+    where the random coefficients are normally distributed
+    \begin{align*}
+        \beta_{1n} & \sim \mathcal{N}(\mu_1, \sigma_1^2) \\
+        \beta_{2n} & \sim \mathcal{N}(\mu_2, \sigma_2^2) \\
+        \beta_{3n} & \sim \mathcal{N}(\mu_3, \sigma_3^2)
+    \end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Conditional Mean Coefficients for HVAC System Choice}
+    The public utility commission is considering a subsidy on the installation cost of heat pump systems to incentivize households to switch to this most efficient HVAC system
+    \begin{itemize}
+        \item The PUC would like to target this subsidy and its marketing to households with certain HVAC system preferences
+        \item We can use information about the HVAC system that a household currently has to generate a conditional distribution of coefficients that better describes that household's preferences
+    \end{itemize}
+    \vspace{2ex}
+    For each alternative, what are the mean $\bm{\beta}_n$ coefficients for the households with that HVAC system?
+    \begin{enumerate}
+        \item Estimate the mixed logit model
+        \item Simulate $\check{\bm{\beta}}_n$ for each household
+        \item Average $\check{\bm{\beta}}_n$ for the households with each HVAC system
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Simulating Conditional Mean Coefficients}
+    Two ways to simulate conditional mean coefficients for each household
+    \begin{itemize}
+        \item \texttt{mlogit} package
+        \item Code the simulation by hand
+    \end{itemize}
+    \vspace{3ex}
+    The \texttt{fitted()} function with \texttt{type = `parameters'} simulates the conditional mean coefficients for every individual
+    \begin{itemize}
+        \item This function returns the $N \times K$ matrix of conditional mean coefficients
+    \end{itemize}
+    \vspace{3ex}
+    We can instead code the simulation by hand
+    \begin{itemize}
+        \item We may want to simulate additional objects that are not part of the \texttt{mlogit} functionality
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Using \texttt{mlogit}}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Mixed Logit Model Results Using \texttt{mlogit}}
+    \vspace{1ex}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients Using \texttt{mlogit}}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Average Conditional Mean Coefficients Using \texttt{mlogit}}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}\frametitle{Steps for Simulating Conditional Mean Coefficients}
+    $$\check{\bm{\beta}}_n = \frac{\sum_{r = 1}^R \bm{\beta}^r P(y_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(y_n \mid \bm{x}_n, \bm{\beta}^r)}$$
+    \begin{enumerate}
+        \item Draw $K \times N \times R$ standard normal random variables
+        \begin{itemize}
+            \item $K$ random coefficients for each of
+            \item $N$ different decision makers for each of
+            \item $R$ different simulation draws
+        \end{itemize}
+        \item Find the MSL estimator, $\widehat{\bm{\theta}}$
+        \begin{itemize}
+            \item See slides from last week on MSL estimation
+        \end{itemize}
+        \item Simulate conditional mean coefficients using the MSL estimator, $\widehat{\bm{\theta}}$
+        \begin{enumerate}
+            \item Transform each set of $K$ standard normals using $\widehat{\bm{\theta}}$ to get $\bm{\beta}^r$
+            \item Calculate the conditional logit choice probability of the chosen alternative, $P(y_n \mid \bm{x}_n, \bm{\beta}^r)$, for each household and random draw
+            \item For each household, take a weighted average of $\bm{\beta}^r$, with weights proportional to $P(y_n \mid \bm{x}_n, \bm{\beta}^r)$, to get $\check{\bm{\beta}}_n$
+        \end{enumerate}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 1: Draw Random Variables and Organize Data}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2a: Simulate Choice Probabilities for One Household}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2b: Calculate Simulated Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2c: Maximize Simulated Log-Likelihood}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 2d: Report MSLE Results}
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\bm{\beta}}_n = \frac{\sum_{r = 1}^R \bm{\beta}^r P(y_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(y_n \mid \bm{x}_n, \bm{\beta}^r)}$$
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3a: Simulate Coefficients for One Household}
+    $$\check{\bm{\beta}}_n = \frac{\sum_{r = 1}^R \bm{\beta}^r P(y_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(y_n \mid \bm{x}_n, \bm{\beta}^r)}$$
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Step 3b: Simulate Coefficients for All Households}
+    $$\check{\bm{\beta}}_n = \frac{\sum_{r = 1}^R \bm{\beta}^r P(y_n \mid \bm{x}_n, \bm{\beta}^r)}{\sum_{r = 1}^R P(y_n \mid \bm{x}_n, \bm{\beta}^r)}$$
+    <<R CODE HERE>>
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Conditional Mean Coefficients for Each HVAC System}
+    <<R CODE HERE>>
+\end{frame}
+
+\end{document}
