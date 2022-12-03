@@ -78,9 +78,9 @@ Week 13: **Dynamics and Endogeneity**
 
 **Problem Set 5**
 * [Problem set](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/problem_set_5.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/camping_dataset.zip) 
-<!-- | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/problem_set_5_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/problem_set_5_solutions.R)
+<!-- | [Solutions](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/problem_set_5_solutions.pdf) | [R code](https://raw.githack.com/woerman/ResEcon703/master/problem_sets/problem_set_5/problem_set_5_solutions.R) -->
 
 ## Final Project
 
 **Final Project**
-* [Final project](https://raw.githack.com/woerman/ResEcon703/master/project/project.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/project/project_dataset.zip) | [Paper](https://doi.org/10.1257/aer.100.3.837) -->
+* [Final project](https://raw.githack.com/woerman/ResEcon703/master/project/project.pdf) | [Data](https://raw.githack.com/woerman/ResEcon703/master/project/project_dataset.zip) | [Paper](https://doi.org/10.1257/aer.100.3.837)
